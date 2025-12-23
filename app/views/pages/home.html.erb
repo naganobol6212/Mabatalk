@@ -1,0 +1,156 @@
+<main class="relative flex min-h-screen w-full flex-col bg-stone-200 overflow-x-hidden pb-24">
+
+  <!-- Header -->
+  <header class="flex items-center justify-between px-6 py-4 sticky top-0 z-20 bg-stone-200/90 backdrop-blur border-b border-white/40">
+    <h1 class="text-xl font-bold tracking-tight text-stone-800">
+      <%= link_to "Mabatalk", root_path %>
+    </h1>
+
+    <%= link_to "ログイン",
+                "#",
+                class: "text-amber-700 font-bold text-sm px-4 py-2 rounded-full border border-amber-300 bg-white hover:bg-amber-50 transition-colors" %>
+  </header>
+
+  <!-- Main -->
+  <div class="flex flex-col items-center px-4 pt-6 w-full max-w-md mx-auto">
+
+    <!-- Hero -->
+    <section class="w-full mb-8 text-center">
+      <h2 class="text-[22px] font-bold leading-9 tracking-tight text-stone-800">
+        声が出せない、身体が動かせない<br>
+        <span class="text-amber-700">まばたき</span>で意思表示する方のための<br>
+        コミュニケーション支援アプリ
+      </h2>
+    </section>
+
+    <!-- CTA -->
+    <section class="w-full flex flex-col gap-4 mb-10">
+        <!-- 主CTA -->
+      <%= link_to "ログインせずに使用する",
+          "#",
+          class: "
+            w-full h-14
+            flex items-center justify-center
+            rounded-full
+            bg-amber-600
+            text-white
+            text-lg font-bold
+            shadow
+            hover:bg-amber-700
+            active:scale-[0.98]
+            transition
+          "
+      %>
+
+      <!-- ログイン -->
+      <%= link_to "ログイン",
+          "#",
+          class: "
+            w-full h-12
+            flex items-center justify-center
+            rounded-full
+            bg-white
+            text-stone-900
+            text-base font-bold
+            hover:bg-stone-200
+            active:scale-[0.98]
+            transition
+          "
+      %>
+
+      <!-- 新規登録 -->
+      <%= link_to "新規登録",
+          "#",
+          class: "
+            w-full h-12
+            flex items-center justify-center
+            rounded-full
+            bg-white
+            border border-stone-300
+            text-stone-600
+            text-base font-bold
+            hover:bg-stone-100
+            active:scale-[0.98]
+            transition
+          "
+      %>
+    </section>
+
+    <!-- How it works -->
+    <section class="w-full mb-10">
+      <div class="flex items-center gap-2 mb-4 px-2">
+        <span class="material-symbols-outlined text-amber-700">touch_app</span>
+        <h3 class="text-lg font-bold text-stone-800">ご利用イメージ</h3>
+      </div>
+
+      <div class="flex flex-col gap-4 relative">
+        <div class="absolute left-[19px] top-6 bottom-6 w-0.5 bg-stone-300 -z-0"></div>
+
+        <% steps = [
+          ["質問カテゴリを見せる", "家族や介護スタッフが質問カテゴリ画面を要介護者に見せます"],
+          ["まばたきで選択する", "要介護者がまばたきで希望するカテゴリを伝え、家族や介護スタッフが選択します"],
+          ["質問に順番に答える", "質問に答えていくことで、困りごとや希望を伝えられます"]
+        ] %>
+
+        <% steps.each_with_index do |(title, text), i| %>
+          <div class="relative flex items-start gap-4 z-10">
+            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-white border-2 border-amber-600 text-amber-700 font-bold text-lg shadow-sm shrink-0">
+              <%= i + 1 %>
+            </div>
+            <div class="flex-1 bg-white/80 p-4 rounded-2xl border border-white shadow-sm">
+              <h4 class="font-bold text-stone-800 mb-1"><%= title %></h4>
+              <p class="text-sm text-stone-600 leading-relaxed"><%= text %></p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- Benefits -->
+    <section class="w-full mb-6">
+      <div class="flex items-center gap-2 mb-4 px-2">
+        <span class="material-symbols-outlined text-sky-500">verified_user</span>
+        <h3 class="text-lg font-bold text-stone-800">ログインするとできること</h3>
+      </div>
+
+      <div class="bg-white rounded-2xl p-6 shadow border border-stone-100">
+        <ul class="space-y-4">
+          <% [
+            "回答内容が自動的に記録されます",
+            "要介護者がどんな困りごとを伝えているかを、あとから見返せます",
+            "複数の介護者で回答内容を共有できます"
+          ].each do |text| %>
+            <li class="flex items-start gap-3">
+              <div class="w-6 h-6 rounded-full bg-sky-100 flex items-center justify-center shrink-0 mt-0.5">
+                <span class="material-symbols-outlined text-sky-500 text-[16px]">check</span>
+              </div>
+              <span class="text-stone-800 font-medium leading-relaxed"><%= text %></span>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Footer -->
+  <nav class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur border-t border-stone-200 pb-safe pt-2 px-6 shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.05)] z-50">
+    <div class="flex justify-around items-end pb-2 max-w-md mx-auto">
+      <%= link_to "#", class: "flex flex-col items-center gap-1 min-w-[64px]" do %>
+        <span class="material-symbols-outlined text-amber-700">chat_bubble</span>
+        <span class="text-[11px] font-bold text-amber-700">質問</span>
+      <% end %>
+
+      <%= link_to "#", class: "flex flex-col items-center gap-1 min-w-[64px]" do %>
+        <span class="material-symbols-outlined text-stone-400">history</span>
+        <span class="text-[11px] text-stone-400">ログ</span>
+      <% end %>
+
+      <%= link_to "#", class: "flex flex-col items-center gap-1 min-w-[64px]" do %>
+        <span class="material-symbols-outlined text-stone-400">settings</span>
+        <span class="text-[11px] text-stone-400">設定</span>
+      <% end %>
+    </div>
+  </nav>
+
+</main>
