@@ -57,3 +57,7 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+gem "devise", "~> 4.9"
+gem "omniauth-google-oauth2"
+gem "omniauth-rails_csrf_protection"

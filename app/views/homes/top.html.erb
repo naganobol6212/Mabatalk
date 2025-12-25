@@ -1,0 +1,13 @@
+<h1>TOPページ</h1>
+
+<p>
+  ログイン中のメールアドレス：
+  <%= current_user.email %>
+</p>
+
+<%= button_to "ログアウト", destroy_user_session_path, method: :delete %>
+
+<%= button_to "Googleでログイン",
+              user_google_oauth2_omniauth_authorize_path,
+              method: :post,
+              data: { turbo: false } %>
