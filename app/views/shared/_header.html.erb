@@ -1,9 +1,22 @@
-  <header class="flex items-center justify-between px-6 py-4 sticky top-0 z-20 bg-stone-200/90 backdrop-blur border-b border-white/40">
+<header class="relative flex items-center justify-between px-6 py-4 sticky top-0 z-20 bg-stone-200/90 backdrop-blur border-b border-white/40">
+  <!-- 左：ロゴ -->
+  <div class="z-10">
     <h1 class="text-xl font-bold tracking-tight text-stone-800">
       <%= link_to "Mabatalk", root_path %>
     </h1>
+  </div>
 
+  <!-- 中央：ページタイトル -->
+  <div class="absolute left-0 right-0 flex justify-center pointer-events-none">
+    <h2 class="text-sm font-bold text-stone-700 pointer-events-auto">
+      <%= content_for?(:page_title) ? yield(:page_title) : "" %>
+    </h2>
+  </div>
+
+  <!-- 右：ログイン -->
+  <div class="z-10">
     <%= link_to "ログイン",
                 "#",
                 class: "text-amber-700 font-bold text-sm px-4 py-2 rounded-full border border-amber-300 bg-white hover:bg-amber-50 transition-colors" %>
-  </header>
+  </div>
+</header>
