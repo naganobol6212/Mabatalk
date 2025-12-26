@@ -1,6 +1,5 @@
 class HomesController < ApplicationController
-  before_action :authenticate_user!
-
   def top
+    redirect_to categories_path if current_user
   end
 end

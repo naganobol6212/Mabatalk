@@ -1,9 +1,12 @@
 <h1>TOPページ</h1>
 
-<p>
-  ログイン中のメールアドレス：
-  <%= current_user.email %>
-</p>
+<% if current_user %>
+  <p>
+    ログイン中のメールアドレス：
+    <%= current_user.email %>
+  </p>
+<% end %>
+
 
 <%= button_to "ログアウト", destroy_user_session_path, method: :delete %>
 
