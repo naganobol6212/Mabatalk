@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   # 未ログイン時の入り口・振り分けページ
   root to: "homes#top"
   # ログイン後のメイン機能(質問カテゴリ一覧)
-  resources :categories, only: %i(index)
+  resources :categories, only: %i[index]
 
   # --- 以下はRails標準の補助機能 ---
   get "up" => "rails/health#show", as: :rails_health_check
