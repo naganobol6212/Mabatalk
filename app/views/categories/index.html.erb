@@ -1,2 +1,128 @@
-<h1>Categories#index</h1>
-<p>Find me in app/views/categories/index.html.erb</p>
+<% content_for :page_title do %>
+  質問カテゴリ
+<% end %>
+
+<main
+  class="
+    relative
+    min-h-screen
+    w-full
+    bg-stone-200
+    overflow-x-hidden
+    pb-24
+  "
+>
+  <!-- コンテンツ全体の中央寄せラッパー -->
+  <div
+    class="
+      flex
+      flex-col
+      items-center
+      px-4
+      pt-6
+      w-full
+      max-w-md
+      mx-auto
+    "
+  >
+    <!-- 表示用カテゴリ定義（仮データ）# 後でDB or 定数に置き換え想定 -->
+    <% categories = [
+      { icon: "local_cafe", title: "飲みもの", ruby: "のみもの", color: "text-amber-700" },
+      { icon: "accessibility_new", title: "体調", ruby: "からだのちょうし", color: "text-sky-600" },
+      { icon: "sentiment_satisfied_alt", title: "気持ち", ruby: "いまのきもち", color: "text-rose-500" },
+      { icon: "volunteer_activism", title: "お願い", ruby: "やってほしいこと", color: "text-emerald-600" }
+    ] %>
+
+    <!-- カテゴリ一覧（2カラムグリッド）-->
+    <div class="grid grid-cols-2 gap-4 w-full">
+      <% categories.each do |category| %>
+        <button
+          class="
+            bg-white/90
+            backdrop-blur
+            rounded-2xl
+            p-6
+            aspect-square
+            flex
+            flex-col
+            items-center
+            justify-center
+            text-center
+
+            shadow-[0_6px_14px_rgba(0,0,0,0.08)]
+            hover:shadow-[0_10px_22px_rgba(0,0,0,0.12)]
+            transition-shadow
+            duration-200
+
+            active:scale-[0.98]
+            focus:outline-none
+            focus:ring-4
+            focus:ring-stone-300
+            group
+          "
+        >
+          <!-- アイコン（カテゴリ識別用 -->
+          <span
+            class="
+              material-symbols-outlined
+              text-[42px]
+              mb-3
+              <%= category[:color] %>
+              group-hover:scale-110
+              transition-transform
+            "
+          >
+            <%= category[:icon] %>
+          </span>
+
+          <!-- カテゴリ名（主テキスト） -->
+          <span
+            class="
+              text-[17px]
+              font-bold
+              text-stone-800
+              mb-1
+              leading-snug
+            "
+          >
+            <%= category[:title] %>
+          </span>
+
+          <!-- ルビ（補助テキスト） -->
+          <span class="text-sm text-stone-600">
+            <%= category[:ruby] %>
+          </span>
+        </button>
+      <% end %>
+    </div>
+
+    <!-- カテゴリ追加ボタン -->
+    <% add_category_path =
+        current_user ? new_category_path : new_user_session_path %>
+
+    <div class="w-full mt-6">
+      <%= link_to add_category_path,
+          class: "
+            w-full h-14
+            flex items-center justify-center
+            rounded-2xl
+
+            border-2 border-dashed border-stone-400
+            bg-transparent
+
+            text-stone-600
+            text-base font-bold
+
+            hover:bg-white/60
+            active:scale-[0.98]
+            transition
+          " do %>
+
+        <span class="material-symbols-outlined mr-2 text-stone-500">
+          add_circle_outline
+        </span>
+        カテゴリを追加
+      <% end %>
+    </div>
+  </div>
+</main>

@@ -1,0 +1,18 @@
+  <nav class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur border-t border-stone-200 pb-safe pt-2 px-6 shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.05)] z-50">
+    <div class="flex justify-around items-end pb-2 max-w-md mx-auto">
+      <%= link_to "#", class: "flex flex-col items-center gap-1 min-w-[64px]" do %>
+        <span class="material-symbols-outlined text-amber-700">chat_bubble</span>
+        <span class="text-[11px] font-bold text-amber-700">質問</span>
+      <% end %>
+
+      <%= link_to "#", class: "flex flex-col items-center gap-1 min-w-[64px]" do %>
+        <span class="material-symbols-outlined text-stone-400">history</span>
+        <span class="text-[11px] text-stone-400">ログ</span>
+      <% end %>
+
+      <%= link_to "#", class: "flex flex-col items-center gap-1 min-w-[64px]" do %>
+        <span class="material-symbols-outlined text-stone-400">settings</span>
+        <span class="text-[11px] text-stone-400">設定</span>
+      <% end %>
+    </div>
+  </nav>
