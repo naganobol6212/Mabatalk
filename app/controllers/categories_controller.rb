@@ -1,7 +1,7 @@
 class CategoriesController < ApplicationController
   def index
     if current_user
-      @categories = current_user.categories
+      @categories = default_categories # 将来DB化後にcurrent_user.categoriesに
     else
       @categories = default_categories
     end
