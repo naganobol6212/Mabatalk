@@ -1,7 +1,4 @@
-<h2 class="text-lg font-bold text-text-main-light dark:text-white pointer-events-auto">
-  <%= @category[:title] %>
-</h2>
-
+<% content_for :page_title, @category[:title] %>
 <div class="grid grid-cols-2 gap-4">
   <% @items.each do |item| %>
     <button class="bg-card-light dark:bg-card-dark rounded-xl p-6 flex flex-col items-center justify-center text-center shadow-soft hover:shadow-md transition-shadow active:scale-95 duration-200 aspect-square group">
