@@ -13,10 +13,43 @@
     </h2>
   </div>
 
-  <!-- 右：ログイン -->
+  <!-- 右：ログイン / ログアウト -->
   <div class="z-10">
-    <%= link_to "ログイン",
-                "#",
-                class: "text-amber-700 font-bold text-sm px-4 py-2 rounded-full border border-amber-300 bg-white hover:bg-amber-50 transition-colors" %>
+    <% unless user_signed_in? %>
+      <!-- 未ログイン：ログイン -->
+      <%= link_to "ログイン",
+                  new_user_session_path,
+                  class: "
+                    text-amber-700
+                    font-bold
+                    text-sm
+                    px-4
+                    py-2
+                    rounded-full
+                    border
+                    border-amber-300
+                    bg-white
+                    hover:bg-amber-50
+                    transition-colors
+                  " %>
+    <% else %>
+      <!-- ログイン中：ログアウト -->
+      <%= link_to "ログアウト",
+                  destroy_user_session_path,
+                  data: { turbo_method: :delete },
+                  class: "
+                    text-stone-600
+                    font-bold
+                    text-sm
+                    px-4
+                    py-2
+                    rounded-full
+                    border
+                    border-stone-300
+                    bg-white
+                    hover:bg-stone-100
+                    transition-colors
+                  " %>
+    <% end %>
   </div>
 </header>
