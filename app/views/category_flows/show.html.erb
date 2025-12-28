@@ -1,34 +1,85 @@
-<%# ヘッダー中央タイトルは content_for を使っている前提 %>
 <% content_for :page_title do %>
   <%= @category[:title] %>
 <% end %>
 
-<%# デバッグ表示：params で何が選ばれたか一目で分かるようにする %>
-<% if @selected_item.present? %>
-  <div class="mb-4 rounded-xl border border-amber-300 bg-white px-4 py-3 text-sm text-stone-700">
-    選択された項目：<%= @selected_item[:name] %>（key=<%= @selected_item[:key] %>）
+<main class="relative min-h-screen w-full bg-stone-200 overflow-x-hidden pb-24">
+  <div class="flex flex-col items-center px-4 pt-6 w-full max-w-md mx-auto">
+
+    <!-- フロー項目一覧 -->
+    <div class="grid grid-cols-2 gap-4 w-full">
+      <% @items.each do |item| %>
+        <%= link_to category_flow_path(
+              category_id: params[:category_id],
+              item: item[:key]
+            ),
+            class: "
+              bg-white/90 backdrop-blur rounded-2xl p-6 aspect-square
+              flex flex-col items-center justify-center text-center
+              shadow-[0_6px_14px_rgba(0,0,0,0.08)]
+              hover:shadow-[0_10px_22px_rgba(0,0,0,0.12)]
+              transition-shadow duration-200
+              active:scale-[0.98]
+              focus:outline-none focus:ring-4 focus:ring-stone-300
+              group
+            " do %>
+
+          <!-- アイコン -->
+          <span class="
+            material-symbols-outlined
+            text-[48px] mb-3
+            <%= item[:color] %>
+            group-hover:scale-110
+            transition-transform
+          ">
+            <%= item[:icon] %>
+          </span>
+
+          <!-- メインテキスト（大きめ） -->
+          <span class="text-[22px] font-bold text-stone-800 mb-1 leading-snug">
+            <%= item[:name] %>
+          </span>
+
+          <!-- ふりがな -->
+          <span class="text-base text-stone-600">
+            <%= item[:kana] %>
+          </span>
+
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- 追加ボタン -->
+    <div class="w-full mt-6">
+      <% if current_user %>
+        <button
+          class="
+            w-full h-16 flex items-center justify-center rounded-2xl
+            border-2 border-dashed border-stone-400 bg-transparent
+            text-stone-600 text-lg font-bold
+            hover:bg-white/60 active:scale-[0.98] transition
+          "
+        >
+          <span class="material-symbols-outlined mr-2 text-stone-500 text-2xl">
+            add_circle_outline
+          </span>
+          項目を追加
+        </button>
+      <% else %>
+        <%= link_to new_user_session_path,
+          class: "
+            w-full h-16 flex items-center justify-center rounded-2xl
+            border-2 border-dashed border-stone-400 bg-transparent
+            text-stone-600 text-lg font-bold
+            hover:bg-white/60 active:scale-[0.98] transition
+          " do %>
+
+          <span class="material-symbols-outlined mr-2 text-stone-500 text-2xl">
+            add_circle_outline
+          </span>
+          項目を追加
+        <% end %>
+      <% end %>
+    </div>
+
   </div>
-<% end %>
-
-<div class="grid grid-cols-2 gap-4">
-  <% @items.each do |item| %>
-    <% selected = (@selected_item.present? && @selected_item[:key] == item[:key]) %>
-
-    <%= link_to category_flow_path(category_id: params[:category_id], item: item[:key]),
-                class: "block" do %>
-      <div class="bg-card-light dark:bg-card-dark rounded-xl p-6 flex flex-col items-center justify-center text-center shadow-soft hover:shadow-md transition-shadow active:scale-95 duration-200 aspect-square group #{selected ? 'ring-2 ring-amber-400' : ''}">
-        <span class="material-icons-round text-5xl mb-3 text-orange-500 group-hover:scale-110 transition-transform">
-          <%= item[:icon] %>
-        </span>
-
-        <span class="text-2xl font-bold text-text-main-light dark:text-text-main-dark mb-1">
-          <%= item[:name] %>
-        </span>
-
-        <span class="text-sm text-text-sub-light dark:text-text-sub-dark">
-          <%= item[:kana] %>
-        </span>
-      </div>
-    <% end %>
-  <% end %>
-</div>
+</main>
