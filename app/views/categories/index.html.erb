@@ -4,18 +4,10 @@
 
 <main class="relative min-h-screen w-full bg-stone-200 overflow-x-hidden pb-24">
   <div class="flex flex-col items-center px-4 pt-6 w-full max-w-md mx-auto">
-
-    <% categories = [
-      { icon: "local_cafe", title: "飲みもの", ruby: "のみもの", color: "text-amber-700" },
-      { icon: "accessibility_new", title: "体調", ruby: "からだのちょうし", color: "text-sky-600" },
-      { icon: "sentiment_satisfied_alt", title: "気持ち", ruby: "いまのきもち", color: "text-rose-500" },
-      { icon: "volunteer_activism", title: "お願い", ruby: "やってほしいこと", color: "text-emerald-600" }
-    ] %>
-
     <!-- カテゴリ一覧 -->
     <div class="grid grid-cols-2 gap-4 w-full">
-      <% categories.each_with_index do |category, index| %>
-        <%= link_to category_flow_path(category_id: index + 1),
+      <% @categories.each do |category| %>
+        <%= link_to category_flow_path(category),
           class: "
             bg-white/90 backdrop-blur rounded-2xl p-6 aspect-square
             flex flex-col items-center justify-center text-center
@@ -30,20 +22,20 @@
           <!-- アイコン -->
           <span class="
             material-symbols-outlined text-[42px] mb-3
-            <%= category[:color] %>
+            <%= category.color %>
             group-hover:scale-110 transition-transform
           ">
-            <%= category[:icon] %>
+            <%= category.icon %>
           </span>
 
           <!-- タイトル -->
           <span class="text-[17px] font-bold text-stone-800 mb-1 leading-snug">
-            <%= category[:title] %>
+            <%= category.title %>
           </span>
 
           <!-- ルビ -->
           <span class="text-sm text-stone-600">
-            <%= category[:ruby] %>
+            <%= category.ruby %>
           </span>
 
         <% end %>
