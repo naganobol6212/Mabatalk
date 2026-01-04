@@ -15,6 +15,6 @@ class CreateFlowItems < ActiveRecord::Migration[7.2]
       t.timestamps
     end
 
-    add_index :flow_items, [:category_id, :user_id, :key], unique: true
+    add_index :flow_items, [ :category_id, :user_id, :key ], unique: true
   end
 end
