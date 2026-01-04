@@ -2,10 +2,11 @@ class FlowItem < ApplicationRecord
   belongs_to :category
   belongs_to :user, optional: true
 
-  validates :key,  presence: true
-  validates :name, presence: true
-  validates :kana, presence: true
-  validates :icon, presence: true
-
-  validates :key, uniqueness: { scope: [:category_id, :user_id] }
+  scope :for_user, ->(user) {
+    if user
+      where(user_id: [nil, user.id])
+    else
+      where(user_id: nil)
+    end
+  }
 end
