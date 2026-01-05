@@ -1,20 +1,74 @@
-<div class="w-full max-w-md space-y-4 text-center">
+<main class="flex-grow px-6 pb-24 pt-6 flex flex-col items-center">
 
-  <p class="text-sm text-text-sub-light">
-    選択した項目
-  </p>
+  <div class="w-full max-w-md space-y-2 mb-10 text-center">
 
-  <p class="text-3xl font-bold">
-    <%= @flow_item.name %>
-  </p>
+    <!-- 選択したカテゴリ -->
+    <div class="bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm">
+      <p class="text-sm text-text-sub-light dark:text-text-sub-dark mb-1">
+        選択したカテゴリ
+      </p>
+      <p class="text-xl font-bold text-text-main-light dark:text-text-main-dark">
+        <%= @flow_item.category.title %>
+      </p>
+    </div>
 
-  <h3 class="text-2xl font-bold mt-8">
-    あっていますか？
-  </h3>
+    <div class="flex flex-col items-center py-2 text-text-sub-light dark:text-text-sub-dark">
+      <span class="material-symbols-outlined text-2xl">arrow_downward</span>
+    </div>
 
-  <div class="grid grid-cols-2 gap-6 mt-8">
-    <button>はい</button>
-    <button>いいえ</button>
+    <!-- 選択した項目 -->
+    <div class="bg-card-light dark:bg-card-dark rounded-xl p-6 shadow-soft border-2 border-primary/20">
+      <p class="text-sm text-text-sub-light dark:text-text-sub-dark mb-2">
+        選択した項目
+      </p>
+
+      <div class="flex flex-col items-center">
+        <span class="material-symbols-outlined text-5xl mb-2 <%= @flow_item.color %>">
+          <%= @flow_item.icon %>
+        </span>
+
+        <p class="text-3xl font-bold text-text-main-light dark:text-text-main-dark">
+          <%= @flow_item.name %>
+        </p>
+
+        <p class="text-sm text-text-sub-light dark:text-text-sub-dark mt-1">
+          <%= @flow_item.kana %>
+        </p>
+      </div>
+    </div>
   </div>
 
-</div>
+  <!-- 確認文言 -->
+  <div class="w-full max-w-md text-center mb-8">
+    <h3 class="text-2xl font-bold text-text-main-light dark:text-white">
+      あっていますか？
+    </h3>
+  </div>
+
+  <!-- はい / いいえ -->
+  <div class="w-full max-w-md grid grid-cols-2 gap-6 mt-auto mb-8">
+
+    <!-- はい（まだリンクしない） -->
+    <button
+      type="button"
+      class="bg-card-light dark:bg-card-dark border-2 border-green-500 rounded-2xl p-6 flex flex-col items-center justify-center shadow-soft"
+    >
+      <span class="material-symbols-outlined text-5xl text-green-600 mb-2">
+        check_circle
+      </span>
+      <span class="text-3xl font-bold">はい</span>
+    </button>
+
+    <!-- いいえ（戻る） -->
+    <%= link_to category_flow_path(@flow_item.category),
+        class: "bg-card-light dark:bg-card-dark border-2 border-red-500 rounded-2xl p-6 flex flex-col items-center justify-center shadow-soft text-center" do %>
+
+      <span class="material-symbols-outlined text-5xl text-red-600 mb-2">
+        cancel
+      </span>
+      <span class="text-3xl font-bold">いいえ</span>
+
+    <% end %>
+  </div>
+
+</main>

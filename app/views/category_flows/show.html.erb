@@ -8,10 +8,7 @@
     <!-- フロー項目一覧 -->
     <div class="grid grid-cols-2 gap-4 w-full">
       <% @items.each do |item| %>
-        <%= link_to category_flow_path(
-              category_id: params[:category_id],
-              item: item[:key]
-            ),
+        <%= link_to confirm_flow_item_path(item),
             class: "
               bg-white/90 backdrop-blur rounded-2xl p-6 aspect-square
               flex flex-col items-center justify-center text-center
