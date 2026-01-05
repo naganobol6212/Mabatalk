@@ -7,6 +7,10 @@ Rails.application.routes.draw do
   resources :categories, only: %i[index new] do
     resource :flow, only: :show, controller: "category_flows"
   end
+  # メッセージ確認画面(FlowItem確認)
+  resources :flow_items, only: [] do
+    get :confirm, on: :member
+  end
   # --- 以下はRails標準の補助機能 ---
   get "up" => "rails/health#show", as: :rails_health_check
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
