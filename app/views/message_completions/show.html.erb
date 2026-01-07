@@ -1,0 +1,36 @@
+<main class="flex-grow px-6 pb-24 pt-6 flex flex-col items-center gap-y-6">
+
+  <div class="w-full max-w-md flex flex-col items-center space-y-8">
+
+    <%# カテゴリ表示 %>
+    <div class="w-full bg-card-light dark:bg-card-dark rounded-2xl p-8 shadow-soft border-2 border-primary/20 flex flex-col items-center text-center">
+      <span class="text-base text-text-sub-light dark:text-text-sub-dark mb-1">
+        カテゴリ
+      </span>
+      <span class="text-5xl font-bold text-text-main-light dark:text-text-main-dark">
+        <%= @flow_item.category.title %>
+      </span>
+    </div>
+
+    <%# 伝えた内容 %>
+    <div class="w-full bg-card-light dark:bg-card-dark rounded-2xl p-8 shadow-soft border-2 border-primary/20 flex flex-col items-center text-center">
+      <span class="material-symbols-outlined text-8xl mb-4 <%= @flow_item.color %>">
+        <%= @flow_item.icon %>
+      </span>
+      <span class="text-5xl font-bold text-text-main-light dark:text-text-main-dark mb-2">
+        <%= @flow_item.name %>
+      </span>
+      <span class="text-2xl text-text-sub-light dark:text-text-sub-dark">
+        を伝えました。
+      </span>
+    </div>
+
+    <%# 続けて伝える %>
+    <%= link_to categories_path,
+      class: "w-full bg-amber-600 text-white text-xl font-bold py-5 rounded-2xl shadow-lg shadow-amber-600/20 hover:bg-orange-700 transition-all active:scale-95 flex items-center justify-center mt-4" do %>
+      <span class="material-symbols-outlined mr-2 text-2xl">arrow_back</span>
+      ほかのことを伝える
+    <% end %>
+
+  </div>
+</main>

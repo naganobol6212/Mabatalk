@@ -48,16 +48,15 @@
   <!-- はい / いいえ -->
   <div class="w-full max-w-md grid grid-cols-2 gap-6 mt-auto mb-8">
 
-    <!-- はい（まだリンクしない） -->
-    <button
-      type="button"
-      class="bg-card-light dark:bg-card-dark border-2 border-green-500 rounded-2xl p-6 flex flex-col items-center justify-center shadow-soft"
-    >
+    <%= link_to message_completion_path(flow_item_id: @flow_item.id),
+      class: "w-full cursor-pointer bg-card-light dark:bg-card-dark border-2 border-green-500 rounded-2xl p-6 flex flex-col items-center justify-center shadow-soft text-center" do %>
+
       <span class="material-symbols-outlined text-5xl text-green-600 mb-2">
         check_circle
       </span>
       <span class="text-3xl font-bold">はい</span>
-    </button>
+
+    <% end %>
 
     <!-- いいえ（戻る） -->
     <%= link_to category_flow_path(@flow_item.category),
