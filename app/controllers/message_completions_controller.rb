@@ -1,5 +1,5 @@
 class MessageCompletionsController < ApplicationController
   def show
-    @flow_item = FlowItem.find(params[:flow_item_id])
+    @message_log = current_user.message_logs.order(created_at: :desc).first
   end
 end

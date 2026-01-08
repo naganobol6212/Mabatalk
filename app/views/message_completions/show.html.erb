@@ -8,17 +8,17 @@
         カテゴリ
       </span>
       <span class="text-5xl font-bold text-text-main-light dark:text-text-main-dark">
-        <%= @flow_item.category.title %>
+        <%= @message_log.flow_item.category.title %>
       </span>
     </div>
 
     <%# 伝えた内容 %>
     <div class="w-full bg-card-light dark:bg-card-dark rounded-2xl p-8 shadow-soft border-2 border-primary/20 flex flex-col items-center text-center">
-      <span class="material-symbols-outlined text-8xl mb-4 <%= @flow_item.color %>">
-        <%= @flow_item.icon %>
+      <span class="material-symbols-outlined text-8xl mb-4 <%= @message_log.flow_item.color %>">
+        <%= @message_log.flow_item.icon %>
       </span>
       <span class="text-5xl font-bold text-text-main-light dark:text-text-main-dark mb-2">
-        <%= @flow_item.name %>
+        <%= @message_log.flow_item.name %>
       </span>
       <span class="text-2xl text-text-sub-light dark:text-text-sub-dark">
         を伝えました。
