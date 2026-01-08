@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_01_04_075253) do
+ActiveRecord::Schema[7.2].define(version: 2026_01_08_033432) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -42,6 +42,15 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_04_075253) do
     t.index ["user_id"], name: "index_flow_items_on_user_id"
   end
 
+  create_table "message_logs", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "flow_item_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["flow_item_id"], name: "index_message_logs_on_flow_item_id"
+    t.index ["user_id"], name: "index_message_logs_on_user_id"
+  end
+
   create_table "posts", force: :cascade do |t|
     t.string "title"
     t.datetime "created_at", null: false
@@ -65,4 +74,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_04_075253) do
   add_foreign_key "categories", "users"
   add_foreign_key "flow_items", "categories"
   add_foreign_key "flow_items", "users"
+  add_foreign_key "message_logs", "flow_items"
+  add_foreign_key "message_logs", "users"
 end

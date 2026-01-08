@@ -11,6 +11,8 @@ Rails.application.routes.draw do
   resources :flow_items, only: [] do
     get :confirm, on: :member
   end
+  # メッセージログ作成(裏側)
+  resources :message_logs, only: %i[create]
   # メッセージ完了画面(表側)
   resource :message_completion, only: %i[show]
   # --- 以下はRails標準の補助機能 ---

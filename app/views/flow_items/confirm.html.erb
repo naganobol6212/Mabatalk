@@ -48,7 +48,8 @@
   <!-- はい / いいえ -->
   <div class="w-full max-w-md grid grid-cols-2 gap-6 mt-auto mb-8">
 
-    <%= link_to message_completion_path(flow_item_id: @flow_item.id),
+    <%= button_to message_logs_path(flow_item_id: @flow_item.id),
+      data: { turbo: false },
       class: "w-full cursor-pointer bg-card-light dark:bg-card-dark border-2 border-green-500 rounded-2xl p-6 flex flex-col items-center justify-center shadow-soft text-center" do %>
 
       <span class="material-symbols-outlined text-5xl text-green-600 mb-2">
