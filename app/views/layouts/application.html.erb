@@ -23,9 +23,39 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body>
-    <%= render 'shared/header' %>
-    <%= yield %>
-    <%= render 'shared/footer' %>
-  </body>
+<body>
+  <%= render 'shared/header' %>
+
+  <% if notice %>
+    <div
+      class="fixed top-4 inset-x-0 z-50 flex justify-center"
+      data-flash
+    >
+      <div
+        class="w-full max-w-md bg-blue-50 dark:bg-blue-900/20
+              rounded-xl p-4 shadow-sm
+              border border-blue-200 dark:border-blue-800
+              flex items-center justify-center space-x-3
+              text-center text-blue-800 dark:text-blue-200"
+      >
+        <span class="material-symbols-outlined text-3xl">
+          history_toggle_off
+        </span>
+        <span class="text-base sm:text-lg font-medium">
+          <%= notice %>
+        </span>
+      </div>
+    </div>
+      <script>
+    setTimeout(() => {
+        const flash = document.querySelector('[data-flash]');
+        if (flash) flash.remove();
+      }, 5000);
+    </script>
+  <% end %>
+
+  <%= yield %>
+
+  <%= render 'shared/footer' %>
+</body>
 </html>

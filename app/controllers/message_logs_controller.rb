@@ -11,6 +11,6 @@ class MessageLogsController < ApplicationController
       session[:last_flow_item_id] = flow_item.id
     end
 
-    redirect_to message_completion_path
+    redirect_to message_completion_path, notice: "ログに自動保存されました"
   end
 end
