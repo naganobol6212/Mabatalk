@@ -1,29 +1,113 @@
-<h2>Sign up</h2>
+<main class="flex-grow w-full max-w-md mx-auto px-6 py-8 pb-32">
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
-
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+  <!-- タイトル -->
+  <div class="text-center mb-2">
+    <h2 class="text-2xl font-bold mb-2">アカウント作成</h2>
+    <p class="text-sm text-gray-500">
+      必要な情報を入力して、<br>
+      MabaTalkをはじめましょう。
+    </p>
   </div>
 
-  <div class="field">
-    <%= f.label :password %>
-    <% if @minimum_password_length %>
-    <em>(<%= @minimum_password_length %> characters minimum)</em>
-    <% end %><br />
-    <%= f.password_field :password, autocomplete: "new-password" %>
+  <%= form_for(resource,
+        as: resource_name,
+        url: registration_path(resource_name),
+        html: { class: "space-y-6" }) do |f| %>
+
+    <!-- エラーメッセージ -->
+    <%= render "registrations/shared/error_messages", resource: resource %>
+
+    <!-- ユーザー名 -->
+    <div class="space-y-2">
+      <%= f.label :name, "ユーザー名",
+            class: "block text-sm font-bold text-gray-700 ml-1" %>
+
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <span class="material-symbols-outlined text-gray-400">person</span>
+        </div>
+
+        <%= f.text_field :name,
+              placeholder: "例：田中タロウ",
+              class: "w-full pl-11 pr-4 py-4 rounded-2xl
+                      bg-white border border-gray-300
+                      focus:border-amber-500 focus:ring-2 focus:ring-amber-200
+                      focus:outline-none transition" %>
+      </div>
+    </div>
+
+    <!-- メールアドレス -->
+    <div class="space-y-2">
+      <%= f.label :email, "メールアドレス",
+            class: "block text-sm font-bold text-gray-700 ml-1" %>
+
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <span class="material-symbols-outlined text-gray-400">email</span>
+        </div>
+
+        <%= f.email_field :email,
+              placeholder: "example@mabatalk.com",
+              class: "w-full pl-11 pr-4 py-4 rounded-2xl
+                      bg-white border border-gray-300
+                      focus:border-amber-500 focus:ring-2 focus:ring-amber-200
+                      focus:outline-none transition" %>
+      </div>
+    </div>
+
+    <!-- パスワード -->
+    <div class="space-y-2">
+      <%= f.label :password, "パスワード",
+            class: "block text-sm font-bold text-gray-700 ml-1" %>
+
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <!-- lock は不安定なので lock_outline を使用 -->
+          <span class="material-symbols-outlined text-gray-400">lock_outline</span>
+        </div>
+
+        <%= f.password_field :password,
+              placeholder: "8文字以上の半角英数字",
+              autocomplete: "new-password",
+              class: "w-full pl-11 pr-4 py-4 rounded-2xl
+                      bg-white border border-gray-300
+                      focus:border-amber-500 focus:ring-2 focus:ring-amber-200
+                      focus:outline-none transition" %>
+      </div>
+    </div>
+
+    <!-- 新規登録ボタン -->
+    <button type="submit"
+      class="w-full bg-amber-600 hover:bg-amber-700
+              text-white font-bold text-lg py-4 rounded-full shadow-lg
+              transform active:scale-95 transition-all
+              flex items-center justify-center gap-2">
+        <span>新規登録</span>
+      <span class="material-symbols-outlined text-xl">arrow_forward</span>
+    </button>
+
+  <% end %>
+
+  <!-- 区切り -->
+  <div class="relative my-4">
+    <div class="absolute inset-0 flex items-center">
+      <div class="w-full border-t border-gray-300"></div>
+    </div>
+    <div class="relative flex justify-center text-sm">
+      <span class="px-3 bg-stone-100 text-gray-500">
+        すでにアカウントをお持ちの方
+      </span>
+    </div>
   </div>
 
-  <div class="field">
-    <%= f.label :password_confirmation %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
+  <!-- ログイン誘導 -->
+  <div class="text-center mb-16">
+    <%= link_to "ログインはこちら",
+          new_user_session_path,
+          class: "inline-block w-full text-center
+                  bg-white border border-gray-300
+                  text-gray-900 font-bold py-4
+                  rounded-full shadow-soft
+                  hover:bg-gray-50 transition-colors" %>
   </div>
-
-  <div class="actions">
-    <%= f.submit "Sign up" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</main>
