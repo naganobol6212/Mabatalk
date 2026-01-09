@@ -1,0 +1,20 @@
+ja:
+  errors:
+    messages:
+      not_saved:
+        one: "1件のエラーがあります"
+        other: "%{count}件のエラーがあります"
+
+  activerecord:
+    models:
+      user: "ユーザー"
+    attributes:
+      user:
+        name: "ユーザー名"
+        email: "メールアドレス"
+        password: "パスワード"
+
+  activemodel:
+    errors:
+      messages:
+        blank: "を入力してください"
