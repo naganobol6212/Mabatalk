@@ -1,0 +1,29 @@
+ja:
+  errors:
+    messages:
+      not_saved:
+        one: "1件のエラーがあります"
+        other: "%{count}件のエラーがあります"
+
+  activerecord:
+    models:
+      user: "ユーザー"
+    attributes:
+      user:
+        name: "ユーザー名"
+        email: "メールアドレス"
+        password: "パスワード"
+
+  activemodel:
+    errors:
+      messages:
+        blank: "を入力してください"
+
+  devise:
+    registrations:
+      signed_up: "アカウント登録が完了しました"
+    sessions:
+      signed_in: "ログインしました"
+      signed_out: "ログアウトしました"
+    omniauth_callbacks:
+      success: "%{kind} アカウントでログインしました"
