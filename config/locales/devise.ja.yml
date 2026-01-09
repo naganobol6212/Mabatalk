@@ -18,3 +18,12 @@ ja:
     errors:
       messages:
         blank: "を入力してください"
+
+  devise:
+    registrations:
+      signed_up: "アカウント登録が完了しました"
+    sessions:
+      signed_in: "ログインしました"
+      signed_out: "ログアウトしました"
+    omniauth_callbacks:
+      success: "%{kind} アカウントでログインしました"
