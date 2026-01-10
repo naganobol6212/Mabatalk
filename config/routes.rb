@@ -11,10 +11,11 @@ Rails.application.routes.draw do
   resources :flow_items, only: [] do
     get :confirm, on: :member
   end
-  # メッセージログ作成(裏側)
-  resources :message_logs, only: %i[create]
+  # メッセージログ作成とメッセージログ一覧表示
+  resources :message_logs, only: %i[index create]
   # メッセージ完了画面(表側)
   resource :message_completion, only: %i[show]
+
   # --- 以下はRails標準の補助機能 ---
   get "up" => "rails/health#show", as: :rails_health_check
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
