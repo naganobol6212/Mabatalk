@@ -3,6 +3,9 @@ class FlowItem < ApplicationRecord
   belongs_to :user, optional: true
   has_many :message_logs
 
+  validates :key, presence: true
+  validates :name, presence: true
+
   scope :for_user, ->(user) {
     if user
       where(user_id: [ nil, user.id ])
