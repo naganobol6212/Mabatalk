@@ -1,0 +1,83 @@
+<% content_for :page_title do %>
+  メッセージ履歴
+<% end %>
+
+<main class="relative min-h-screen w-full bg-stone-200 overflow-x-hidden pb-24">
+  <div class="flex flex-col items-center px-4 pt-4 w-full max-w-md mx-auto gap-4">
+
+    <% if @message_logs.any? %>
+      <% @message_logs.each do |log| %>
+        <% flow_item = log.flow_item %>
+        <% category  = flow_item.category %>
+
+        <div
+          class="
+            bg-white/90 backdrop-blur rounded-2xl p-5 w-full
+            shadow-[0_6px_14px_rgba(0,0,0,0.08)]
+            flex flex-col gap-3
+            border-l-4
+            <%= category.color %>
+          "
+        >
+          <!-- 上段：日時・ユーザー -->
+          <div class="flex justify-between items-center border-b border-stone-200 pb-2">
+            <div class="flex items-center gap-2 text-stone-500">
+              <span class="material-symbols-outlined text-sm">
+                schedule
+              </span>
+              <span class="text-sm font-medium tracking-wide">
+                <%= l(log.created_at, format: :short) %>
+              </span>
+            </div>
+
+            <span class="text-xs bg-stone-100 text-stone-600 px-2 py-1 rounded-full font-medium">
+              <%= log.user.name %>
+            </span>
+          </div>
+
+          <!-- 中段：カテゴリ・回答 -->
+          <div class="flex items-center gap-4">
+            <!-- フロー項目アイコン -->
+            <div
+              class="
+                flex-shrink-0 w-14 h-14 rounded-full
+                flex items-center justify-center
+                bg-stone-100
+              "
+            >
+              <span class="material-symbols-outlined text-[32px] <%= flow_item.color %>">
+                <%= flow_item.icon %>
+              </span>
+            </div>
+
+            <!-- テキスト -->
+            <div class="flex flex-col">
+              <span class="text-xs text-stone-500 mb-0.5">
+                <%= category.title %>
+              </span>
+              <span class="text-xl font-bold text-stone-800 leading-snug">
+                <%= flow_item.name %>
+              </span>
+            </div>
+          </div>
+        </div>
+
+      <% end %>
+
+    <% else %>
+      <!-- 空状態 -->
+      <div class="text-center text-stone-500 mt-20 space-y-4">
+        <span class="material-symbols-outlined text-5xl opacity-40">
+          history
+        </span>
+        <p class="text-sm font-medium">
+          まだメッセージ履歴はありません
+        </p>
+        <p class="text-xs">
+          メッセージを最後まで選択すると、ここに履歴が表示されます
+        </p>
+      </div>
+    <% end %>
+
+  </div>
+</main>

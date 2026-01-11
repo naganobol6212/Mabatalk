@@ -1,4 +1,10 @@
 class MessageLogsController < ApplicationController
+  before_action :authenticate_user!, only: [ :index ]
+
+  def index
+    @message_logs = MessageLog.for_viewer(current_user)
+  end
+
   def create
   flow_item = FlowItem.find(params[:flow_item_id])
 
