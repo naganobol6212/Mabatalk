@@ -11,6 +11,9 @@ module Myapp
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.2
 
+    config.time_zone = 'Tokyo'
+    config.active_record.default_timezone = :local
+
     config.i18n.default_locale = :ja
     config.i18n.available_locales = [ :ja, :en ]
     # Please, add to the `ignore` list any other `lib` subdirectories that do
@@ -22,8 +25,6 @@ module Myapp
     #
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
-    #
-    # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end
