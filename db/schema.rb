@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_01_09_221720) do
+ActiveRecord::Schema[7.2].define(version: 2026_01_11_223706) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -42,6 +42,16 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_09_221720) do
     t.index ["category_id", "user_id", "key"], name: "index_flow_items_on_category_id_and_user_id_and_key", unique: true
     t.index ["category_id"], name: "index_flow_items_on_category_id"
     t.index ["user_id"], name: "index_flow_items_on_user_id"
+  end
+
+  create_table "message_categories", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "kana", null: false
+    t.string "icon", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_message_categories_on_user_id"
   end
 
   create_table "message_logs", force: :cascade do |t|
@@ -77,6 +87,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_09_221720) do
   add_foreign_key "categories", "users"
   add_foreign_key "flow_items", "categories"
   add_foreign_key "flow_items", "users"
+  add_foreign_key "message_categories", "users"
   add_foreign_key "message_logs", "flow_items"
   add_foreign_key "message_logs", "users"
 end
