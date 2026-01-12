@@ -44,7 +44,7 @@
 
     <!-- カテゴリ追加 -->
     <% add_category_path =
-        current_user ? new_category_path : new_user_session_path %>
+        current_user ? new_message_category_path : new_user_session_path %>
 
     <div class="w-full mt-6">
       <%= link_to add_category_path,

@@ -3,10 +3,12 @@ Rails.application.routes.draw do
   devise_for :users, controllers: { omniauth_callbacks: "users/omniauth_callbacks" }
   # 未ログイン時の入り口・振り分けページ
   root to: "homes#top"
-  # ログイン後のメイン機能(質問カテゴリ一覧)
-  resources :categories, only: %i[index new] do
+  # ログイン後のメイン機能(カテゴリ一覧)
+  resources :categories, only: %i[index] do
     resource :flow, only: :show, controller: "category_flows"
   end
+  # メッセージカテゴリ(ユーザー操作用)
+  resources :message_categories, only: %i[new create]
   # メッセージ確認画面(FlowItem確認)
   resources :flow_items, only: [] do
     get :confirm, on: :member
