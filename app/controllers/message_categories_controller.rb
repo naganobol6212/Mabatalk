@@ -2,7 +2,7 @@ class MessageCategoriesController < ApplicationController
   before_action :authenticate_user!
 
   def new
-    @message_category = MessageCategory.new
+    @message_category = MessageCategory.new(icon: "local_cafe")
   end
 
   def create

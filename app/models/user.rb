@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   has_many :message_logs
+  has_many :message_categories, dependent: :destroy
   validates :name, presence: true
 
   # Include default devise modules. Others available are:
