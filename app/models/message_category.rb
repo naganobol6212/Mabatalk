@@ -11,5 +11,4 @@ class MessageCategory < ApplicationRecord
   def ruby
     kana
   end
-
 end

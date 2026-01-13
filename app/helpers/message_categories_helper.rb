@@ -16,5 +16,4 @@ module MessageCategoriesHelper
       "volunteer_activism" => "text-emerald-500"
     }[icon] || "text-gray-400"
   end
-
 end
