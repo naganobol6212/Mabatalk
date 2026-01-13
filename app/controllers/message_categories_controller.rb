@@ -1,8 +1,11 @@
 class MessageCategoriesController < ApplicationController
+  include MessageCategoriesHelper
   before_action :authenticate_user!
 
   def new
-    @message_category = MessageCategory.new(icon: "local_cafe")
+    default_icon = message_category_icons.keys.first
+
+    @message_category = MessageCategory.new(icon: default_icon)
   end
 
   def create
