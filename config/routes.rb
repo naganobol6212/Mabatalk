@@ -1,21 +1,20 @@
 Rails.application.routes.draw do
-  # 認証(devise + Google OAuth)
   devise_for :users, controllers: { omniauth_callbacks: "users/omniauth_callbacks" }
-  # 未ログイン時の入り口・振り分けページ
+
   root to: "homes#top"
-  # ログイン後のメイン機能(カテゴリ一覧)
+
   resources :categories, only: %i[index] do
     resource :flow, only: :show, controller: "category_flows"
   end
-  # メッセージカテゴリ(ユーザー操作用)
+
   resources :message_categories, only: %i[new create]
-  # メッセージ確認画面(FlowItem確認)
-  resources :flow_items, only: [] do
+
+  resources :flow_items, only: %i[new create] do
     get :confirm, on: :member
   end
-  # メッセージログ作成とメッセージログ一覧表示
+
   resources :message_logs, only: %i[index create]
-  # メッセージ完了画面(表側)
+
   resource :message_completion, only: %i[show]
 
   # --- 以下はRails標準の補助機能 ---
