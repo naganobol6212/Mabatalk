@@ -23,7 +23,7 @@ class FlowItemsController < ApplicationController
   private
 
   def set_category
-    @category = current_user.message_categories.find(params[:category_id])
+    @category = Category.find(params[:category_id])
   end
 
   def set_flow_item
