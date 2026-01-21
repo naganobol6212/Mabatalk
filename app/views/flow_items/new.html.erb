@@ -1,7 +1,12 @@
 <main class="flex-grow px-4 pt-6 pb-24">
   <div class="max-w-md mx-auto">
 
-    <%= form_with model: @flow_item, url: flow_items_path, local: true do |f| %>
+    <%= form_with model: @flow_item,
+              url: flow_items_path,
+              local: true,
+              data: { turbo: false } do |f| %>
+
+      <%= hidden_field_tag :category_id, @category.id %>
 
       <% if @flow_item.errors.any? %>
         <div class="mb-4 rounded-xl bg-red-50 p-4 text-sm text-red-700">
@@ -27,7 +32,7 @@
           </div>
 
           <span class="text-xl font-bold text-gray-800">
-            <%= @category.name %>
+            <%= @category.title %>
           </span>
         </div>
       </div>

@@ -10,10 +10,13 @@ class FlowItemsController < ApplicationController
   def create
     @flow_item = @category.flow_items.build(flow_item_params)
 
+    last_position = @category.flow_items.maximum(:position) || 0
+    @flow_item.position = last_position + 1
+
     if @flow_item.save
       redirect_to category_flow_path(@category)
     else
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
