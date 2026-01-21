@@ -1,0 +1,138 @@
+<main class="flex-grow px-4 pt-6 pb-24">
+  <div class="max-w-md mx-auto">
+
+    <%= form_with model: @flow_item,
+              url: flow_items_path,
+              local: true,
+              data: { turbo: false } do |f| %>
+
+      <%= hidden_field_tag :category_id, @category.id %>
+
+      <% if @flow_item.errors.any? %>
+        <div class="mb-4 rounded-xl bg-red-50 p-4 text-sm text-red-700">
+          <ul class="list-disc pl-5 space-y-1">
+            <% @flow_item.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <!-- 選択中のカテゴリ -->
+      <div class="bg-white rounded-xl p-6 shadow mb-6">
+        <p class="text-sm font-bold text-gray-600 mb-3 pl-1">
+          選択中のカテゴリ
+        </p>
+
+        <div class="flex items-center gap-4 bg-gray-100 p-4 rounded-xl">
+          <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 shrink-0">
+            <span class="material-symbols-outlined text-2xl">
+              <%= @category.icon %>
+            </span>
+          </div>
+
+          <span class="text-xl font-bold text-gray-800">
+            <%= @category.title %>
+          </span>
+        </div>
+      </div>
+
+      <!-- アイコン選択 -->
+      <div class="bg-white rounded-xl p-6 shadow mb-6">
+        <p class="text-sm font-bold text-gray-600 mb-4 pl-1">
+          アイコンを選択
+        </p>
+
+        <div class="grid grid-cols-4 gap-4">
+          <% flow_item_icons.each do |icon| %>
+            <label class="cursor-pointer">
+              <%= f.radio_button :icon, icon, class: "hidden peer" %>
+
+              <div
+                class="
+                  aspect-square rounded-2xl
+                  flex items-center justify-center
+                  border-2 border-gray-200
+                  bg-gray-50
+                  peer-checked:border-orange-500
+                  peer-checked:bg-orange-50
+                  transition-all
+                  relative
+                "
+              >
+                <span
+                  class="
+                    material-symbols-outlined
+                    text-3xl
+                    text-gray-400
+                    peer-checked:text-orange-500
+                  "
+                >
+                  <%= icon %>
+                </span>
+
+                <span
+                  class="
+                    absolute -top-2 -right-2
+                    bg-orange-500 text-white
+                    rounded-full p-0.5
+                    shadow
+                    hidden peer-checked:block
+                  "
+                >
+                  <span class="material-symbols-outlined text-sm">
+                    check
+                  </span>
+                </span>
+              </div>
+            </label>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- 入力欄 -->
+      <div class="bg-white rounded-xl p-6 shadow space-y-6 mb-6">
+        <div>
+          <%= f.label :name, "項目名",
+            class: "block text-sm font-bold text-gray-600 mb-2 pl-1" %>
+
+          <%= f.text_field :name,
+            placeholder: "例：水",
+            class: "
+              w-full bg-gray-100
+              rounded-xl p-4
+              text-lg font-bold text-gray-800
+              focus:ring-2 focus:ring-orange-400
+            " %>
+        </div>
+
+        <div>
+          <%= f.label :kana, "よみかた",
+            class: "block text-sm font-bold text-gray-600 mb-2 pl-1" %>
+
+          <%= f.text_field :kana,
+            placeholder: "例：みず",
+            class: "
+              w-full bg-gray-100
+              rounded-xl p-4
+              text-lg font-bold text-gray-800
+              focus:ring-2 focus:ring-orange-400
+            " %>
+        </div>
+      </div>
+
+      <!-- 保存ボタン -->
+      <div class="mt-2">
+        <%= f.submit "保存",
+          class: "
+            w-full bg-amber-600
+            hover:bg-orange-600
+            text-white font-bold text-lg
+            py-4 rounded-xl
+            transition-all active:scale-[0.98]
+          " %>
+      </div>
+
+    <% end %>
+  </div>
+</main>
