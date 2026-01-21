@@ -48,19 +48,17 @@
     <!-- 追加ボタン -->
     <div class="w-full mt-6">
       <% if current_user %>
-        <button
-          class="
-            w-full h-16 flex items-center justify-center rounded-2xl
-            border-2 border-dashed border-stone-400 bg-transparent
-            text-stone-600 text-lg font-bold
-            hover:bg-white/60 active:scale-[0.98] transition
-          "
-        >
+        <%= link_to new_flow_item_path(category_id: @category.id),
+          class: "w-full h-16 flex items-center justify-center rounded-2xl
+                  border-2 border-dashed border-stone-400 bg-transparent
+                  text-stone-600 text-lg font-bold
+                  hover:bg-white/60 active:scale-[0.98] transition" do %>
           <span class="material-symbols-outlined mr-2 text-stone-500 text-2xl">
             add_circle_outline
           </span>
           項目を追加
-        </button>
+        <% end %>
+
       <% else %>
         <%= link_to new_user_session_path,
           class: "

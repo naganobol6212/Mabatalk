@@ -9,6 +9,7 @@ class FlowItemsController < ApplicationController
 
   def create
     @flow_item = @category.flow_items.build(flow_item_params)
+    @flow_item.user = current_user
 
     last_position = @category.flow_items.maximum(:position) || 0
     @flow_item.position = last_position + 1
