@@ -1,7 +1,7 @@
 class FlowItemsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_category, only: [:new, :create]
-  before_action :set_flow_item, only: [:confirm]
+  before_action :set_category, only: [ :new, :create ]
+  before_action :set_flow_item, only: [ :confirm ]
 
   def new
     @flow_item = @category.flow_items.build
