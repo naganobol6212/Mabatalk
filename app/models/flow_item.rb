@@ -1,5 +1,5 @@
 class FlowItem < ApplicationRecord
-  belongs_to :category
+  belongs_to :message_category, optional: true
   belongs_to :user, optional: true
   has_many :message_logs
 

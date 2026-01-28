@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_01_20_095432) do
+ActiveRecord::Schema[7.2].define(version: 2026_01_28_085018) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -29,18 +29,17 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_20_095432) do
   end
 
   create_table "flow_items", force: :cascade do |t|
-    t.bigint "category_id", null: false
     t.bigint "user_id"
     t.string "key", null: false
     t.string "name", null: false
     t.string "kana", null: false
     t.string "icon", null: false
-    t.string "color"
+    t.string "icon_color"
     t.integer "position", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["category_id", "user_id", "key"], name: "index_flow_items_on_category_id_and_user_id_and_key", unique: true
-    t.index ["category_id"], name: "index_flow_items_on_category_id"
+    t.bigint "message_category_id"
+    t.index ["message_category_id"], name: "index_flow_items_on_message_category_id"
     t.index ["user_id"], name: "index_flow_items_on_user_id"
   end
 
@@ -48,9 +47,13 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_20_095432) do
     t.string "name", null: false
     t.string "kana", null: false
     t.string "icon", null: false
-    t.bigint "user_id", null: false
+    t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "key"
+    t.string "icon_color"
+    t.integer "position", default: 0, null: false
+    t.index ["key"], name: "index_message_categories_on_key", unique: true
     t.index ["user_id"], name: "index_message_categories_on_user_id"
   end
 
@@ -59,6 +62,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_20_095432) do
     t.bigint "flow_item_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "message_category_name", null: false
+    t.string "flow_item_name", null: false
     t.index ["flow_item_id"], name: "index_message_logs_on_flow_item_id"
     t.index ["user_id"], name: "index_message_logs_on_user_id"
   end
@@ -85,7 +90,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_20_095432) do
   end
 
   add_foreign_key "categories", "users"
-  add_foreign_key "flow_items", "categories"
+  add_foreign_key "flow_items", "message_categories"
   add_foreign_key "flow_items", "users"
   add_foreign_key "message_categories", "users"
   add_foreign_key "message_logs", "flow_items"

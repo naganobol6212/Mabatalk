@@ -3,14 +3,10 @@ Rails.application.routes.draw do
 
   root to: "homes#top"
 
-  resources :categories, only: %i[index] do
-    resource :flow, only: :show, controller: "category_flows"
-  end
-
-  resources :message_categories, only: %i[new create]
-
-  resources :flow_items, only: %i[new create] do
-    get :confirm, on: :member
+  resources :message_categories, only: %i[index new create] do
+    resources :flow_items, only: %i[index new create] do
+      get :confirm, on: :member
+    end
   end
 
   resources :message_logs, only: %i[index create]
