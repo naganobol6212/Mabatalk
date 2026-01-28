@@ -16,7 +16,7 @@ class MessageCategoriesController < ApplicationController
       current_user.message_categories.build(message_category_params)
 
     if @message_category.save
-      redirect_to categories_path
+      redirect_to message_categories_path
     else
       render :new, status: :unprocessable_entity
     end
