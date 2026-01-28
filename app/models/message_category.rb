@@ -6,7 +6,7 @@ class MessageCategory < ApplicationRecord
 
   scope :for_user, ->(user) {
     if user
-      where(user_id: [nil, user.id])
+      where(user_id: [ nil, user.id ])
     else
       where(user_id: nil)
     end
