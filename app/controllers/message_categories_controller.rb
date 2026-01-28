@@ -1,6 +1,6 @@
 class MessageCategoriesController < ApplicationController
   include MessageCategoriesHelper
-  before_action :authenticate_user!, only; %i[new create]
+  before_action :authenticate_user!, only: %i[new create]
 
   def index
     @message_categories = MessageCategory.for_user(current_user).order(:position)

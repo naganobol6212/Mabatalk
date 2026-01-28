@@ -8,7 +8,7 @@
     <!-- フロー項目一覧 -->
     <div class="grid grid-cols-2 gap-4 w-full">
       <% @flow_items.each do |item| %>
-        <%= link_to confirm_flow_item_path(item),
+        <%= link_to confirm_message_category_flow_item_path(@message_category,item),
             class: "
               bg-white/90 backdrop-blur rounded-2xl p-6 aspect-square
               flex flex-col items-center justify-center text-center

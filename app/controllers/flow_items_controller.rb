@@ -1,6 +1,6 @@
 class FlowItemsController < ApplicationController
   before_action :set_message_category, only: %i[index new create]
-  before_action :set_flow_item, only: [ :confirm ]
+  before_action :set_flow_item, only: %i[confirm]
 
   def index
     @flow_items =
@@ -28,12 +28,13 @@ class FlowItemsController < ApplicationController
   end
 
   def confirm
+    @message_category = @flow_item.message_category
   end
 
   private
 
   def set_message_category
-    @message_category = MessageCategory.find(params[:message_category_id])
+      @message_category = MessageCategory.find(params[:message_category_id])
   end
 
   def set_flow_item

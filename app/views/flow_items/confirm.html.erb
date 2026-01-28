@@ -8,7 +8,7 @@
         選択したカテゴリ
       </p>
       <p class="text-xl font-bold text-text-main-light dark:text-text-main-dark">
-        <%= @flow_item.category.title %>
+        <%= @message_category.name %>
       </p>
     </div>
 
@@ -23,7 +23,7 @@
       </p>
 
       <div class="flex flex-col items-center">
-        <span class="material-symbols-outlined text-5xl mb-2 <%= @flow_item.color %>">
+        <span class="material-symbols-outlined text-5xl mb-2 <%= @flow_item.icon_color %>">
           <%= @flow_item.icon %>
         </span>
 
@@ -60,7 +60,7 @@
     <% end %>
 
     <!-- いいえ（戻る） -->
-    <%= link_to category_flow_path(@flow_item.category),
+    <%= link_to message_category_flow_items_path(@message_category),
         class: "bg-card-light dark:bg-card-dark border-2 border-red-500 rounded-2xl p-6 flex flex-col items-center justify-center shadow-soft text-center" do %>
 
       <span class="material-symbols-outlined text-5xl text-red-600 mb-2">
