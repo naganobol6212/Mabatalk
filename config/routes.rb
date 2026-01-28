@@ -1,12 +1,7 @@
 Rails.application.routes.draw do
   devise_for :users, controllers: { omniauth_callbacks: "users/omniauth_callbacks" }
 
-  root to: "message_categories#index"
-  # root to: "homes#top"
-
-  resources :categories, only: %i[index] do
-    resource :flow, only: :show, controller: "category_flows"
-  end
+  root to: "homes#top"
 
   resources :message_categories, only: %i[index new create] do
     resources :flow_items, only: %i[index new create] do
