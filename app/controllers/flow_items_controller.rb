@@ -41,6 +41,6 @@ class FlowItemsController < ApplicationController
   end
 
   def flow_item_params
-    params.require(:flow_item).permit(:name, :kana, :icon)
+    params.require(:flow_item).permit(:name, :kana, :icon, :icon_color)
   end
 end
