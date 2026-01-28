@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_01_28_010905) do
+ActiveRecord::Schema[7.2].define(version: 2026_01_28_051631) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -29,7 +29,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_28_010905) do
   end
 
   create_table "flow_items", force: :cascade do |t|
-    t.bigint "category_id", null: false
     t.bigint "user_id"
     t.string "key", null: false
     t.string "name", null: false
@@ -40,8 +39,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_28_010905) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "message_category_id"
-    t.index ["category_id", "user_id", "key"], name: "index_flow_items_on_category_id_and_user_id_and_key", unique: true
-    t.index ["category_id"], name: "index_flow_items_on_category_id"
     t.index ["message_category_id"], name: "index_flow_items_on_message_category_id"
     t.index ["user_id"], name: "index_flow_items_on_user_id"
   end
@@ -91,7 +88,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_28_010905) do
   end
 
   add_foreign_key "categories", "users"
-  add_foreign_key "flow_items", "categories"
   add_foreign_key "flow_items", "message_categories"
   add_foreign_key "flow_items", "users"
   add_foreign_key "message_categories", "users"
