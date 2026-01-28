@@ -7,7 +7,9 @@ Rails.application.routes.draw do
     resource :flow, only: :show, controller: "category_flows"
   end
 
-  resources :message_categories, only: %i[new create]
+  resources :message_categories, only: %i[index new create] do
+    resources :flow_items, only: :index
+  end
 
   resources :flow_items, only: %i[new create] do
     get :confirm, on: :member

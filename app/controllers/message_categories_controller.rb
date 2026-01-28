@@ -1,10 +1,13 @@
 class MessageCategoriesController < ApplicationController
   include MessageCategoriesHelper
-  before_action :authenticate_user!
+  before_action :authenticate_user!, only; %i[new create]
+
+  def index
+    @message_categories = MessageCategory.for_user(current_user).order(:position)
+  end
 
   def new
     default_icon = message_category_icons.keys.first
-
     @message_category = MessageCategory.new(icon: default_icon)
   end
 
@@ -15,7 +18,7 @@ class MessageCategoriesController < ApplicationController
     if @message_category.save
       redirect_to categories_path
     else
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -23,6 +26,6 @@ class MessageCategoriesController < ApplicationController
 
   def message_category_params
     params.require(:message_category)
-          .permit(:name, :kana, :icon)
+          .permit(:name, :kana, :icon, :icon_color)
   end
 end
