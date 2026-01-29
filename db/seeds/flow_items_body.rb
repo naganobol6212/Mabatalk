@@ -1,3 +1,5 @@
+# flow_items are initial data for MVP.
+# Existing records are respected (no overwrite).
 body = MessageCategory.find_by!(key: "body")
 
 body.flow_items.find_or_create_by!(key: "hard") do |f|

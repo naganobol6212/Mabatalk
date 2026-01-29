@@ -1,31 +1,40 @@
-MessageCategory.find_or_create_by!(key: "body") do |c|
-  c.name    = "体調"
-  c.kana     = "からだのちょうし"
-  c.icon     = "accessibility_new"
-  c.icon_color    = "text-orange-600"
-  c.position = 1
-end
+categories = [
+  {
+    key: "body",
+    name: "体調",
+    kana: "からだのちょうし",
+    icon: "accessibility_new",
+    icon_color: "text-orange-600",
+    position: 1
+  },
+  {
+    key: "drink",
+    name: "飲みもの",
+    kana: "のみもの",
+    icon: "local_drink",
+    icon_color: "text-sky-600",
+    position: 2
+  },
+  {
+    key: "request",
+    name: "お願い",
+    kana: "やってほしいこと",
+    icon: "volunteer_activism",
+    icon_color: "text-emerald-600",
+    position: 3
+  },
+  {
+    key: "feeling",
+    name: "気持ち",
+    kana: "いまのきもち",
+    icon: "sentiment_satisfied_alt",
+    icon_color: "text-rose-500",
+    position: 4
+  }
+]
 
-MessageCategory.find_or_create_by!(key: "drink") do |c|
-  c.name    = "飲みもの"
-  c.kana     = "のみもの"
-  c.icon     = "local_drink"
-  c.icon_color    = "text-sky-600"
-  c.position = 2
-end
-
-MessageCategory.find_or_create_by!(key: "request") do |c|
-  c.name    = "お願い"
-  c.kana     = "やってほしいこと"
-  c.icon     = "volunteer_activism"
-  c.icon_color    = "text-emerald-600"
-  c.position = 3
-end
-
-MessageCategory.find_or_create_by!(key: "feeling") do |c|
-  c.name    = "気持ち"
-  c.kana     = "いまのきもち"
-  c.icon     = "sentiment_satisfied_alt"
-  c.icon_color    = "text-rose-500"
-  c.position = 4
+categories.each do |attrs|
+  mc = MessageCategory.find_or_initialize_by(key: attrs[:key])
+  mc.assign_attributes(attrs)
+  mc.save!
 end
