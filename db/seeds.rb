@@ -7,7 +7,9 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
-# =========================
-# Categories
-# =========================
 require_relative "seeds/message_categories"
+
+require_relative "seeds/flow_items_body"
+require_relative "seeds/flow_items_drink"
+require_relative "seeds/flow_items_request"
+require_relative "seeds/flow_items_feeling"
