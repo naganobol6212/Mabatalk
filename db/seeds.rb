@@ -7,12 +7,8 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
-puts "🌱 Seeding MessageCategories..."
 require_relative "seeds/message_categories"
-
-puts "🌱 Seeding FlowItems..."
-Dir[File.join(__dir__, "seeds/flow_items/*.rb")].sort.each do |file|
-  require file
-end
-
-puts "✅ Seeding completed"
+require_relative "seeds/flow_items_body"
+require_relative "seeds/flow_items_drink"
+require_relative "seeds/flow_items_request"
+require_relative "seeds/flow_items_feeling"

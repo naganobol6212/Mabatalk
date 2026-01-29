@@ -1,33 +1,42 @@
 feeling = MessageCategory.find_by!(key: "feeling")
 
-feeling.flow_items.find_or_create_by!(key: "happy") do |f|
-  f.name       = "うれしい"
-  f.kana       = "うれしい"
-  f.icon       = "sentiment_excited"
-  f.icon_color = "text-amber-500"
-  f.position   = 1
-end
+items = [
+  {
+    key: "happy",
+    name: "うれしい",
+    kana: "うれしい",
+    icon: "sentiment_excited",
+    icon_color: "text-amber-500",
+    position: 1
+  },
+  {
+    key: "lonely",
+    name: "さみしい",
+    kana: "さみしい",
+    icon: "sentiment_dissatisfied",
+    icon_color: "text-blue-400",
+    position: 2
+  },
+  {
+    key: "anxious",
+    name: "不安",
+    kana: "ふあん",
+    icon: "sentiment_worried",
+    icon_color: "text-purple-500",
+    position: 3
+  },
+  {
+    key: "okay",
+    name: "大丈夫",
+    kana: "だいじょうぶ",
+    icon: "thumb_up",
+    icon_color: "text-emerald-500",
+    position: 4
+  }
+]
 
-feeling.flow_items.find_or_create_by!(key: "lonely") do |f|
-  f.name       = "さみしい"
-  f.kana       = "さみしい"
-  f.icon       = "sentiment_dissatisfied"
-  f.icon_color = "text-blue-400"
-  f.position   = 2
-end
-
-feeling.flow_items.find_or_create_by!(key: "anxious") do |f|
-  f.name       = "不安"
-  f.kana       = "ふあん"
-  f.icon       = "sentiment_worried"
-  f.icon_color = "text-purple-500"
-  f.position   = 3
-end
-
-feeling.flow_items.find_or_create_by!(key: "okay") do |f|
-  f.name       = "大丈夫"
-  f.kana       = "だいじょうぶ"
-  f.icon       = "thumb_up"
-  f.icon_color = "text-emerald-500"
-  f.position   = 4
+items.each do |attrs|
+  item = feeling.flow_items.find_or_initialize_by(key: attrs[:key])
+  item.assign_attributes(attrs)
+  item.save!
 end
