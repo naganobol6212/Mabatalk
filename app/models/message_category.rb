@@ -5,6 +5,8 @@ class MessageCategory < ApplicationRecord
   validates :name, uniqueness: { scope: :user_id }
   validates :key, presence: true, uniqueness: true
 
+  before_validation :set_key, on: :create
+
   scope :for_user, ->(user) {
     if user
       where(user_id: [ nil, user.id ])
@@ -19,5 +21,11 @@ class MessageCategory < ApplicationRecord
 
   def ruby
     kana
+  end
+
+  private
+
+  def set_key
+    self.key ||= SecureRandom.uuid
   end
 end
