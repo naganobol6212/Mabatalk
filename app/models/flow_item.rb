@@ -1,8 +1,9 @@
 class FlowItem < ApplicationRecord
-  belongs_to :message_category, optional: true
+  belongs_to :message_category
   belongs_to :user, optional: true
   has_many :message_logs
 
+  validates :key, presence: true, uniqueness: true
   validates :name, :kana, :icon, presence: true
 
   before_validation :set_key, on: :create
@@ -14,6 +15,7 @@ class FlowItem < ApplicationRecord
       where(user_id: nil)
     end
   }
+
   private
 
   def set_key

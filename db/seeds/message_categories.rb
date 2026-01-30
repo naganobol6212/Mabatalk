@@ -34,7 +34,10 @@ categories = [
 ]
 
 categories.each do |attrs|
-  mc = MessageCategory.find_or_initialize_by(key: attrs[:key])
-  mc.assign_attributes(attrs)
+  mc = MessageCategory.find_or_initialize_by(
+    key: attrs[:key],
+    user_id: nil
+  )
+  mc.assign_attributes(attrs.merge(user_id: nil))
   mc.save!
 end

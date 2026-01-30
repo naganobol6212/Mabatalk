@@ -36,7 +36,10 @@ items = [
 ]
 
 items.each do |attrs|
-  item = request.flow_items.find_or_initialize_by(key: attrs[:key])
-  item.assign_attributes(attrs)
+  item = FlowItem.find_or_initialize_by(key: attrs[:key])
+  item.assign_attributes(attrs.merge(
+    user_id: nil,
+    message_category: request
+  ))
   item.save!
 end
