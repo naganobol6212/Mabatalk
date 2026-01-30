@@ -1,18 +1,71 @@
-  <nav class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur border-t border-stone-200 pb-safe pt-2 px-6 shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.05)] z-50">
-    <div class="flex justify-around items-end pb-2 max-w-md mx-auto">
-      <%= link_to message_categories_path, class: "flex flex-col items-center gap-1 min-w-[64px]" do %>
-        <span class="material-symbols-outlined text-amber-700">chat_bubble</span>
-        <span class="text-[11px] font-bold text-amber-700">メッセージ</span>
-      <% end %>
+<% active_icon   = "text-amber-700" %>
+<% active_text   = "text-amber-700 font-bold" %>
+<% inactive_icon = "text-stone-400" %>
+<% inactive_text = "text-stone-400" %>
 
-      <%= link_to message_logs_path, class: "flex flex-col items-center gap-1 min-w-[64px]" do %>
-        <span class="material-symbols-outlined text-stone-400">history</span>
-        <span class="text-[11px] text-stone-400">履歴</span>
-      <% end %>
+<% message_active =
+  controller_name == "message_categories" ||
+  controller_name == "flow_items"
+%>
 
-      <%= link_to "#", class: "flex flex-col items-center gap-1 min-w-[64px]" do %>
-        <span class="material-symbols-outlined text-stone-400">settings</span>
-        <span class="text-[11px] text-stone-400">設定</span>
-      <% end %>
-    </div>
-  </nav>
+<% log_active = controller_name == "message_logs" %>
+
+<nav class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur border-t border-stone-200 pb-safe pt-2 px-6 shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.05)] z-50">
+  <div class="flex justify-around items-end pb-2 max-w-md mx-auto">
+
+    <!-- メッセージ -->
+    <%= link_to message_categories_path,
+      class: "flex flex-col items-center gap-1 min-w-[64px]" do %>
+
+      <span class="
+        material-symbols-outlined
+        <%= message_active ? active_icon : inactive_icon %>
+      ">
+        chat_bubble
+      </span>
+
+      <span class="
+        text-[11px]
+        <%= message_active ? active_text : inactive_text %>
+      ">
+        メッセージ
+      </span>
+
+    <% end %>
+
+    <!-- 履歴 -->
+    <%= link_to message_logs_path,
+      class: "flex flex-col items-center gap-1 min-w-[64px]" do %>
+
+      <span class="
+        material-symbols-outlined
+        <%= log_active ? active_icon : inactive_icon %>
+      ">
+        history
+      </span>
+
+      <span class="
+        text-[11px]
+        <%= log_active ? active_text : inactive_text %>
+      ">
+        履歴
+      </span>
+
+    <% end %>
+
+    <!-- 設定（未実装） -->
+    <%= link_to "#",
+      class: "flex flex-col items-center gap-1 min-w-[64px]" do %>
+
+      <span class="material-symbols-outlined text-stone-400">
+        settings
+      </span>
+
+      <span class="text-[11px] text-stone-400">
+        設定
+      </span>
+
+    <% end %>
+
+  </div>
+</nav>
