@@ -21,20 +21,33 @@
 
           <!-- アイコン -->
           <span class="
-            material-symbols-outlined text-[42px] mb-3
+            material-symbols-outlined
+            !text-[60px]
+            mb-4
             <%= message_category.icon_color %>
-            group-hover:scale-110 transition-transform
+            transition-transform
+            group-hover:scale-110
           ">
             <%= message_category.icon %>
           </span>
 
           <!-- タイトル -->
-          <span class="text-[17px] font-bold text-stone-800 mb-1 leading-snug">
+          <span class="
+            text-[22px]
+            font-bold
+            text-stone-900
+            mb-2
+            leading-tight
+          ">
             <%= message_category.name %>
           </span>
 
           <!-- ルビ -->
-          <span class="text-sm text-stone-600">
+          <span class="
+            text-[16px]
+            text-stone-700
+            leading-tight
+          ">
             <%= message_category.kana %>
           </span>
 
