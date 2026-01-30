@@ -3,6 +3,7 @@ class MessageCategory < ApplicationRecord
   has_many :flow_items, dependent: :destroy
   validates :name, :kana, :icon, presence: true
   validates :name, uniqueness: { scope: :user_id }
+  validates :key, presence: true, uniqueness: true
 
   scope :for_user, ->(user) {
     if user
