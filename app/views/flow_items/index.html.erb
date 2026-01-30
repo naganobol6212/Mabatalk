@@ -23,21 +23,32 @@
           <!-- アイコン -->
           <span class="
             material-symbols-outlined
-            text-[48px] mb-3
+            !text-[52px]
+            mb-4
             <%= item.icon_color %>
-            group-hover:scale-110
             transition-transform
+            group-hover:scale-110
           ">
             <%= item.icon %>
           </span>
 
           <!-- メインテキスト（大きめ） -->
-          <span class="text-[22px] font-bold text-stone-800 mb-1 leading-snug">
+          <span class="
+            text-[22px]
+            font-bold
+            text-stone-900
+            mb-2
+            leading-tight
+          ">
             <%= item.name %>
           </span>
 
           <!-- ふりがな -->
-          <span class="text-base text-stone-600">
+          <span class="
+            text-[16px]
+            text-stone-700
+            leading-tight
+          ">
             <%= item.kana %>
           </span>
 
