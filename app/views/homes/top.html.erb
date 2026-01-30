@@ -1,20 +1,33 @@
 <main class="relative flex min-h-screen w-full flex-col bg-stone-200 overflow-x-hidden pb-24">
-  <!-- Main -->
   <div class="flex flex-col items-center px-4 pt-6 w-full max-w-md mx-auto">
 
     <!-- Hero -->
-    <section class="w-full mb-8 text-center">
-      <h2 class="text-[22px] font-bold leading-9 tracking-tight text-stone-800">
-        声が出せない、身体が動かせない<br>
-        <span class="text-amber-700">まばたき</span>で意思表示する方のための<br>
-        コミュニケーション支援アプリ
+    <section class="w-full mb-10 text-center">
+      <div class="mb-4">
+        <p class="text-sm font-bold tracking-wide text-stone-500">
+          まばたきでつながる
+        </p>
+        <h1 class="text-3xl font-black tracking-tight text-amber-700">
+          MabaTalk
+        </h1>
+      </div>
+
+      <h2 class="text-[20px] font-bold leading-8 text-stone-800">
+        声がだせなくても、<br>
+        身体が動かせなくても。<br>
+        <span class="text-amber-700">まばたき</span>で<br>
+        気持ちを伝えるアプリ
       </h2>
+
+      <p class="mt-3 text-sm text-stone-600 leading-relaxed">
+        要介護者と介護者をつなぐ、<br>
+        かんたんコミュニケーション支援
+      </p>
     </section>
 
     <!-- CTA -->
-    <section class="w-full flex flex-col gap-4 mb-10">
-        <!-- 主CTA -->
-      <%= link_to "ログインせずに使用する",
+    <section class="w-full flex flex-col gap-6 mb-12">
+      <%= link_to "ログインせずに使ってみる",
           message_categories_path,
           class: "
             w-full h-14
@@ -30,42 +43,42 @@
           "
       %>
 
-      <!-- ログイン -->
-      <%= link_to "ログイン",
-          new_user_session_path,
-          class: "
-            w-full h-12
-            flex items-center justify-center
-            rounded-full
-            bg-white
-            text-stone-900
-            text-base font-bold
-            hover:bg-stone-200
-            active:scale-[0.98]
-            transition
-          "
-      %>
+      <div class="grid grid-cols-2 gap-4">
+        <%= link_to "ログイン",
+            new_user_session_path,
+            class: "
+              h-12
+              flex items-center justify-center
+              rounded-full
+              bg-white
+              text-stone-900
+              text-base font-bold
+              hover:bg-stone-200
+              active:scale-[0.98]
+              transition
+            "
+        %>
 
-      <!-- 新規登録 -->
-      <%= link_to "新規登録",
-          new_user_registration_path,
-          class: "
-            w-full h-12
-            flex items-center justify-center
-            rounded-full
-            bg-white
-            border border-stone-300
-            text-stone-600
-            text-base font-bold
-            hover:bg-stone-100
-            active:scale-[0.98]
-            transition
-          "
-      %>
+        <%= link_to "新規登録",
+            new_user_registration_path,
+            class: "
+              h-12
+              flex items-center justify-center
+              rounded-full
+              bg-white
+              border border-stone-300
+              text-stone-600
+              text-base font-bold
+              hover:bg-stone-100
+              active:scale-[0.98]
+              transition
+            "
+        %>
+      </div>
     </section>
 
     <!-- How it works -->
-    <section class="w-full mb-10">
+    <section class="w-full mb-12">
       <div class="flex items-center gap-2 mb-4 px-2">
         <span class="material-symbols-outlined text-amber-700">touch_app</span>
         <h3 class="text-lg font-bold text-stone-800">ご利用イメージ</h3>
@@ -75,16 +88,36 @@
         <div class="absolute left-[19px] top-6 bottom-6 w-0.5 bg-stone-300 -z-0"></div>
 
         <% steps = [
-          ["質問カテゴリを見せる", "家族や介護スタッフが質問カテゴリ画面を要介護者に見せます"],
-          ["まばたきで選択する", "要介護者がまばたきで希望するカテゴリを伝え、家族や介護スタッフが選択します"],
-          ["質問に順番に答える", "質問に答えていくことで、困りごとや希望を伝えられます"]
+          [
+            "メッセージカテゴリを見せる",
+            "ご家族やスタッフが、画面を本人に見せます"
+          ],
+          [
+            "指差しで問いかける",
+            "順番に項目を指し、伝えたい内容があればまばたきしてもらいます"
+          ],
+          [
+            "メッセージを選んでいく",
+            "項目を選んでいくことで、本人の気持ちや困りごとが伝わります"
+          ]
         ] %>
 
         <% steps.each_with_index do |(title, text), i| %>
           <div class="relative flex items-start gap-4 z-10">
-            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-white border-2 border-amber-600 text-amber-700 font-bold text-lg shadow-sm shrink-0">
+            <div class="
+              flex items-center justify-center
+              w-10 h-10
+              rounded-full
+              bg-white
+              border-2 border-amber-600
+              text-amber-700
+              font-bold text-lg
+              shadow-sm
+              shrink-0
+            ">
               <%= i + 1 %>
             </div>
+
             <div class="flex-1 bg-white/80 p-4 rounded-2xl border border-white shadow-sm">
               <h4 class="font-bold text-stone-800 mb-1"><%= title %></h4>
               <p class="text-sm text-stone-600 leading-relaxed"><%= text %></p>
@@ -98,21 +131,32 @@
     <section class="w-full mb-6">
       <div class="flex items-center gap-2 mb-4 px-2">
         <span class="material-symbols-outlined text-sky-500">verified_user</span>
-        <h3 class="text-lg font-bold text-stone-800">ログインするとできること</h3>
+        <h3 class="text-lg font-bold text-stone-800">ログインで広がる機能</h3>
       </div>
 
       <div class="bg-white rounded-2xl p-6 shadow border border-stone-100">
         <ul class="space-y-4">
           <% [
-            "回答内容が自動的に記録されます",
-            "要介護者がどんな困りごとを伝えているかを、あとから見返せます",
-            "複数の介護者で回答内容を共有できます"
+            "メッセージの選択結果が自動で履歴に残ります",
+            "履歴をあとから振り返って確認できます",
+            "ご本人に合わせて、カテゴリや項目を自由に作れます"
           ].each do |text| %>
             <li class="flex items-start gap-3">
-              <div class="w-6 h-6 rounded-full bg-sky-100 flex items-center justify-center shrink-0 mt-0.5">
-                <span class="material-symbols-outlined text-sky-500 text-[16px]">check</span>
+              <div class="
+                w-6 h-6
+                rounded-full
+                bg-sky-100
+                flex items-center justify-center
+                shrink-0
+                mt-0.5
+              ">
+                <span class="material-symbols-outlined text-sky-500 text-[16px]">
+                  check
+                </span>
               </div>
-              <span class="text-stone-800 font-medium leading-relaxed"><%= text %></span>
+              <span class="text-stone-800 font-medium leading-relaxed">
+                <%= text %>
+              </span>
             </li>
           <% end %>
         </ul>
