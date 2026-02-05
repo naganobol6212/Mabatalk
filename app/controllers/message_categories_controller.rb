@@ -3,7 +3,7 @@ class MessageCategoriesController < ApplicationController
   before_action :authenticate_user!, only: %i[new create]
 
   def index
-    @message_categories = MessageCategory.for_user(current_user).order(created_at: :asc)
+    @message_categories = MessageCategory.for_user(current_user).order(:position)
   end
 
   def new
