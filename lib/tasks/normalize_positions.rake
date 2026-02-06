@@ -40,11 +40,9 @@ namespace :data do
       MessageCategory
         .where(user_id: nil)
         .find_each do |cat|
-
           cat.flow_items
               .order(:position, :created_at, :id)
               .each_with_index do |item, idx|
-
             desired_pos   = idx + 1
             desired_color = item.icon_color.presence || default_color
 
@@ -64,15 +62,12 @@ namespace :data do
         .distinct
         .pluck(:user_id)
         .each do |uid|
-
           MessageCategory
             .where(user_id: uid)
             .find_each do |cat|
-
               cat.flow_items
                   .order(:position, :created_at, :id)
                   .each_with_index do |item, idx|
-
                 desired_pos   = idx + 1
                 desired_color = item.icon_color.presence || default_color
 
