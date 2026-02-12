@@ -10,23 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_01_30_054555) do
+ActiveRecord::Schema[7.2].define(version: 2026_02_12_064247) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-
-  create_table "categories", force: :cascade do |t|
-    t.string "title", null: false
-    t.string "ruby", null: false
-    t.string "icon", null: false
-    t.string "color", null: false
-    t.integer "position", default: 0, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "user_id"
-    t.string "key"
-    t.index ["key"], name: "index_categories_on_key", unique: true
-    t.index ["user_id"], name: "index_categories_on_user_id"
-  end
 
   create_table "flow_items", force: :cascade do |t|
     t.bigint "user_id"
@@ -67,12 +53,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_30_054555) do
     t.index ["user_id"], name: "index_message_logs_on_user_id"
   end
 
-  create_table "posts", force: :cascade do |t|
-    t.string "title"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -88,7 +68,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_30_054555) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
-  add_foreign_key "categories", "users"
   add_foreign_key "flow_items", "message_categories"
   add_foreign_key "flow_items", "users"
   add_foreign_key "message_categories", "users"
