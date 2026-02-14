@@ -1,5 +1,6 @@
-# app/controllers/pages_controller.rb
 class PagesController < ApplicationController
-  def home
-  end
+  def home; end
+  def guide; end
+  def terms; end
+  def privacy_policy; end
 end

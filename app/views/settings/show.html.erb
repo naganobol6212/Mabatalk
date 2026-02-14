@@ -1,0 +1,244 @@
+<% content_for :page_title do %>
+  設定
+<% end %>
+
+<main class="relative min-h-screen w-full bg-stone-200 overflow-x-hidden pb-24">
+  <div class="flex flex-col items-center px-4 pt-6 w-full max-w-md mx-auto space-y-6">
+
+    <%# =========================
+        はじめての方へ（安心導線）
+        ========================= %>
+    <section class="w-full">
+      <div class="flex items-center gap-2 mb-3 px-2">
+        <span class="material-symbols-outlined text-amber-700">menu_book</span>
+        <h3 class="text-lg font-bold text-stone-800">はじめての方へ</h3>
+      </div>
+
+      <div class="bg-white/90 backdrop-blur rounded-2xl shadow border border-stone-100 overflow-hidden">
+        <%= link_to guide_path,
+                    class: "w-full flex items-center gap-3 p-5 hover:bg-stone-100/60 active:scale-[0.99] transition focus:outline-none focus:ring-4 focus:ring-stone-300" do %>
+
+          <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-amber-700 text-[26px]">
+              touch_app
+            </span>
+          </div>
+
+          <div class="flex-1 text-left">
+            <div class="text-[18px] font-bold text-stone-900 leading-tight">
+              使い方を見る
+            </div>
+            <div class="text-sm text-stone-600 mt-1 leading-relaxed">
+              基本操作を図解で確認できます
+            </div>
+          </div>
+
+          <span class="material-symbols-outlined text-stone-400">
+            chevron_right
+          </span>
+        <% end %>
+    </section>
+
+    <%# =========================
+        お困りですか？
+        ========================= %>
+    <section class="w-full">
+      <div class="flex items-center gap-2 mb-3 px-2">
+        <span class="material-symbols-outlined text-sky-500">support_agent</span>
+        <h3 class="text-lg font-bold text-stone-800">お困りですか？</h3>
+      </div>
+
+      <div class="bg-white/90 backdrop-blur rounded-2xl shadow border border-stone-100 overflow-hidden">
+        <%= link_to new_feedback_path,
+                    class: "w-full flex items-center gap-3 p-5 hover:bg-stone-100/60 active:scale-[0.99] transition focus:outline-none focus:ring-4 focus:ring-stone-300" do %>
+
+          <div class="w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-sky-500 text-[26px]">
+              chat
+            </span>
+          </div>
+
+          <div class="flex-1 text-left">
+            <div class="text-[18px] font-bold text-stone-900 leading-tight">
+              ご意見箱
+            </div>
+            <div class="text-sm text-stone-600 mt-1 leading-relaxed">
+              改善のために、困ったことを送れます
+            </div>
+          </div>
+
+          <span class="material-symbols-outlined text-stone-400">
+            chevron_right
+          </span>
+
+        <% end %>
+
+      </div>
+
+    </section>
+
+    <%# =========================
+        アカウント（Devise既存機能へ誘導）
+        ========================= %>
+    <section class="w-full">
+      <div class="flex items-center gap-2 mb-3 px-2">
+        <span class="material-symbols-outlined text-amber-700">manage_accounts</span>
+        <h3 class="text-lg font-bold text-stone-800">アカウント</h3>
+      </div>
+
+      <div class="bg-white/90 backdrop-blur rounded-2xl shadow border border-stone-100 overflow-hidden divide-y divide-stone-100">
+
+        <%# プロフィール編集（= Devise registration edit に寄せる） %>
+        <%= link_to edit_user_registration_path,
+          class: "
+            w-full flex items-center gap-3 p-5
+            hover:bg-stone-100/60 active:scale-[0.99] transition
+            focus:outline-none focus:ring-4 focus:ring-stone-300
+          " do %>
+          <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-amber-700 text-[26px]">person</span>
+          </div>
+          <div class="flex-1 text-left">
+            <div class="text-[18px] font-bold text-stone-900 leading-tight">プロフィール編集</div>
+            <div class="text-sm text-stone-600 mt-1 leading-relaxed">名前・メールなどを変更します</div>
+          </div>
+          <span class="material-symbols-outlined text-stone-400">chevron_right</span>
+        <% end %>
+
+        <%# メールアドレス（同じく Devise edit へ。UI文言で“メール”に焦点） %>
+        <%= link_to edit_user_registration_path(anchor: "email"),
+          class: "
+            w-full flex items-center gap-3 p-5
+            hover:bg-stone-100/60 active:scale-[0.99] transition
+            focus:outline-none focus:ring-4 focus:ring-stone-300
+          " do %>
+          <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-orange-600 text-[26px]">mail</span>
+          </div>
+          <div class="flex-1 text-left">
+            <div class="text-[18px] font-bold text-stone-900 leading-tight">メールアドレス</div>
+            <div class="text-sm text-stone-600 mt-1 leading-relaxed">ログインに使うメールを変更します</div>
+          </div>
+          <span class="material-symbols-outlined text-stone-400">chevron_right</span>
+        <% end %>
+
+        <%# パスワード（同じく Devise edit へ。UI文言で“パスワード”に焦点） %>
+        <%= link_to edit_user_registration_path(anchor: "password"),
+          class: "
+            w-full flex items-center gap-3 p-5
+            hover:bg-stone-100/60 active:scale-[0.99] transition
+            focus:outline-none focus:ring-4 focus:ring-stone-300
+          " do %>
+          <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-indigo-600 text-[26px]">lock</span>
+          </div>
+          <div class="flex-1 text-left">
+            <div class="text-[18px] font-bold text-stone-900 leading-tight">パスワード設定</div>
+            <div class="text-sm text-stone-600 mt-1 leading-relaxed">安全のために定期的に変更できます</div>
+          </div>
+          <span class="material-symbols-outlined text-stone-400">chevron_right</span>
+        <% end %>
+
+        <%# ログアウト（誤操作を防ぐため“赤すぎない”がコツ） %>
+        <div class="p-5">
+          <%= button_to destroy_user_session_path,
+            method: :delete,
+            form: { data: { turbo: true } },
+            class: "
+              w-full h-14
+              flex items-center justify-center gap-2
+              rounded-2xl
+              bg-stone-100/80 hover:bg-stone-200
+              text-stone-700 font-bold
+              active:scale-[0.99] transition
+              focus:outline-none focus:ring-4 focus:ring-stone-300
+            " do %>
+            <span class="material-symbols-outlined text-[22px]">logout</span>
+            ログアウト
+          <% end %>
+        </div>
+      </div>
+
+      <%# 補足: anchor は“将来 Devise 編集画面を整える時”に使える程度の目印です。
+          今すぐ section 分割する必要はありません（情報設計のハブの役割が優先）。
+      %>
+    </section>
+
+    <%# =========================
+        サービスについて
+        ========================= %>
+    <section class="w-full">
+      <div class="flex items-center gap-2 mb-3 px-2">
+        <span class="material-symbols-outlined text-stone-600">info</span>
+        <h3 class="text-lg font-bold text-stone-800">サービスについて</h3>
+      </div>
+
+      <div class="bg-white/90 backdrop-blur rounded-2xl shadow border border-stone-100 overflow-hidden divide-y divide-stone-100">
+        <%= link_to "https://note.com/prime_snail5740/n/n02d9f797d46a",
+              target: "_blank",
+              rel: "noopener",
+              class: "w-full flex items-center gap-3 p-5 hover:bg-stone-100/60 active:scale-[0.99] transition focus:outline-none focus:ring-4 focus:ring-stone-300" do %>
+
+          <div class="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-stone-600 text-[26px]">
+              description
+            </span>
+          </div>
+
+          <div class="flex-1 text-left">
+            <div class="text-[18px] font-bold text-stone-900 leading-tight">
+              MabaTalk公式note
+            </div>
+            <div class="text-sm text-stone-600 mt-1 leading-relaxed">
+              開発背景やアップデート情報
+            </div>
+          </div>
+
+          <span class="material-symbols-outlined text-stone-400">
+            open_in_new
+          </span>
+        <% end %>
+
+        <%= link_to terms_path,
+              class: "w-full flex items-center justify-between p-5 hover:bg-stone-100/60 active:scale-[0.99] transition focus:outline-none focus:ring-4 focus:ring-stone-300" do %>
+          <span class="text-[18px] font-bold text-stone-900">利用規約</span>
+          <span class="material-symbols-outlined text-stone-400">chevron_right</span>
+        <% end %>
+
+        <%= link_to privacy_policy_path,
+              class: "w-full flex items-center justify-between p-5 hover:bg-stone-100/60 active:scale-[0.99] transition focus:outline-none focus:ring-4 focus:ring-stone-300" do %>
+          <span class="text-[18px] font-bold text-stone-900">プライバシーポリシー</span>
+          <span class="material-symbols-outlined text-stone-400">chevron_right</span>
+        <% end %>
+      </div>
+
+      <%# TODO:
+          - mabatalk_note_url は credentials / ENV に置くのがおすすめ
+          - terms_path, privacy_policy_path が無い場合は PagesController などで静的ページを作る
+      %>
+    </section>
+
+    <%# =========================
+        アカウント削除（最下部 + 目立たせすぎない）
+        ========================= %>
+    <section class="w-full pt-4">
+      <div class="flex justify-center">
+        <%= button_to user_registration_path,
+          method: :delete,
+          form: { data: { turbo: true } },
+          data: {
+            turbo_confirm: "アカウントを削除します。\n履歴などのデータは元に戻せません。\n本当に削除しますか？"
+          },
+          class: "
+            text-sm text-stone-500 hover:text-red-600
+            underline underline-offset-4 decoration-stone-300
+            px-4 py-2 rounded-full
+            transition
+          " do %>
+          アカウントを削除する
+        <% end %>
+      </div>
+    </section>
+
+  </div>
+</main>

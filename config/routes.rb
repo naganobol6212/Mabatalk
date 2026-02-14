@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get "feedbacks/new"
+  get "feedbacks/create"
   devise_for :users, controllers: { omniauth_callbacks: "users/omniauth_callbacks" }
 
   root to: "homes#top"
@@ -12,6 +14,14 @@ Rails.application.routes.draw do
   resources :message_logs, only: %i[index create]
 
   resource :message_completion, only: %i[show]
+
+  resource :settings, only: %i[show]
+
+  get "/guide", to: "pages#guide", as: :guide
+  get "/terms", to: "pages#terms", as: :terms
+  get "/privacy_policy", to: "pages#privacy_policy", as: :privacy_policy
+
+  resources :feedbacks, only: %i[new create]
 
   # --- 以下はRails標準の補助機能 ---
   get "up" => "rails/health#show", as: :rails_health_check
