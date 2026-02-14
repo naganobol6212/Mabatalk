@@ -1,0 +1,25 @@
+<% content_for :page_title do %>
+  ご意見箱
+<% end %>
+
+<main class="relative min-h-screen w-full bg-stone-200 overflow-x-hidden pb-24">
+  <div class="flex flex-col items-center px-4 pt-6 w-full max-w-md mx-auto">
+    <div class="w-full bg-white/90 rounded-2xl p-6 shadow border border-stone-100">
+      <p class="text-sm text-stone-600 mb-4">
+        困ったこと・改善してほしいことを送れます。
+      </p>
+
+      <%= form_with url: feedbacks_path, method: :post, data: { turbo: true } do |f| %>
+        <div class="mb-4">
+          <%= f.label :message, "内容", class: "block text-sm font-bold text-stone-700 mb-2" %>
+          <%= f.text_area :message, rows: 6,
+            class: "w-full rounded-xl border border-stone-300 p-3",
+            placeholder: "例）ボタンが押しづらい / こうしてほしい など" %>
+        </div>
+
+        <%= f.submit "送信する",
+          class: "w-full h-12 rounded-2xl bg-amber-600 text-white font-bold hover:bg-amber-700 active:scale-[0.98] transition" %>
+      <% end %>
+    </div>
+  </div>
+</main>
