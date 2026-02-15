@@ -22,8 +22,19 @@ ja:
   devise:
     registrations:
       signed_up: "アカウント登録が完了しました"
+
     sessions:
       signed_in: "ログインしました"
       signed_out: "ログアウトしました"
+
+    failure:
+      invalid: "メールアドレスまたはパスワードが正しくありません"
+      not_found_in_database: "メールアドレスまたはパスワードが正しくありません"
+      unauthenticated: "ログインが必要です"
+      already_authenticated: "すでにログインしています"
+      timeout: "一定時間操作がなかったため、再度ログインしてください"
+
     omniauth_callbacks:
       success: "%{kind} アカウントでログインしました"
+      failure: "%{kind}でのログインに失敗しました"
+
