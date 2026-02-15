@@ -30,7 +30,7 @@ ja:
     failure:
       invalid: "メールアドレスまたはパスワードが正しくありません"
       not_found_in_database: "メールアドレスまたはパスワードが正しくありません"
-      unauthenticated: "ログインが必要です"
+      unauthenticated: "この機能を利用するにはログインが必要です"
       already_authenticated: "すでにログインしています"
       timeout: "一定時間操作がなかったため、再度ログインしてください"
 
