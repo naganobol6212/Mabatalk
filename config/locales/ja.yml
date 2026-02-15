@@ -1,0 +1,8 @@
+ja:
+  activerecord:
+    errors:
+      models:
+        user:
+          attributes:
+            email:
+              taken: "はすでに登録されています"
