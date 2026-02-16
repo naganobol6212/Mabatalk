@@ -40,34 +40,69 @@
 <body>
   <%= render 'shared/header' %>
 
-  <% if notice %>
-    <div
-      class="fixed top-4 inset-x-0 z-50 flex justify-center"
-      data-flash
-    >
-      <div
-        class="w-full max-w-md bg-blue-50 dark:bg-blue-900/20
-              rounded-xl p-4 shadow-sm
-              border border-blue-200 dark:border-blue-800
-              flex items-center justify-center space-x-3
-              text-center text-blue-800 dark:text-blue-200"
-      >
-        <span class="material-symbols-outlined text-3xl">
-          history_toggle_off
-        </span>
-        <span class="text-base sm:text-lg font-medium">
-          <%= notice %>
-        </span>
+  <% flash.each do |type, message| %>
+
+    <% bg_class =
+      case type.to_sym
+      when :notice
+        "bg-emerald-50 text-emerald-700 border-emerald-200"
+      when :alert
+        "bg-red-50 text-red-700 border-red-200"
+      else
+        "bg-gray-50 text-gray-700 border-gray-200"
+      end %>
+
+    <% icon_name =
+      case type.to_sym
+      when :notice
+        "check_circle"
+      when :alert
+        "error"
+      else
+        "info"
+      end %>
+
+    <% icon_color =
+      case type.to_sym
+      when :notice
+        "text-emerald-600"
+      when :alert
+        "text-red-600"
+      else
+        "text-gray-600"
+      end %>
+
+    <div class="fixed top-4 inset-x-0 z-50 flex justify-center" data-flash>
+      <div class="relative w-full max-w-md rounded-xl p-4 shadow-sm border <%= bg_class %>">
+
+        <!-- 閉じる -->
+        <button
+          type="button"
+          onclick="this.closest('[data-flash]').remove()"
+          class="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+          aria-label="閉じる"
+        >
+          ×
+        </button>
+
+        <div class="flex items-center gap-3 text-left">
+          <span class="material-symbols-outlined <%= icon_color %>">
+            <%= icon_name %>
+          </span>
+          <span class="text-base sm:text-lg font-medium">
+            <%= message %>
+          </span>
+        </div>
       </div>
     </div>
-      <script>
-    setTimeout(() => {
+
+    <script>
+      setTimeout(() => {
         const flash = document.querySelector('[data-flash]');
         if (flash) flash.remove();
       }, 5000);
     </script>
   <% end %>
-
   <%= yield %>
 
   <%= render 'shared/footer' %>

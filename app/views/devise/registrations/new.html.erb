@@ -14,66 +14,83 @@
         url: registration_path(resource_name),
         html: { class: "space-y-6" }) do |f| %>
 
-    <!-- エラーメッセージ -->
-    <%= render "registrations/shared/error_messages", resource: resource %>
-
     <!-- ユーザー名 -->
     <div class="space-y-2">
-      <%= f.label :name, "ユーザー名",
-            class: "block text-sm font-bold text-gray-700 ml-1" %>
+      <%= f.label :name,
+            class: "block text-sm font-bold ml-1 #{resource.errors[:name].present? ? 'text-red-600' : 'text-gray-700'}" do %>
+        ユーザー名
+      <% end %>
 
       <div class="relative">
         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
           <span class="material-symbols-outlined text-gray-400">person</span>
         </div>
+        <% name_border_class = resource.errors[:name].present? ? 'border-red-400 bg-red-50' : 'border-gray-300' %>
 
         <%= f.text_field :name,
               placeholder: "例：田中タロウ",
-              class: "w-full pl-11 pr-4 py-4 rounded-2xl
-                      bg-white border border-gray-300
+              class: "w-full pl-11 pr-4 py-4 rounded-2xl bg-white border #{name_border_class}
                       focus:border-amber-500 focus:ring-2 focus:ring-amber-200
                       focus:outline-none transition" %>
       </div>
+      <% if resource.errors[:name].present? %>
+        <p class="text-sm text-red-600 ml-1">
+          <%= resource.errors[:name].first %>
+        </p>
+      <% end %>
     </div>
 
     <!-- メールアドレス -->
-    <div class="space-y-2">
-      <%= f.label :email, "メールアドレス",
-            class: "block text-sm font-bold text-gray-700 ml-1" %>
+    <%= f.label :email,
+          class: "text-sm font-bold ml-1 #{resource.errors[:email].present? ? 'text-red-600' : 'text-gray-700'}" do %>
+      メールアドレス
+    <% end %>
 
       <div class="relative">
         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
           <span class="material-symbols-outlined text-gray-400">email</span>
         </div>
+        <% border_class = resource.errors[:email].present? ? 'border-red-400 bg-red-50' : 'border-gray-300' %>
 
         <%= f.email_field :email,
               placeholder: "example@mabatalk.com",
-              class: "w-full pl-11 pr-4 py-4 rounded-2xl
-                      bg-white border border-gray-300
+              class: "w-full pl-11 pr-4 py-4 rounded-2xl bg-white border #{border_class}
                       focus:border-amber-500 focus:ring-2 focus:ring-amber-200
                       focus:outline-none transition" %>
       </div>
+      <% if resource.errors[:email].present? %>
+        <p class="text-sm text-red-600 ml-1">
+          <%= resource.errors[:email].first %>
+        </p>
+      <% end %>
     </div>
 
     <!-- パスワード -->
     <div class="space-y-2">
-      <%= f.label :password, "パスワード",
-            class: "block text-sm font-bold text-gray-700 ml-1" %>
+      <%= f.label :password,
+            class: "block text-sm font-bold ml-1 #{resource.errors[:password].present? ? 'text-red-600' : 'text-gray-700'}" do %>
+        パスワード
+      <% end %>
 
       <div class="relative">
         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
           <!-- lock は不安定なので lock_outline を使用 -->
           <span class="material-symbols-outlined text-gray-400">lock_outline</span>
         </div>
+        <% password_border_class = resource.errors[:password].present? ? 'border-red-400 bg-red-50' : 'border-gray-300' %>
 
         <%= f.password_field :password,
-              placeholder: "8文字以上の半角英数字",
+              placeholder: "6文字以上の半角英数字",
               autocomplete: "new-password",
-              class: "w-full pl-11 pr-4 py-4 rounded-2xl
-                      bg-white border border-gray-300
+              class: "w-full pl-11 pr-4 py-4 rounded-2xl bg-white border #{password_border_class}
                       focus:border-amber-500 focus:ring-2 focus:ring-amber-200
                       focus:outline-none transition" %>
       </div>
+      <% if resource.errors[:password].present? %>
+        <p class="text-sm text-red-600 ml-1">
+          <%= resource.errors[:password].first %>
+        </p>
+      <% end %>
     </div>
 
     <!-- 新規登録ボタン -->
