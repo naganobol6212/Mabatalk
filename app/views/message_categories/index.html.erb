@@ -5,55 +5,16 @@
 <main class="relative min-h-screen w-full bg-stone-200 overflow-x-hidden pb-24">
   <div class="flex flex-col items-center px-4 pt-6 w-full max-w-md mx-auto">
     <!-- カテゴリ一覧 -->
-    <div class="grid grid-cols-2 gap-4 w-full">
-      <% @message_categories.each do |message_category| %>
-        <%= link_to message_category_flow_items_path(message_category),
-          class: "
-            bg-white/90 backdrop-blur rounded-2xl p-6 aspect-square
-            flex flex-col justify-between items-center text-center
-            shadow-[0_6px_14px_rgba(0,0,0,0.08)]
-            hover:shadow-[0_10px_22px_rgba(0,0,0,0.12)]
-            transition-shadow duration-200
-            active:scale-[0.98]
-            focus:outline-none focus:ring-4 focus:ring-stone-300
-            group
-          " do %>
-
-          <!-- アイコン -->
-          <span class="
-            material-symbols-outlined
-            !text-[60px]
-            mb-4
-            <%= message_category.icon_color %>
-            transition-transform
-            group-hover:scale-110
-          ">
-            <%= message_category.icon %>
-          </span>
-
-          <!-- タイトル -->
-          <span class="
-            text-[22px]
-            font-bold
-            text-stone-900
-            mb-2
-            leading-tight
-          ">
-            <%= message_category.name %>
-          </span>
-
-          <!-- ルビ -->
-          <span class="
-            text-[16px]
-            text-stone-700
-            leading-tight
-          ">
-            <%= message_category.kana %>
-          </span>
-
-        <% end %>
-      <% end %>
-    </div>
+<div class="grid grid-cols-2 gap-4 w-full">
+  <% @message_categories.each do |message_category| %>
+    <%= render "shared/square_card",
+        path: message_category_flow_items_path(message_category),
+        icon: message_category.icon,
+        icon_color: message_category.icon_color,
+        title: message_category.name,
+        kana: message_category.kana %>
+  <% end %>
+</div>
 
     <!-- カテゴリ追加 -->
     <div class="w-full mt-6">

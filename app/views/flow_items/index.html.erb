@@ -8,58 +8,16 @@
     <!-- フロー項目一覧 -->
     <div class="grid grid-cols-2 gap-4 w-full">
       <% @flow_items.each do |item| %>
-        <%= link_to confirm_message_category_flow_item_path(@message_category, item),
-          class: "
-            bg-white/90 backdrop-blur rounded-2xl p-6 aspect-square
-            flex flex-col justify-between items-center text-center
-            shadow-[0_6px_14px_rgba(0,0,0,0.08)]
-            hover:shadow-[0_10px_22px_rgba(0,0,0,0.12)]
-            transition-shadow duration-200
-            active:scale-[0.98]
-            focus:outline-none focus:ring-4 focus:ring-stone-300
-            group
-          " do %>
-
-          <!-- アイコン -->
-          <span class="
-            material-symbols-outlined
-            !text-[52px]
-            <%= item.icon_color %>
-            transition-transform
-            group-hover:scale-110
-          ">
-            <%= item.icon %>
-          </span>
-
-          <!-- テキストエリア（高さ固定） -->
-          <div class="h-[72px] flex flex-col justify-center">
-            <span class="
-              text-[22px]
-              font-bold
-              text-stone-900
-              leading-tight
-              line-clamp-2
-            ">
-              <%= item.name %>
-            </span>
-
-            <span class="
-              text-[15px]
-              text-stone-700
-              leading-tight
-              line-clamp-2
-            ">
-              <%= item.kana %>
-            </span>
-          </div>
-
-        <% end %>
-
+        <%= render "shared/square_card",
+            path: confirm_message_category_flow_item_path(@message_category, item),
+            icon: item.icon,
+            icon_color: item.icon_color,
+            title: item.name,
+            kana: item.kana %>
       <% end %>
     </div>
 
-
-    <!-- 追加ボタン -->
+    <!-- 項目追加 -->
     <div class="w-full mt-6">
       <% if current_user %>
         <%= link_to new_message_category_flow_item_path(@message_category),
