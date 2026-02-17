@@ -1,4 +1,4 @@
-request = MessageCategory.find_by!(key: "request")
+request = MessageCategory.find_by!(key: "request", user_id: nil)
 
 items = [
   {

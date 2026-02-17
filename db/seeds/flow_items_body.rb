@@ -1,4 +1,4 @@
-body = MessageCategory.find_by!(key: "body")
+body = MessageCategory.find_by!(key: "body", user_id: nil)
 
 items = [
   {
@@ -18,12 +18,20 @@ items = [
     position: 2
   },
   {
+      key: "itchy",
+      name: "かゆい",
+      kana: "かゆい",
+      icon: "sentiment_stressed",
+      icon_color: "text-yellow-500",
+      position: 3
+    },
+  {
     key: "hot",
     name: "暑い",
     kana: "あつい",
     icon: "wb_sunny",
     icon_color: "text-orange-500",
-    position: 3
+    position: 4
   },
   {
     key: "cold",
@@ -31,7 +39,7 @@ items = [
     kana: "さむい",
     icon: "ac_unit",
     icon_color: "text-cyan-600",
-    position: 4
+    position: 5
   }
 ]
 

@@ -1,4 +1,4 @@
-feeling = MessageCategory.find_by!(key: "feeling")
+feeling = MessageCategory.find_by!(key: "feeling", user_id: nil)
 
 items = [
   {
