@@ -1,11 +1,31 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Myapp" %></title>
+    <title><%= content_for(:title) || "MabaTalk" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+
+    <!-- Description -->
+    <meta name="description" content="声が出せなくても、身体が動かせなくても。まばたきでつながるコミュニケーション支援アプリ｜MabaTalk">
+
+    <!-- OGP -->
+    <meta property="og:title" content="MabaTalk">
+    <meta property="og:description" content="声が出せなくても、身体が動かせなくても。まばたきでつながるコミュニケーション支援アプリ｜MabaTalk">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mabatalk.com">
+    <meta property="og:image" content="https://mabatalk.com/ogp.png">
+    <meta property="og:locale" content="ja_JP">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="MabaTalk">
+    <meta name="twitter:description" content="声が出せなくても、身体が動かせなくても。まばたきでつながるコミュニケーション支援アプリ｜MabaTalk">
+    <meta name="twitter:image" content="https://mabatalk.com/ogp.png">
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#fb8603">
 
     <%= yield :head %>
 
@@ -28,7 +48,7 @@
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
       rel="stylesheet"
     >
-
+    <meta name="theme-color" content="#fb8603">
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
