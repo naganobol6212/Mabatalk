@@ -28,8 +28,8 @@ ja:
       signed_out: "ログアウトしました"
 
     failure:
-      invalid: "メールアドレスまたはパスワードが正しくありません"
-      not_found_in_database: "メールアドレスまたはパスワードが正しくありません"
+      invalid: "メールアドレスまたはパスワードが正しくありません。もう一度お試しください。"
+      not_found_in_database: "メールアドレスまたはパスワードが正しくありません。もう一度お試しください。"
       unauthenticated: "この機能を利用するにはログインが必要です"
       already_authenticated: "すでにログインしています"
       timeout: "一定時間操作がなかったため、再度ログインしてください"
@@ -37,4 +37,13 @@ ja:
     omniauth_callbacks:
       success: "%{kind} アカウントでログインしました"
       failure: "%{kind}でのログインに失敗しました"
+
+    mailer:
+      reset_password_instructions:
+        subject: "【MabaTalk】パスワード再設定（8時間以内にご対応ください）"
+
+    passwords:
+      send_instructions: "パスワード再設定用のメールを送信しました"
+      updated: "パスワードが変更されました"
+      invalid_token: "無効なリンクです。再度お試しください"
 

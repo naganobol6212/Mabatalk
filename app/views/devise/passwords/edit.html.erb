@@ -1,25 +1,42 @@
-<h2>Change your password</h2>
+<main class="flex-grow w-full max-w-md mx-auto px-6 py-8 pb-32">
 
-<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
-  <%= f.hidden_field :reset_password_token %>
-
-  <div class="field">
-    <%= f.label :password, "New password" %><br />
-    <% if @minimum_password_length %>
-      <em>(<%= @minimum_password_length %> characters minimum)</em><br />
-    <% end %>
-    <%= f.password_field :password, autofocus: true, autocomplete: "new-password" %>
+  <div class="text-center mb-4">
+    <h2 class="text-2xl font-bold mb-2">新しいパスワードを設定</h2>
+    <p class="text-sm text-gray-500">
+      新しいパスワードを入力してください。
+    </p>
   </div>
 
-  <div class="field">
-    <%= f.label :password_confirmation, "Confirm new password" %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
-  </div>
+  <%= form_for(resource,
+        as: resource_name,
+        url: password_path(resource_name),
+        html: { method: :put, class: "space-y-6" }) do |f| %>
 
-  <div class="actions">
-    <%= f.submit "Change my password" %>
-  </div>
-<% end %>
+    <%= f.hidden_field :reset_password_token %>
 
-<%= render "devise/shared/links" %>
+    <!-- 新しいパスワード -->
+    <%= render "shared/password_field",
+          f: f,
+          field: :password,
+          label: "新しいパスワード",
+          minimum_length: @minimum_password_length,
+          autocomplete: "new-password",
+          autofocus: true,
+          errors: resource.errors[:password] %>
+
+    <%= render "shared/password_field",
+          f: f,
+          field: :password_confirmation,
+          label: "パスワード確認",
+          autocomplete: "new-password",
+          errors: resource.errors[:password_confirmation] %>
+
+    <button type="submit"
+      class="w-full bg-amber-600 hover:bg-amber-700
+              text-white font-bold text-lg py-4 rounded-full shadow-lg
+              transform active:scale-95 transition-all">
+        パスワードを変更
+    </button>
+
+  <% end %>
+</main>
