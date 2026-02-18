@@ -1,6 +1,5 @@
 <main class="flex-grow w-full max-w-md mx-auto px-6 py-8 pb-32">
 
-  <!-- タイトル -->
   <div class="text-center mb-4">
     <h2 class="text-2xl font-bold mb-2">新しいパスワードを設定</h2>
     <p class="text-sm text-gray-500">
@@ -15,78 +14,29 @@
 
     <%= f.hidden_field :reset_password_token %>
 
-    <!-- パスワード -->
-    <div class="space-y-2">
-      <%= f.label :password,
-            class: "block text-sm font-bold ml-1 #{resource.errors[:password].present? ? 'text-red-600' : 'text-gray-700'}" do %>
-        新しいパスワード
-      <% end %>
+    <!-- 新しいパスワード -->
+    <%= render "shared/password_field",
+          f: f,
+          field: :password,
+          label: "新しいパスワード",
+          minimum_length: @minimum_password_length,
+          autocomplete: "new-password",
+          autofocus: true,
+          errors: resource.errors[:password] %>
 
-      <% if @minimum_password_length %>
-        <p class="text-xs text-gray-500 ml-1">
-          ※ <%= @minimum_password_length %>文字以上で入力してください
-        </p>
-      <% end %>
+    <%= render "shared/password_field",
+          f: f,
+          field: :password_confirmation,
+          label: "パスワード確認",
+          autocomplete: "new-password",
+          errors: resource.errors[:password_confirmation] %>
 
-      <div class="relative">
-        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <span class="material-symbols-outlined text-gray-400">lock_outline</span>
-        </div>
-
-        <% border_class = resource.errors[:password].present? ? 'border-red-400 bg-red-50' : 'border-gray-300' %>
-
-        <%= f.password_field :password,
-              autofocus: true,
-              autocomplete: "new-password",
-              class: "w-full pl-11 pr-4 py-4 rounded-2xl bg-white border #{border_class}
-                      focus:border-amber-500 focus:ring-2 focus:ring-amber-200
-                      focus:outline-none transition" %>
-      </div>
-
-      <% if resource.errors[:password].present? %>
-        <p class="text-sm text-red-600 ml-1">
-          <%= resource.errors[:password].first %>
-        </p>
-      <% end %>
-    </div>
-
-    <!-- 確認 -->
-    <div class="space-y-2">
-      <%= f.label :password_confirmation,
-            class: "block text-sm font-bold ml-1 #{resource.errors[:password_confirmation].present? ? 'text-red-600' : 'text-gray-700'}" do %>
-        パスワード確認
-      <% end %>
-
-      <div class="relative">
-        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <span class="material-symbols-outlined text-gray-400">lock</span>
-        </div>
-
-        <% border_class = resource.errors[:password_confirmation].present? ? 'border-red-400 bg-red-50' : 'border-gray-300' %>
-
-        <%= f.password_field :password_confirmation,
-              autocomplete: "new-password",
-              class: "w-full pl-11 pr-4 py-4 rounded-2xl bg-white border #{border_class}
-                      focus:border-amber-500 focus:ring-2 focus:ring-amber-200
-                      focus:outline-none transition" %>
-      </div>
-
-      <% if resource.errors[:password_confirmation].present? %>
-        <p class="text-sm text-red-600 ml-1">
-          <%= resource.errors[:password_confirmation].first %>
-        </p>
-      <% end %>
-    </div>
-
-    <!-- 変更ボタン -->
     <button type="submit"
       class="w-full bg-amber-600 hover:bg-amber-700
               text-white font-bold text-lg py-4 rounded-full shadow-lg
-              transform active:scale-95 transition-all
-              flex items-center justify-center gap-2">
-        <span>パスワードを変更</span>
+              transform active:scale-95 transition-all">
+        パスワードを変更
     </button>
 
   <% end %>
-
 </main>
