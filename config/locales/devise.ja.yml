@@ -40,7 +40,7 @@ ja:
 
     mailer:
       reset_password_instructions:
-        subject: "【MabaTalk】パスワード再設定のご案内"
+        subject: "【MabaTalk】パスワード再設定（8時間以内にご対応ください）"
 
     passwords:
       send_instructions: "パスワード再設定用のメールを送信しました"
