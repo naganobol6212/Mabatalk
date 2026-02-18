@@ -1,25 +1,92 @@
-<h2>Change your password</h2>
+<main class="flex-grow w-full max-w-md mx-auto px-6 py-8 pb-32">
 
-<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
-  <%= f.hidden_field :reset_password_token %>
-
-  <div class="field">
-    <%= f.label :password, "New password" %><br />
-    <% if @minimum_password_length %>
-      <em>(<%= @minimum_password_length %> characters minimum)</em><br />
-    <% end %>
-    <%= f.password_field :password, autofocus: true, autocomplete: "new-password" %>
+  <!-- タイトル -->
+  <div class="text-center mb-4">
+    <h2 class="text-2xl font-bold mb-2">新しいパスワードを設定</h2>
+    <p class="text-sm text-gray-500">
+      新しいパスワードを入力してください。
+    </p>
   </div>
 
-  <div class="field">
-    <%= f.label :password_confirmation, "Confirm new password" %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
-  </div>
+  <%= form_for(resource,
+        as: resource_name,
+        url: password_path(resource_name),
+        html: { method: :put, class: "space-y-6" }) do |f| %>
 
-  <div class="actions">
-    <%= f.submit "Change my password" %>
-  </div>
-<% end %>
+    <%= f.hidden_field :reset_password_token %>
 
-<%= render "devise/shared/links" %>
+    <!-- パスワード -->
+    <div class="space-y-2">
+      <%= f.label :password,
+            class: "block text-sm font-bold ml-1 #{resource.errors[:password].present? ? 'text-red-600' : 'text-gray-700'}" do %>
+        新しいパスワード
+      <% end %>
+
+      <% if @minimum_password_length %>
+        <p class="text-xs text-gray-500 ml-1">
+          ※ <%= @minimum_password_length %>文字以上で入力してください
+        </p>
+      <% end %>
+
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <span class="material-symbols-outlined text-gray-400">lock_outline</span>
+        </div>
+
+        <% border_class = resource.errors[:password].present? ? 'border-red-400 bg-red-50' : 'border-gray-300' %>
+
+        <%= f.password_field :password,
+              autofocus: true,
+              autocomplete: "new-password",
+              class: "w-full pl-11 pr-4 py-4 rounded-2xl bg-white border #{border_class}
+                      focus:border-amber-500 focus:ring-2 focus:ring-amber-200
+                      focus:outline-none transition" %>
+      </div>
+
+      <% if resource.errors[:password].present? %>
+        <p class="text-sm text-red-600 ml-1">
+          <%= resource.errors[:password].first %>
+        </p>
+      <% end %>
+    </div>
+
+    <!-- 確認 -->
+    <div class="space-y-2">
+      <%= f.label :password_confirmation,
+            class: "block text-sm font-bold ml-1 #{resource.errors[:password_confirmation].present? ? 'text-red-600' : 'text-gray-700'}" do %>
+        パスワード確認
+      <% end %>
+
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <span class="material-symbols-outlined text-gray-400">lock</span>
+        </div>
+
+        <% border_class = resource.errors[:password_confirmation].present? ? 'border-red-400 bg-red-50' : 'border-gray-300' %>
+
+        <%= f.password_field :password_confirmation,
+              autocomplete: "new-password",
+              class: "w-full pl-11 pr-4 py-4 rounded-2xl bg-white border #{border_class}
+                      focus:border-amber-500 focus:ring-2 focus:ring-amber-200
+                      focus:outline-none transition" %>
+      </div>
+
+      <% if resource.errors[:password_confirmation].present? %>
+        <p class="text-sm text-red-600 ml-1">
+          <%= resource.errors[:password_confirmation].first %>
+        </p>
+      <% end %>
+    </div>
+
+    <!-- 変更ボタン -->
+    <button type="submit"
+      class="w-full bg-amber-600 hover:bg-amber-700
+              text-white font-bold text-lg py-4 rounded-full shadow-lg
+              transform active:scale-95 transition-all
+              flex items-center justify-center gap-2">
+        <span>パスワードを変更</span>
+    </button>
+
+  <% end %>
+
+</main>
