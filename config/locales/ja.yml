@@ -6,3 +6,5 @@ ja:
           attributes:
             email:
               taken: "はすでに登録されています"
+            current_password:
+              invalid: "が正しくありません"
