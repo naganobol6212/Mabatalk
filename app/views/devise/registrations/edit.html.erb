@@ -1,98 +1,216 @@
-<main class="flex-grow w-full max-w-md mx-auto px-6 py-8 pb-32">
+<%# どのセクションが送信されたかを判定（エラー表示の絞り込みに使用） %>
+<% email_section_submitted    = params.dig(:user, :email).present? %>
+<% password_section_submitted = params.dig(:user, :password).present? %>
 
-  <div class="text-center mb-4">
-    <h2 class="text-2xl font-bold mb-2">アカウント設定</h2>
-    <p class="text-sm text-gray-500">
-      情報を変更する場合のみ入力してください。
-    </p>
-  </div>
+<%# Google等OAuthでログインしたユーザーはメール/パスワードをアプリ側で変更できない %>
+<% oauth_user = resource.provider.present? %>
 
-  <%= form_for(resource,
-        as: resource_name,
-        url: registration_path(resource_name),
-        html: { method: :put, class: "space-y-6" }) do |f| %>
+<main class="flex-grow w-full bg-stone-200 overflow-x-hidden pb-28">
+  <div class="flex flex-col items-center px-4 pt-6 w-full max-w-md mx-auto space-y-6">
 
-    <!-- メール -->
-    <div class="space-y-2">
-      <%= f.label :email,
-            class: "block text-sm font-bold ml-1 #{resource.errors[:email].present? ? 'text-red-600' : 'text-gray-700'}" do %>
-        メールアドレス
-      <% end %>
-
-      <div class="relative">
-        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <span class="material-symbols-outlined text-gray-400">email</span>
-        </div>
-
-        <% border_class = resource.errors[:email].present? ? 'border-red-400 bg-red-50' : 'border-gray-300' %>
-
-        <%= f.email_field :email,
-              autofocus: true,
-              autocomplete: "email",
-              class: "w-full pl-11 pr-4 py-4 rounded-2xl bg-white border #{border_class}
-                      focus:border-amber-500 focus:ring-2 focus:ring-amber-200
-                      focus:outline-none transition" %>
-      </div>
-
-      <% if resource.errors[:email].present? %>
-        <p class="text-sm text-red-600 ml-1">
-          <%= resource.errors[:email].first %>
-        </p>
-      <% end %>
+    <div class="text-center w-full px-2">
+      <h2 class="text-2xl font-bold">アカウント設定</h2>
     </div>
 
-    <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
-      <p class="text-sm text-amber-600 ml-1">
-        確認待ちメール: <%= resource.unconfirmed_email %>
-      </p>
-    <% end %>
+    <%# ===== プロフィール ===== %>
+    <section class="w-full">
+      <div class="flex items-center gap-2 mb-3 px-2">
+        <span class="material-symbols-outlined text-amber-700">person</span>
+        <h3 class="text-lg font-bold text-stone-800">プロフィール</h3>
+      </div>
 
-    <!-- 新しいパスワード -->
-    <%= render "shared/password_field",
-          f: f,
-          field: :password,
-          label: "新しいパスワード（変更する場合のみ）",
-          minimum_length: @minimum_password_length,
-          autocomplete: "new-password",
-          left_icon: "lock_outline",
-          errors: resource.errors[:password] %>
+      <div class="bg-white/90 backdrop-blur rounded-2xl shadow border border-stone-100 p-5">
+        <%= form_for(resource,
+              as: resource_name,
+              url: registration_path(resource_name),
+              html: { method: :put, class: "space-y-4" }) do |f| %>
 
-    <!-- パスワード確認 -->
-    <%= render "shared/password_field",
-          f: f,
-          field: :password_confirmation,
-          label: "パスワード確認",
-          autocomplete: "new-password",
-          left_icon: "lock",
-          errors: resource.errors[:password_confirmation] %>
+          <div class="space-y-2">
+            <%= f.label :name,
+                  class: "block text-sm font-bold ml-1 #{resource.errors[:name].present? ? 'text-red-600' : 'text-gray-700'}" do %>
+              ユーザー名
+            <% end %>
 
-    <!-- 現在のパスワード -->
-    <%= render "shared/password_field",
-          f: f,
-          field: :current_password,
-          label: "現在のパスワード（変更確認用）",
-          autocomplete: "current-password",
-          left_icon: "lock",
-          errors: resource.errors[:current_password] %>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <span class="material-symbols-outlined text-gray-400">person</span>
+              </div>
 
-    <button type="submit"
-      class="w-full bg-amber-600 hover:bg-amber-700
-              text-white font-bold text-lg py-4 rounded-full shadow-lg
-              transform active:scale-95 transition-all">
-        更新する
-    </button>
+              <% border_class = resource.errors[:name].present? ? 'border-red-400 bg-red-50' : 'border-gray-300' %>
 
-  <% end %>
+              <%= f.text_field :name,
+                    autocomplete: "name",
+                    class: "w-full pl-11 pr-4 py-4 rounded-2xl bg-white border #{border_class}
+                            focus:border-amber-500 focus:ring-2 focus:ring-amber-200
+                            focus:outline-none transition" %>
+            </div>
 
-  <!-- アカウント削除 -->
-  <div class="mt-12 text-center">
-    <p class="text-sm text-gray-500 mb-3">アカウントを削除する場合</p>
+            <% if resource.errors[:name].present? %>
+              <p class="text-sm text-red-600 ml-1"><%= resource.errors[:name].first %></p>
+            <% end %>
+          </div>
 
-    <%= button_to "アカウント削除",
-          registration_path(resource_name),
-          method: :delete,
-          data: { turbo_confirm: "本当に削除しますか？" },
-          class: "text-red-600 font-bold hover:underline" %>
+          <button type="submit"
+            class="w-full bg-amber-600 hover:bg-amber-700
+                    text-white font-bold py-3 rounded-full shadow
+                    active:scale-95 transition-all">
+            名前を保存
+          </button>
+
+        <% end %>
+      </div>
+    </section>
+
+    <%# ===== メールアドレス ===== %>
+    <section class="w-full">
+      <div class="flex items-center gap-2 mb-3 px-2">
+        <span class="material-symbols-outlined text-orange-600">mail</span>
+        <h3 class="text-lg font-bold text-stone-800">メールアドレス</h3>
+      </div>
+
+      <% if oauth_user %>
+        <%# OAuthユーザーはメールをGoogle側で管理しているため変更不可 %>
+        <div class="bg-white/90 backdrop-blur rounded-2xl shadow border border-stone-100 p-5">
+          <div class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-stone-400 mt-0.5 shrink-0">link</span>
+            <p class="text-sm text-stone-600 leading-relaxed">
+              Googleアカウントでログインしているため、メールアドレスはGoogle側で管理されています。変更する場合はGoogleアカウントの設定をご確認ください。
+            </p>
+          </div>
+        </div>
+      <% else %>
+        <div class="bg-white/90 backdrop-blur rounded-2xl shadow border border-stone-100 p-5">
+          <%= form_for(resource,
+                as: resource_name,
+                url: registration_path(resource_name),
+                html: { method: :put, class: "space-y-4" }) do |f| %>
+
+            <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+              <p class="text-sm text-amber-600 ml-1">
+                確認待ちメール: <%= resource.unconfirmed_email %>
+              </p>
+            <% end %>
+
+            <div class="space-y-2">
+              <%= f.label :email,
+                    class: "block text-sm font-bold ml-1 #{resource.errors[:email].present? ? 'text-red-600' : 'text-gray-700'}" do %>
+                メールアドレス
+              <% end %>
+
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <span class="material-symbols-outlined text-gray-400">email</span>
+                </div>
+
+                <% border_class = resource.errors[:email].present? ? 'border-red-400 bg-red-50' : 'border-gray-300' %>
+
+                <%= f.email_field :email,
+                      autocomplete: "email",
+                      class: "w-full pl-11 pr-4 py-4 rounded-2xl bg-white border #{border_class}
+                              focus:border-amber-500 focus:ring-2 focus:ring-amber-200
+                              focus:outline-none transition" %>
+              </div>
+
+              <% if resource.errors[:email].present? %>
+                <p class="text-sm text-red-600 ml-1"><%= resource.errors[:email].first %></p>
+              <% end %>
+            </div>
+
+            <%# current_password: このセクション送信失敗時のみエラーを表示 %>
+            <%= render "shared/password_field",
+                  f: f,
+                  field: :current_password,
+                  label: "現在のパスワード（確認用）",
+                  autocomplete: "current-password",
+                  left_icon: "lock",
+                  errors: (email_section_submitted ? resource.errors[:current_password] : []) %>
+
+            <button type="submit"
+              class="w-full bg-amber-600 hover:bg-amber-700
+                      text-white font-bold py-3 rounded-full shadow
+                      active:scale-95 transition-all">
+              メールを更新
+            </button>
+
+          <% end %>
+        </div>
+      <% end %>
+    </section>
+
+    <%# ===== パスワードを変更 ===== %>
+    <section class="w-full">
+      <div class="flex items-center gap-2 mb-3 px-2">
+        <span class="material-symbols-outlined text-indigo-600">lock</span>
+        <h3 class="text-lg font-bold text-stone-800">パスワードを変更</h3>
+      </div>
+
+      <% if oauth_user %>
+        <%# OAuthユーザーはパスワード認証を使用していないため変更不可 %>
+        <div class="bg-white/90 backdrop-blur rounded-2xl shadow border border-stone-100 p-5">
+          <div class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-stone-400 mt-0.5 shrink-0">link</span>
+            <p class="text-sm text-stone-600 leading-relaxed">
+              Googleアカウントでログインしているため、パスワードはGoogle側で管理されています。
+            </p>
+          </div>
+        </div>
+      <% else %>
+        <div class="bg-white/90 backdrop-blur rounded-2xl shadow border border-stone-100 p-5">
+          <%= form_for(resource,
+                as: resource_name,
+                url: registration_path(resource_name),
+                html: { method: :put, class: "space-y-4" }) do |f| %>
+
+            <%# 現在のパスワードを先頭に置くことで「認証してから変更」の流れを自然に表現 %>
+            <%= render "shared/password_field",
+                  f: f,
+                  field: :current_password,
+                  label: "現在のパスワード",
+                  autocomplete: "current-password",
+                  left_icon: "lock",
+                  errors: (password_section_submitted ? resource.errors[:current_password] : []) %>
+
+            <%= render "shared/password_field",
+                  f: f,
+                  field: :password,
+                  label: "新しいパスワード",
+                  minimum_length: @minimum_password_length,
+                  autocomplete: "new-password",
+                  left_icon: "lock_outline",
+                  errors: resource.errors[:password] %>
+
+            <%= render "shared/password_field",
+                  f: f,
+                  field: :password_confirmation,
+                  label: "新しいパスワード（確認）",
+                  autocomplete: "new-password",
+                  left_icon: "lock",
+                  errors: resource.errors[:password_confirmation] %>
+
+            <button type="submit"
+              class="w-full bg-amber-600 hover:bg-amber-700
+                      text-white font-bold py-3 rounded-full shadow
+                      active:scale-95 transition-all">
+              パスワードを変更
+            </button>
+
+          <% end %>
+        </div>
+      <% end %>
+    </section>
+
+    <%# ===== アカウント削除 ===== %>
+    <section class="w-full">
+      <div class="bg-white/90 backdrop-blur rounded-2xl shadow border border-stone-100 p-5 text-center">
+        <p class="text-sm text-gray-500 mb-3">アカウントを削除する場合</p>
+
+        <%= button_to "アカウント削除",
+              registration_path(resource_name),
+              method: :delete,
+              data: { turbo_confirm: "本当に削除しますか？" },
+              class: "text-red-600 font-bold hover:underline" %>
+      </div>
+    </section>
+
   </div>
-
 </main>
