@@ -1,4 +1,8 @@
 ja:
+  message_categories:
+    destroy:
+      success: "カテゴリを削除しました"
+      restricted: "ログが記録されているため削除できません"
   activerecord:
     errors:
       models:

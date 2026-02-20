@@ -1,6 +1,6 @@
 class MessageCategoriesController < ApplicationController
   include MessageCategoriesHelper
-  before_action :authenticate_user!, only: %i[new create]
+  before_action :authenticate_user!, only: %i[new create destroy]
 
   def index
     @message_categories = MessageCategory.for_user(current_user).order(:position)
@@ -20,6 +20,14 @@ class MessageCategoriesController < ApplicationController
     else
       render :new, status: :unprocessable_entity
     end
+  end
+
+  def destroy
+    @message_category = current_user.message_categories.find(params[:id])
+    @message_category.destroy!
+    redirect_to message_categories_path, notice: t("message_categories.destroy.success")
+  rescue ActiveRecord::DeleteRestrictionError
+    redirect_to message_categories_path, alert: t("message_categories.destroy.restricted")
   end
 
   private
