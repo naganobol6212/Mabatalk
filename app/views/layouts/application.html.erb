@@ -125,14 +125,7 @@
   <% end %>
   <%= yield %>
 
-  <div class="w-full text-center text-[12px] text-stone-500 pb-28 pt-6">
-    <div class="space-x-6">
-      <%= link_to "利用規約", terms_path,
-          class: "hover:text-stone-700" %>
-      <%= link_to "プライバシーポリシー", privacy_policy_path,
-          class: "hover:text-stone-700" %>
-    </div>
-  </div>
+  <%= yield :legal_links %>
 
   <%= render 'shared/footer' %>
 </body>
