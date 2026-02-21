@@ -3,6 +3,7 @@ ja:
     destroy:
       success: "カテゴリを削除しました"
       restricted: "ログが記録されているため削除できません"
+      confirm: "このカテゴリを削除しますか？"
   activerecord:
     errors:
       models:

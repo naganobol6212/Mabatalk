@@ -2,35 +2,68 @@
   メッセージカテゴリ
 <% end %>
 
-<main class="relative min-h-screen w-full bg-stone-200 overflow-x-hidden pb-24">
+<main class="relative min-h-screen w-full bg-stone-200 pb-44"
+      data-controller="edit-mode">
   <div class="flex flex-col items-center px-4 pt-6 w-full max-w-md mx-auto">
+
     <!-- カテゴリ一覧 -->
-<div class="grid grid-cols-2 gap-4 w-full">
-  <% @message_categories.each do |message_category| %>
-    <%= render "shared/square_card",
-        path: message_category_flow_items_path(message_category),
-        icon: message_category.icon,
-        icon_color: message_category.icon_color,
-        title: message_category.name,
-        kana: message_category.kana %>
-  <% end %>
-</div>
-
-    <!-- カテゴリ追加 -->
-    <div class="w-full mt-6">
-      <%= link_to (current_user ? new_message_category_path : new_user_session_path),
-        class: "
-          w-full h-14 flex items-center justify-center rounded-2xl
-          border-2 border-dashed border-stone-400 bg-transparent
-          text-stone-600 text-base font-bold
-          hover:bg-white/60 active:scale-[0.98] transition
-        " do %>
-
-        <span class="material-symbols-outlined mr-2 text-stone-500">
-          add_circle_outline
-        </span>
-        カテゴリを追加
+    <div class="grid grid-cols-2 gap-4 w-full">
+      <% @message_categories.each do |message_category| %>
+        <div class="relative">
+          <%= render "shared/square_card",
+              path: message_category_flow_items_path(message_category),
+              icon: message_category.icon,
+              icon_color: message_category.icon_color,
+              title: message_category.name,
+              kana: message_category.kana %>
+          <% if current_user && message_category.user_id? %>
+            <div data-edit-mode-target="editOnly"
+                 class="hidden absolute top-2 right-2 z-10">
+              <%= button_to message_category_path(message_category),
+                  method: :delete,
+                  form: { data: { turbo_confirm: t("message_categories.destroy.confirm") } },
+                  class: "w-8 h-8 flex items-center justify-center rounded-full bg-red-100 text-red-500 hover:bg-red-200 transition" do %>
+                <span class="material-symbols-outlined text-[18px]!">delete</span>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
       <% end %>
     </div>
+
   </div>
+
+  <!-- 画面下部固定エリア（ログイン中のみ） -->
+  <% if user_signed_in? %>
+    <div class="fixed inset-x-0 bottom-24 z-20 flex justify-center
+                bg-linear-to-t from-stone-200 via-stone-200/90 to-transparent
+                px-4 pb-4 pt-10 pointer-events-none">
+      <div class="flex w-full max-w-md flex-col gap-2 pointer-events-auto">
+
+        <!-- カテゴリを追加（管理モード時のみ） -->
+        <div data-edit-mode-target="editOnly" class="hidden">
+          <%= link_to new_message_category_path,
+            class: "w-full h-14 flex items-center justify-center gap-2 rounded-xl
+                    bg-white font-bold text-amber-700 shadow-sm
+                    ring-1 ring-amber-200 hover:bg-amber-50
+                    active:scale-[0.98] transition" do %>
+            <span class="material-symbols-outlined">add_circle</span>
+            カテゴリを追加
+          <% end %>
+        </div>
+
+        <!-- 管理モードトグル -->
+        <button data-action="click->edit-mode#toggle"
+                class="w-full flex items-center justify-center gap-1.5 rounded-xl
+                       py-2.5 text-stone-500 text-sm font-medium
+                       hover:bg-stone-300/30 active:scale-[0.98] transition">
+          <span class="material-symbols-outlined text-[18px]!"
+                data-edit-mode-target="toggleIcon">settings</span>
+          <span data-edit-mode-target="toggleLabel">管理モード</span>
+        </button>
+
+      </div>
+    </div>
+  <% end %>
+
 </main>
