@@ -7,7 +7,7 @@ Rails.application.routes.draw do
   root to: "homes#top"
 
   resources :message_categories, only: %i[index new create destroy] do
-    resources :flow_items, only: %i[index new create] do
+    resources :flow_items, only: %i[index new create destroy] do
       get :confirm, on: :member
     end
   end

@@ -1,5 +1,6 @@
 class FlowItemsController < ApplicationController
-  before_action :set_message_category, only: %i[index new create]
+  before_action :authenticate_user!, only: %i[new create destroy]
+  before_action :set_message_category, only: %i[index new create destroy]
   before_action :set_flow_item, only: %i[confirm]
 
   def index
@@ -29,6 +30,15 @@ class FlowItemsController < ApplicationController
 
   def confirm
     @message_category = @flow_item.message_category
+  end
+
+  def destroy
+    @flow_item = @message_category.flow_items
+                                  .where(user: current_user)
+                                  .find(params[:id])
+    @flow_item.destroy
+    redirect_to message_category_flow_items_path(@message_category),
+                notice: t("flow_items.destroy.success")
   end
 
   private

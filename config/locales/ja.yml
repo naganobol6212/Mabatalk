@@ -4,6 +4,10 @@ ja:
       success: "カテゴリを削除しました"
       restricted: "ログが記録されているため削除できません"
       confirm: "このカテゴリを削除しますか？"
+  flow_items:
+    destroy:
+      success: "項目を削除しました"
+      confirm: "この項目を削除しますか？"
   activerecord:
     errors:
       models:
