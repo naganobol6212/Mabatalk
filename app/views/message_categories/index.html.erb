@@ -2,8 +2,9 @@
   メッセージカテゴリ
 <% end %>
 
-<main class="relative min-h-screen w-full bg-stone-200 pb-44"
-      data-controller="edit-mode">
+<% content_for :edit_mode_enabled, true %>
+
+<main class="relative min-h-screen w-full bg-stone-200 pb-24">
   <div class="flex flex-col items-center px-4 pt-6 w-full max-w-md mx-auto">
 
     <!-- カテゴリ一覧 -->
@@ -33,35 +34,21 @@
 
   </div>
 
-  <!-- 画面下部固定エリア（ログイン中のみ） -->
+  <!-- 画面下部固定エリア（編集モード時のみ） -->
   <% if user_signed_in? %>
-    <div class="fixed inset-x-0 bottom-24 z-20 flex justify-center
+    <div data-edit-mode-target="editOnly"
+         class="hidden fixed inset-x-0 bottom-24 z-20
                 bg-linear-to-t from-stone-200 via-stone-200/90 to-transparent
                 px-4 pb-4 pt-10 pointer-events-none">
-      <div class="flex w-full max-w-md flex-col gap-2 pointer-events-auto">
-
-        <!-- カテゴリを追加（管理モード時のみ） -->
-        <div data-edit-mode-target="editOnly" class="hidden">
-          <%= link_to new_message_category_path,
-            class: "w-full h-14 flex items-center justify-center gap-2 rounded-xl
-                    bg-white font-bold text-amber-700 shadow-sm
-                    ring-1 ring-amber-200 hover:bg-amber-50
-                    active:scale-[0.98] transition" do %>
-            <span class="material-symbols-outlined">add_circle</span>
-            カテゴリを追加
-          <% end %>
-        </div>
-
-        <!-- 管理モードトグル -->
-        <button data-action="click->edit-mode#toggle"
-                class="w-full flex items-center justify-center gap-1.5 rounded-xl
-                       py-2.5 text-stone-500 text-sm font-medium
-                       hover:bg-stone-300/30 active:scale-[0.98] transition">
-          <span class="material-symbols-outlined text-[18px]!"
-                data-edit-mode-target="toggleIcon">settings</span>
-          <span data-edit-mode-target="toggleLabel">管理モード</span>
-        </button>
-
+      <div class="flex justify-center w-full max-w-md mx-auto pointer-events-auto">
+        <%= link_to new_message_category_path,
+          class: "w-full h-14 flex items-center justify-center gap-2 rounded-xl
+                  bg-white font-bold text-amber-700 shadow-sm
+                  ring-1 ring-amber-200 hover:bg-amber-50
+                  active:scale-[0.98] transition" do %>
+          <span class="material-symbols-outlined">add_circle</span>
+          カテゴリを追加
+        <% end %>
       </div>
     </div>
   <% end %>

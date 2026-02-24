@@ -12,9 +12,9 @@
     </h2>
   </div>
 
-  <!-- 右：ログイン / ログアウト -->
+  <!-- 右：ログイン / 編集トグル -->
   <div class="z-10">
-    <% unless user_signed_in? %>
+    <% if !user_signed_in? %>
       <!-- 未ログイン：ログイン -->
       <%= link_to "ログイン",
                   new_user_session_path,
@@ -31,24 +31,31 @@
                     hover:bg-amber-50
                     transition-colors
                   " %>
-    <% else %>
-      <!-- ログイン中：ログアウト -->
-      <%= link_to "ログアウト",
-                  destroy_user_session_path,
-                  data: { turbo_method: :delete },
-                  class: "
-                    text-stone-600
-                    font-bold
-                    text-sm
-                    px-4
-                    py-2
-                    rounded-full
-                    border
-                    border-stone-300
-                    bg-white
-                    hover:bg-stone-100
-                    transition-colors
-                  " %>
+    <% elsif content_for?(:edit_mode_enabled) %>
+      <!-- ログイン中 かつ 編集対応ページ：編集トグル -->
+      <button
+        type="button"
+        aria-pressed="false"
+        data-action="click->edit-mode#toggle"
+        data-edit-mode-target="toggleButton"
+        class="
+          flex items-center gap-1
+          text-amber-700
+          font-bold
+          text-sm
+          px-4
+          py-2
+          rounded-full
+          border
+          border-amber-300
+          bg-white
+          hover:bg-amber-50
+          transition-colors
+        ">
+        <span class="material-symbols-outlined text-[16px]!"
+              data-edit-mode-target="toggleIcon">edit</span>
+        <span data-edit-mode-target="toggleLabel">編集する</span>
+      </button>
     <% end %>
   </div>
 </header>
