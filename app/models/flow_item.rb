@@ -1,7 +1,7 @@
 class FlowItem < ApplicationRecord
   belongs_to :message_category
   belongs_to :user, optional: true
-  has_many :message_logs, dependent: :restrict_with_exception
+  has_many :message_logs, dependent: :nullify
 
   validates :key, presence: true, uniqueness: true
   validates :name, :kana, :icon, presence: true
