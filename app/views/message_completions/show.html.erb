@@ -3,23 +3,23 @@
   <div class="w-full max-w-md flex flex-col items-center space-y-8">
 
     <%# カテゴリ表示 %>
-    <% if @flow_item %>
+    <% if @flow_item_name.present? %>
       <div class="w-full bg-card-light dark:bg-card-dark rounded-2xl p-8 shadow-soft border-2 border-primary/20 flex flex-col items-center text-center">
         <span class="text-base text-text-sub-light dark:text-text-sub-dark mb-1">
           カテゴリ
         </span>
         <span class="text-5xl font-bold text-text-main-light dark:text-text-main-dark">
-          <%= @message_category.name %>
+          <%= @message_category_name %>
         </span>
       </div>
 
     <%# 伝えた内容 %>
       <div class="w-full bg-card-light dark:bg-card-dark rounded-2xl p-8 shadow-soft border-2 border-primary/20 flex flex-col items-center text-center">
-        <span class="material-symbols-outlined text-8xl mb-4 <%= @flow_item.icon_color %>">
-          <%= @flow_item.icon %>
+        <span class="material-symbols-outlined text-8xl mb-4 <%= @flow_item_icon_color %>">
+          <%= @flow_item_icon %>
         </span>
         <span class="text-5xl font-bold text-text-main-light dark:text-text-main-dark mb-2">
-          <%= @flow_item.name %>
+          <%= @flow_item_name %>
         </span>
         <span class="text-2xl text-text-sub-light dark:text-text-sub-dark">
           を伝えました。
