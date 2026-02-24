@@ -2,51 +2,49 @@
   <%= @message_category[:title] %>
 <% end %>
 
+<% content_for :edit_mode_enabled, true %>
+
 <main class="relative min-h-screen w-full bg-stone-200 overflow-x-hidden pb-24">
   <div class="flex flex-col items-center px-4 pt-6 w-full max-w-md mx-auto">
 
     <!-- フロー項目一覧 -->
     <div class="grid grid-cols-2 gap-4 w-full">
       <% @flow_items.each do |item| %>
-        <%= render "shared/square_card",
-            path: confirm_message_category_flow_item_path(@message_category, item),
-            icon: item.icon,
-            icon_color: item.icon_color,
-            title: item.name,
-            kana: item.kana %>
+        <div class="relative">
+          <%= render "shared/square_card",
+              path: confirm_message_category_flow_item_path(@message_category, item),
+              icon: item.icon,
+              icon_color: item.icon_color,
+              title: item.name,
+              kana: item.kana %>
+          <% if current_user && item.user_id? %>
+            <div data-edit-mode-target="editOnly"
+                 class="hidden absolute top-2 right-2 z-10">
+              <%= button_to message_category_flow_item_path(@message_category, item),
+                  method: :delete,
+                  form: { data: { turbo_confirm: t("flow_items.destroy.confirm") } },
+                  class: "w-8 h-8 flex items-center justify-center rounded-full bg-red-100 text-red-500 hover:bg-red-200 transition" do %>
+                <span class="material-symbols-outlined text-[18px]!">delete</span>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
       <% end %>
     </div>
 
-    <!-- 項目追加 -->
-    <div class="w-full mt-6">
-      <% if current_user %>
+    <!-- 項目追加（編集モード時のみ） -->
+    <% if current_user %>
+      <div data-edit-mode-target="editOnly" class="hidden w-full mt-6">
         <%= link_to new_message_category_flow_item_path(@message_category),
-          class: "w-full h-16 flex items-center justify-center rounded-2xl
-                  border-2 border-dashed border-stone-400 bg-transparent
-                  text-stone-600 text-lg font-bold
-                  hover:bg-white/60 active:scale-[0.98] transition" do %>
-          <span class="material-symbols-outlined mr-2 text-stone-500 text-2xl">
-            add_circle_outline
-          </span>
+          class: "w-full h-14 flex items-center justify-center gap-2 rounded-xl
+                  bg-white font-bold text-amber-700 shadow-sm
+                  ring-1 ring-amber-200 hover:bg-amber-50
+                  active:scale-[0.98] transition" do %>
+          <span class="material-symbols-outlined">add_circle</span>
           項目を追加
         <% end %>
-
-      <% else %>
-        <%= link_to new_user_session_path,
-          class: "
-            w-full h-16 flex items-center justify-center rounded-2xl
-            border-2 border-dashed border-stone-400 bg-transparent
-            text-stone-600 text-lg font-bold
-            hover:bg-white/60 active:scale-[0.98] transition
-          " do %>
-
-          <span class="material-symbols-outlined mr-2 text-stone-500 text-2xl">
-            add_circle_outline
-          </span>
-          項目を追加
-        <% end %>
-      <% end %>
-    </div>
+      </div>
+    <% end %>
 
   </div>
 </main>

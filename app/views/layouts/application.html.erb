@@ -48,7 +48,6 @@
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
       rel="stylesheet"
     >
-    <meta name="theme-color" content="#fb8603">
 
     <link rel="manifest" href="/manifest.json">
 
@@ -60,7 +59,7 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-<body>
+<body data-controller="edit-mode">
   <%= render 'shared/header' %>
 
   <% flash.each do |type, message| %>
@@ -125,14 +124,7 @@
   <% end %>
   <%= yield %>
 
-  <div class="w-full text-center text-[12px] text-stone-500 pb-28 pt-6">
-    <div class="space-x-6">
-      <%= link_to "利用規約", terms_path,
-          class: "hover:text-stone-700" %>
-      <%= link_to "プライバシーポリシー", privacy_policy_path,
-          class: "hover:text-stone-700" %>
-    </div>
-  </div>
+  <%= yield :legal_links %>
 
   <%= render 'shared/footer' %>
 </body>

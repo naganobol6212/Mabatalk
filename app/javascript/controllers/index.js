@@ -12,3 +12,6 @@ application.register("hello", HelloController)
 
 import PasswordToggleController from "./password_toggle_controller"
 application.register("password-toggle", PasswordToggleController)
+
+import EditModeController from "./edit_mode_controller"
+application.register("edit-mode", EditModeController)
