@@ -86,7 +86,7 @@
         <h3 class="text-lg font-bold text-stone-800">アカウント</h3>
       </div>
 
-      <div class="bg-white/90 backdrop-blur rounded-2xl shadow border border-stone-100 overflow-hidden">
+      <div class="bg-white/90 backdrop-blur rounded-2xl shadow border border-stone-100 overflow-hidden divide-y divide-stone-100">
         <%= link_to edit_user_registration_path,
           class: "
             w-full flex items-center gap-3 p-5
@@ -99,6 +99,22 @@
           <div class="flex-1 text-left">
             <div class="text-[18px] font-bold text-stone-900 leading-tight">アカウント設定</div>
             <div class="text-sm text-stone-600 mt-1 leading-relaxed">名前・メール・パスワードを変更します</div>
+          </div>
+          <span class="material-symbols-outlined text-stone-400">chevron_right</span>
+        <% end %>
+
+        <%= link_to destroy_user_session_path,
+          data: { turbo_method: :delete },
+          class: "
+            w-full flex items-center gap-3 p-5
+            hover:bg-stone-100/60 active:scale-[0.99] transition
+            focus:outline-none focus:ring-4 focus:ring-stone-300
+          " do %>
+          <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-red-500 text-[26px]">logout</span>
+          </div>
+          <div class="flex-1 text-left">
+            <div class="text-[18px] font-bold text-stone-900 leading-tight">ログアウト</div>
           </div>
           <span class="material-symbols-outlined text-stone-400">chevron_right</span>
         <% end %>
