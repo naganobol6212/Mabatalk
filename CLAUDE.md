@@ -1,172 +1,120 @@
 # CLAUDE.md
 
-Claude Code がこのリポジトリで作業する際のガイドライン。
+このファイルは AI（Claude Code）が本リポジトリで安全に作業するための最小ルール。
+README内容は繰り返さない。
 
-## アプリ概要
+---
 
-**MabaTalk** — 重度身体障害者（まばたきのみでコミュニケーションをとる方など）を支援する Rails 7.2 製 Web アプリ。介護者がカスタマイズ可能なカテゴリからメッセージを選択し、利用者が yes/no で応答する。すべての応答はログに記録・共有可能。
+## 基本方針
 
-## コマンド
+- 変更は小さく・局所的に
+- 大規模リファクタ禁止
+- 設計の美しさより UX 安定を優先
+- 既存パターンを必ず踏襲（独自抽象化を増やさない）
 
-### 開発サーバー
+---
+
+## 絶対に壊してはいけないルール
+
+### Shared Defaults
+
+`user_id: nil` は全ユーザー共通デフォルト。
+
+- 取得時は必ず既存の `for_user(user)` スコープを使う
+- raw な `where` で置き換えない
+- 既存の `user_id: nil` レコードを更新・削除しない
+
+### Snapshot パターン
+
+`MessageLog` は以下を保持する：
+
+- `message_category_name`
+- `flow_item_name`
+
+- 表示は `log.flow_item_name` を使う
+- `log.flow_item.name` に戻さない
+- snapshot カラムを削除しない
+
+### セキュリティ
+
+- UI表示制御はセキュリティではない
+- コントローラーで必ず current_user スコープを適用
+- 整数IDを外部公開しない（UUIDキーを使う）
+
+---
+
+## i18n
+
+- Viewに日本語直書き禁止
+- 必ず `t()` を使用
+- 新規文言は `config/locales/ja.yml` に追加
+
+---
+
+## マイグレーション（過去の障害より）
+
+- 作成後すぐコミット（履歴乖離防止）
+- カラム追加時は `column_exists?` ガード
+- `change` より `up/down`
+- `down` では自分が追加したカラムのみ削除
+
+---
+
+## フロントエンド
+
+- DaisyUI 優先
+- カスタム CSS 最小限
+- `app/assets/builds/` はコミットしない
+
+---
+
+## 実装前に宣言
+
+- 何を変更するか
+- なぜ変更するか
+- どのファイルを触るか
+
+---
+
+## 実装完了条件（必須）
 
 ```bash
-./bin/dev         # Rails + esbuild + Tailwind を起動 (Foreman/Procfile.dev)
-bin/setup         # 初回セットアップ (依存関係インストール + DB 準備)
-docker-compose up # Docker での代替起動
+bin/rails db:prepare
+bin/rails test
+bin/rubocop -f github
+bin/brakeman --no-pager || [ $? -eq 5 ]
 ```
 
-### Assets
+すべて成功して初めて完了。
 
-```bash
-npm run build       # esbuild で JavaScript をバンドル
-npm run build:css   # Tailwind CSS をコンパイル
-```
+---
 
-### Database
+## ブランチ運用
 
-```bash
-bin/rails db:prepare   # DB 作成 + migrate + seed (いつでも安全に実行可)
-bin/rails db:migrate   # pending な migration を実行
-bin/rails db:seed      # デフォルトカテゴリ・アイテムを投入
-```
+- main へ直接 push 禁止
+- `feature/<機能名>` または `hotfix/<内容>`
 
-### テスト
+---
 
-```bash
-bin/rails test          # ユニットテスト
-bin/rails test:system   # システムテスト (Capybara + Selenium)
-```
+## コミット提案
 
-### Lint & セキュリティ
+実装の区切りごとに、実務想定の粒度でコミット候補（対象ファイル・メッセージ）を提示する。
+ユーザーが確認・承認してからコミットする。
 
-```bash
-bin/rubocop -f github                      # Ruby スタイルチェック (rubocop-rails-omakase)
-bin/brakeman --no-pager || [ $? -eq 5 ]    # セキュリティスキャン (exit 5 = 問題なし)
-```
+---
 
-## アーキテクチャ
+## issue 完了後の Obsidian 記録
 
-### Stack
+実装完了後、以下に設計・実装の解説ノートを追加する。
 
-- **Backend:** Ruby 3.3.6, Rails 7.2.3, PostgreSQL
-- **Frontend:** Hotwire (Turbo + Stimulus), Tailwind CSS 4.x, DaisyUI 5.x
-- **Auth:** Devise + Google OAuth2
-- **Bundling:** esbuild (JS), Lightning CSS / Tailwind CLI (CSS)
-- **Locale:** `:ja` デフォルト、Asia/Tokyo タイムゾーン
+- Vault: `/Users/naganoma/Obsidian Vault/01_projects/MabaTalk/architecture/`
+- 既存ファイル（`deletion-policy.md` 等）のフォーマットに合わせる
+- 必須セクション: 背景・コード・トレードオフ・面接での語り方・関連ドキュメント
 
-### Domain Model
+---
 
-```
-User (Devise)
-├── has_many :message_categories
-├── has_many :flow_items
-└── has_many :message_logs
+## 不明点がある場合
 
-MessageCategory (user_id が null → 全ユーザー共通のデフォルト)
-└── has_many :flow_items
-
-FlowItem (user_id が null → 全ユーザー共通のデフォルト)
-└── has_many :message_logs
-
-MessageLog (監査ログ)
-├── belongs_to :user
-├── belongs_to :flow_item
-└── message_category_name, flow_item_name  # 非正規化スナップショット
-```
-
-### 主要パターン
-
-**Shared Defaults:** `user_id: null` のカテゴリ・FlowItem は全ユーザーに表示されるグローバルデフォルト。`for_user(user)` スコープでユーザー固有レコードとデフォルトを結合する。
-
-**UUID Keys:** `message_categories.key` と `flow_items.key` は `SecureRandom.uuid` を格納（`before_validation :set_key` で自動設定）。整数 ID の列挙攻撃を防ぐ。
-
-**Snapshot Pattern:** `MessageLog` はログ記録時点の `message_category_name` と `flow_item_name` を保存。カテゴリ・アイテムが後から削除されても履歴を保持できる。
-
-### メッセージ選択フロー
-
-```
-/message_categories                              → カテゴリ選択
-/message_categories/:id/flow_items               → アイテム選択
-/message_categories/:id/flow_items/:id/confirm   → 確認 (yes/no UI)
-POST /message_logs                               → ログ保存
-/message_completion                              → 完了画面
-```
-
-カテゴリ・FlowItem の CRUD には認証が必要。選択・確認フローはログイン不要（未認証の介護者でも使えるが、ログは保存されない）。
-
-### Frontend
-
-- **Stimulus controllers:** `app/javascript/controllers/`
-- **Tailwind source:** `app/assets/stylesheets/application.tailwind.css`（コンパイル結果の `app/assets/builds/` はコミットしない）
-- コンポーネントは DaisyUI のクラスを優先し、カスタム CSS は最小限に
-
-### Authentication
-
-Devise の設定: `database_authenticatable`, `registerable`, `recoverable`, `rememberable`, `validatable`, `omniauthable` (Google OAuth2)。
-
-Google OAuth コールバック: `app/controllers/users/omniauth_callbacks_controller.rb` の `User.from_omniauth`。
-
-### 開発環境のメール
-
-`letter_opener_web` でメールをキャプチャ。`/letter_opener` にアクセスしてプレビュー（SMTP サーバー不要）。
-
-### i18n
-
-ユーザー向け文字列は必ず Rails i18n を使う。Locale ファイルは `config/locales/`。View に日本語をハードコードしない。
-
-## CI (GitHub Actions)
-
-`.github/workflows/ci.yml` で以下を実行:
-1. **Brakeman** — セキュリティスキャン
-2. **RuboCop** — スタイル Lint
-
-テストは設定済みだが CI では現在無効。
-
-## 2週間リリース戦略
-
-機能開発から本番リリースまでの標準的な 2 週間スプリントサイクル。
-
-### 開発ポリシー（最優先）
-
-- 過剰設計しない
-- 大規模リファクタは禁止（致命的問題を除く）
-- まず動くものを優先
-- UX安定を最優先
-- テストは重要だが、出荷を止めるほど完璧を求めない
-- 1機能ずつ小さく出す
-- 迷ったらシンプルな実装を選ぶ
-
-### Week 1: 開発フェーズ
-
-| 日程 | アクティビティ |
-|------|--------------|
-| Day 1–2 | 要件確認・タスク分解・feature ブランチ作成 |
-| Day 3–5 | 実装（モデル → コントローラ → View の順） |
-| Day 6–7 | ユニットテスト・システムテスト作成、Brakeman / RuboCop をクリア |
-
-### Week 2: 検証・リリースフェーズ
-
-| 日程 | アクティビティ |
-|------|--------------|
-| Day 8–9 | PR 作成・コードレビュー・フィードバック対応 |
-| Day 10–11 | ステージング環境での動作確認・回帰テスト |
-| Day 12 | main へのマージ・本番 deploy |
-| Day 13–14 | 本番モニタリング・不具合があれば hotfix |
-
-### ブランチ運用ルール
-
-```
-main          ← 本番。直接 push 禁止
-  └── feature/<機能名>   ← 開発用（PR 経由で main にマージ）
-  └── hotfix/<説明>      ← 本番障害の緊急修正
-```
-
-### リリース前チェックリスト
-
-- [ ] `bin/rails test` がすべて通過
-- [ ] `bin/brakeman` で脆弱性なし
-- [ ] `bin/rubocop` でスタイル違反なし
-- [ ] `db/migrate` の migration が正常に動作する
-- [ ] i18n キーの抜け漏れなし (`config/locales/`)
-- [ ] PR に変更内容・テスト方法・スクリーンショットを記載
+1. 既存の類似実装を読む
+2. 既存設計を優先
+3. 新しい抽象化を作らない
