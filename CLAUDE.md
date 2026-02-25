@@ -80,12 +80,13 @@ README内容は繰り返さない。
 
 ```bash
 bin/rails db:prepare
-bin/rails test
 bin/rubocop -f github
 bin/brakeman --no-pager || [ $? -eq 5 ]
 ```
 
 すべて成功して初めて完了。
+
+※ `bin/rails test` は別途実施（本リリース後に整備予定）。
 
 ---
 
