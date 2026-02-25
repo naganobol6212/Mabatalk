@@ -1,7 +1,8 @@
 class FlowItemsController < ApplicationController
-  before_action :authenticate_user!, only: %i[new create destroy]
-  before_action :set_message_category, only: %i[index new create destroy]
+  before_action :authenticate_user!, only: %i[new create edit update destroy]
+  before_action :set_message_category, only: %i[index new create edit update destroy]
   before_action :set_flow_item, only: %i[confirm]
+  before_action :set_flow_item_for_owner, only: %i[edit update destroy]
 
   def index
     @flow_items =
@@ -32,10 +33,18 @@ class FlowItemsController < ApplicationController
     @message_category = @flow_item.message_category
   end
 
+  def edit; end
+
+  def update
+    if @flow_item.update(flow_item_params)
+      redirect_to message_category_flow_items_path(@message_category),
+                  notice: t("flow_items.update.success")
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
   def destroy
-    @flow_item = @message_category.flow_items
-                                  .where(user: current_user)
-                                  .find(params[:id])
     @flow_item.destroy
     redirect_to message_category_flow_items_path(@message_category),
                 notice: t("flow_items.destroy.success")
@@ -44,11 +53,17 @@ class FlowItemsController < ApplicationController
   private
 
   def set_message_category
-      @message_category = MessageCategory.find(params[:message_category_id])
+    @message_category = MessageCategory.find(params[:message_category_id])
   end
 
   def set_flow_item
     @flow_item = FlowItem.find(params[:id])
+  end
+
+  def set_flow_item_for_owner
+    @flow_item = @message_category.flow_items
+                                  .where(user: current_user)
+                                  .find(params[:id])
   end
 
   def flow_item_params
