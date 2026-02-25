@@ -1,7 +1,7 @@
 <main class="flex-grow px-4 pt-6 pb-24">
   <div class="max-w-md mx-auto">
 
-    <%= form_with model: @message_category, local: true do |f| %>
+    <%= form_with model: @message_category, local: true, data: { turbo: false } do |f| %>
 
       <% if @message_category.errors.any? %>
         <div class="mb-4 rounded-xl bg-red-50 p-4 text-sm text-red-700">
@@ -14,58 +14,7 @@
       <% end %>
 
       <!-- アイコン選択 -->
-      <%= f.hidden_field :color %>
-      <div class="bg-white rounded-xl p-6 shadow mb-6">
-        <p class="text-sm font-bold text-gray-600 mb-4 pl-1">
-          アイコンを選択
-        </p>
-
-        <div class="grid grid-cols-4 gap-4">
-          <% message_category_icons.each do |icon, _label| %>
-            <label class="cursor-pointer">
-              <%= f.radio_button :icon, icon, class: "hidden peer" %>
-
-              <div
-                class="
-                  aspect-square rounded-2xl
-                  flex items-center justify-center
-                  border-2 border-gray-200
-                  bg-gray-50
-                  peer-checked:border-orange-500
-                  peer-checked:bg-orange-50
-                  transition-all
-                  relative
-                "
-              >
-                <span
-                  class="
-                    material-symbols-outlined
-                    text-3xl
-                    text-gray-400
-                    peer-checked:text-orange-500
-                  "
-                >
-                  <%= icon %>
-                </span>
-
-                <span
-                  class="
-                    absolute -top-2 -right-2
-                    bg-orange-500 text-white
-                    rounded-full p-0.5
-                    shadow
-                    hidden peer-checked:block
-                  "
-                >
-                  <span class="material-symbols-outlined text-sm">
-                    check
-                  </span>
-                </span>
-              </div>
-            </label>
-          <% end %>
-        </div>
-      </div>
+      <%= render "icon_picker", f: f %>
 
       <!-- 入力欄 -->
       <div class="bg-white rounded-xl p-6 shadow space-y-6 mb-6">

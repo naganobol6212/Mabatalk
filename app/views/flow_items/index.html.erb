@@ -20,12 +20,18 @@
           <% if current_user && item.user_id? %>
             <div data-edit-mode-target="editOnly"
                  class="hidden absolute top-2 right-2 z-10">
-              <%= button_to message_category_flow_item_path(@message_category, item),
-                  method: :delete,
-                  form: { data: { turbo_confirm: t("flow_items.destroy.confirm") } },
-                  class: "w-8 h-8 flex items-center justify-center rounded-full bg-red-100 text-red-500 hover:bg-red-200 transition" do %>
-                <span class="material-symbols-outlined text-[18px]!">delete</span>
-              <% end %>
+              <div class="flex flex-col gap-1">
+                <%= link_to edit_message_category_flow_item_path(@message_category, item),
+                    class: "w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-500 hover:bg-blue-200 transition" do %>
+                  <span class="material-symbols-outlined text-[18px]!">edit</span>
+                <% end %>
+                <%= button_to message_category_flow_item_path(@message_category, item),
+                    method: :delete,
+                    form: { data: { turbo_confirm: t("flow_items.destroy.confirm") } },
+                    class: "w-8 h-8 flex items-center justify-center rounded-full bg-red-100 text-red-500 hover:bg-red-200 transition" do %>
+                  <span class="material-symbols-outlined text-[18px]!">delete</span>
+                <% end %>
+              </div>
             </div>
           <% end %>
         </div>
