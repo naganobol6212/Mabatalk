@@ -15,7 +15,7 @@
 
     <%# 伝えた内容 %>
       <div class="w-full bg-card-light dark:bg-card-dark rounded-2xl p-8 shadow-soft border-2 border-primary/20 flex flex-col items-center text-center">
-        <span class="material-symbols-outlined text-8xl mb-4 <%= @flow_item_icon_color %>">
+        <span class="material-symbols-outlined text-8xl mb-4 <%= icon_color_class(@flow_item_icon_color) %>">
           <%= @flow_item_icon %>
         </span>
         <span class="text-5xl font-bold text-text-main-light dark:text-text-main-dark mb-2">
