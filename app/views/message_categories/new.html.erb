@@ -2,7 +2,7 @@
   <div class="max-w-md mx-auto">
 
     <%= form_with model: @message_category, local: true, data: { turbo: false } do |f| %>
-
+      <%= hidden_field_tag :source_category_id, @source_category_id if @source_category_id.present? %>
       <% if @message_category.errors.any? %>
         <div class="mb-4 rounded-xl bg-red-50 p-4 text-sm text-red-700">
           <ul class="list-disc pl-5 space-y-1">
@@ -51,6 +51,7 @@
       <!-- 保存ボタン -->
       <div class="mt-2">
         <%= f.submit "保存",
+          data: { disable_with: "保存中..." },
           class: "
             w-full bg-amber-600
             hover:bg-orange-600

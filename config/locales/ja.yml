@@ -6,6 +6,8 @@ ja:
       confirm: "このカテゴリを削除しますか？"
     update:
       success: "カテゴリを更新しました"
+    copy:
+      success: "カテゴリをコピーしました。フロー項目を編集できます"
   flow_items:
     destroy:
       success: "項目を削除しました"
