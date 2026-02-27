@@ -34,6 +34,15 @@
               </div>
             </div>
           <% end %>
+          <% if current_user && !message_category.user_id? %>
+            <div data-edit-mode-target="editOnly"
+                 class="hidden absolute top-2 right-2 z-10">
+              <%= link_to copy_message_category_path(message_category),
+                  class: "w-8 h-8 flex items-center justify-center rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition" do %>
+                <span class="material-symbols-outlined text-[18px]!">content_copy</span>
+              <% end %>
+            </div>
+          <% end %>
         </div>
       <% end %>
     </div>
