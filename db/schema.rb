@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_02_21_083726) do
+ActiveRecord::Schema[7.2].define(version: 2026_02_27_040108) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -20,7 +20,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_02_21_083726) do
     t.string "name", null: false
     t.string "kana", null: false
     t.string "icon", null: false
-    t.string "icon_color"
+    t.string "icon_color", default: "gray", null: false
     t.integer "position", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -38,7 +38,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_02_21_083726) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "key"
-    t.string "icon_color"
+    t.string "icon_color", default: "gray", null: false
     t.integer "position", default: 0, null: false
     t.index ["key"], name: "index_message_categories_on_key", unique: true
     t.index ["user_id"], name: "index_message_categories_on_user_id"

@@ -4,6 +4,8 @@ class MessageCategory < ApplicationRecord
   validates :name, :kana, :icon, presence: true
   validates :name, uniqueness: { scope: :user_id }
   validates :key, presence: true, uniqueness: true
+  validates :icon, inclusion: { in: ->(_) { IconDefinitions::CATEGORY_ICONS.keys } }
+  validates :icon_color, inclusion: { in: ->(_) { IconDefinitions::ICON_COLORS.keys } }, if: :user_id?
 
   before_validation :set_key, on: :create
 

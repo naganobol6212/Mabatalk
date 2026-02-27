@@ -1,0 +1,23 @@
+<div class="bg-white rounded-xl p-6 shadow mb-6">
+    <p class="text-sm font-bold text-gray-600 mb-4 pl-1">
+      カラーを選択
+    </p>
+
+    <div class="flex flex-wrap gap-3">
+      <% icon_colors.each do |color_key, attrs| %>
+        <label class="cursor-pointer">
+          <%= f.radio_button :icon_color, color_key, class: "hidden peer" %>
+          <div class="
+            w-10 h-10 rounded-full
+            border-2 border-transparent
+            peer-checked:border-gray-800
+            peer-checked:scale-110
+            transition-all
+            flex items-center justify-center
+          ">
+            <div class="w-7 h-7 rounded-full <%= icon_bg_class(color_key) %>"></div>
+          </div>
+        </label>
+      <% end %>
+    </div>
+  </div>

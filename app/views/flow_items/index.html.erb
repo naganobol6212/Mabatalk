@@ -14,7 +14,7 @@
           <%= render "shared/square_card",
               path: confirm_message_category_flow_item_path(@message_category, item),
               icon: item.icon,
-              icon_color: item.icon_color,
+              icon_color: icon_color_class(item.icon_color),
               title: item.name,
               kana: item.kana %>
           <% if current_user && item.user_id? %>
