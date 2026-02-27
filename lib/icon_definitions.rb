@@ -5,8 +5,9 @@ module IconDefinitions
   # 既存アイコン名を削除すると既存DBデータが孤立するため、削除禁止。
   CATEGORY_ICONS = {
     "local_cafe"          => { label: "飲みもの" },
+    "local_drink"          => { label: "飲みもの" },
     "accessibility_new"   => { label: "体調" },
-    "sentiment_satisfied" => { label: "気持ち" },
+    "sentiment_satisfied_alt" => { label: "気持ち" },
     "volunteer_activism"  => { label: "お願い" },
     "home"                => { label: "生活・家" },
     "restaurant"          => { label: "食事" },
