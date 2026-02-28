@@ -63,7 +63,17 @@ namespace :data do
           kana: "いたい",
           icon: "sentiment_very_dissatisfied",
           icon_color: "text-red-600",
-          position: 2
+          position: 2,
+          detail_flow_key: "pain_detail"
+        },
+        "itchy" => {
+          category: "body",
+          name: "かゆい",
+          kana: "かゆい",
+          icon: "sentiment_stressed",
+          icon_color: "text-yellow-500",
+          position: 3,
+          detail_flow_key: "itch_detail"
         },
         "hot" => {
           category: "body",
@@ -71,7 +81,8 @@ namespace :data do
           kana: "あつい",
           icon: "wb_sunny",
           icon_color: "text-orange-500",
-          position: 3
+          position: 4,
+          detail_flow_key: "hot_detail"
         },
         "cold" => {
           category: "body",
@@ -79,7 +90,8 @@ namespace :data do
           kana: "さむい",
           icon: "ac_unit",
           icon_color: "text-cyan-600",
-          position: 4
+          position: 5,
+          detail_flow_key: "cold_detail"
         },
 
         # drink
@@ -89,7 +101,8 @@ namespace :data do
           kana: "みず",
           icon: "water_drop",
           icon_color: "text-cyan-500",
-          position: 1
+          position: 1,
+          detail_flow_key: "drink_detail"
         },
         "sports_drink" => {
           category: "drink",
@@ -97,7 +110,8 @@ namespace :data do
           kana: "すぽーつどりんく",
           icon: "water",
           icon_color: "text-blue-600",
-          position: 2
+          position: 2,
+          detail_flow_key: "drink_amount_detail"
         },
         "tea" => {
           category: "drink",
@@ -105,7 +119,8 @@ namespace :data do
           kana: "おちゃ",
           icon: "emoji_food_beverage",
           icon_color: "text-green-600",
-          position: 3
+          position: 3,
+          detail_flow_key: "drink_detail"
         },
         "carbonated_drink" => {
           category: "drink",
@@ -113,7 +128,8 @@ namespace :data do
           kana: "たんさんいんりょう",
           icon: "local_drink",
           icon_color: "text-yellow-500",
-          position: 4
+          position: 4,
+          detail_flow_key: "drink_amount_detail"
         },
         "fruit_juice" => {
           category: "drink",
@@ -121,7 +137,8 @@ namespace :data do
           kana: "ふるーつじゅーす",
           icon: "grocery",
           icon_color: "text-orange-500",
-          position: 5
+          position: 5,
+          detail_flow_key: "drink_amount_detail"
         },
 
         # feeling
@@ -173,7 +190,8 @@ namespace :data do
           kana: "おんど",
           icon: "thermostat",
           icon_color: "text-emerald-500",
-          position: 2
+          position: 2,
+          detail_flow_key: "room_temp_detail"
         },
         "light" => {
           category: "request",
@@ -181,7 +199,8 @@ namespace :data do
           kana: "あかり",
           icon: "lightbulb",
           icon_color: "text-amber-500",
-          position: 3
+          position: 3,
+          detail_flow_key: "light_detail"
         },
         "bed" => {
           category: "request",
@@ -189,7 +208,8 @@ namespace :data do
           kana: "べっど",
           icon: "bed",
           icon_color: "text-indigo-500",
-          position: 4
+          position: 4,
+          detail_flow_key: "bed_detail"
         }
       }
 
@@ -200,12 +220,13 @@ namespace :data do
         category = MessageCategory.find_by!(key: seed[:category], user_id: nil)
 
         item.update!(
-          name: seed[:name],
-          kana: seed[:kana],
-          icon: seed[:icon],
-          icon_color: seed[:icon_color],
-          position: seed[:position],
-          message_category: category
+          name:             seed[:name],
+          kana:             seed[:kana],
+          icon:             seed[:icon],
+          icon_color:       seed[:icon_color],
+          position:         seed[:position],
+          message_category: category,
+          detail_flow_key:  seed[:detail_flow_key]
         )
 
         puts "Updated FlowItem: #{item.key}"
