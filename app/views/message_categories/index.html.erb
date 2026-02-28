@@ -8,8 +8,12 @@
   <div class="flex flex-col items-center px-4 pt-6 w-full max-w-md mx-auto">
 
     <!-- カテゴリ一覧 -->
+    <%# TODO: 並び替えUIは一時的に非表示。system カテゴリを含む全体並び替えが
+        設計できた時点で reorder コントローラーを復活させる。
+        バックエンド（reorder アクション・position カラム）は残存。 %>
     <div class="grid grid-cols-2 gap-4 w-full">
       <% @message_categories.each do |message_category| %>
+        <%# data-reorder-card / data-id は reorder 復活時に再追加する %>
         <div class="relative">
           <%= render "shared/square_card",
               path: message_category_flow_items_path(message_category),
@@ -21,6 +25,10 @@
             <div data-edit-mode-target="editOnly"
                  class="hidden absolute top-2 right-2 z-10">
               <div class="flex flex-col gap-1">
+                <%# 並び替えボタンは一時非表示。
+                    理由: system カテゴリより上に DOM 移動できるバグがあり、
+                    リロード後にスナップバックする UX 問題があるため。
+                    reorder_controller.js は削除せず残してある。 %>
                 <%= link_to edit_message_category_path(message_category),
                     class: "w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-500 hover:bg-blue-200 transition" do %>
                   <span class="material-symbols-outlined text-[18px]!">edit</span>

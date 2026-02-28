@@ -1,5 +1,5 @@
 class FlowItemsController < ApplicationController
-  before_action :authenticate_user!, only: %i[new create edit update destroy]
+  before_action :authenticate_user!, only: %i[new create edit update destroy reorder]
   before_action :set_message_category, only: %i[index new create edit update destroy]
   before_action :set_flow_item, only: %i[confirm]
   before_action :set_flow_item_for_owner, only: %i[edit update destroy]
@@ -48,6 +48,26 @@ class FlowItemsController < ApplicationController
     @flow_item.destroy
     redirect_to message_category_flow_items_path(@message_category),
                 notice: t("flow_items.destroy.success")
+  end
+
+  def reorder
+    @message_category = current_user.message_categories.find(params[:message_category_id])
+    scope = @message_category.flow_items.where(user_id: current_user.id)
+
+    allowed_ids = scope.pluck(:id)
+    submitted_ids = params[:ids].map(&:to_i)
+
+    return head :forbidden unless (submitted_ids - allowed_ids).empty?
+
+    system_max = @message_category.flow_items.where(user_id: nil).maximum(:position) || 0
+
+    ActiveRecord::Base.transaction do
+      submitted_ids.each_with_index do |id, index|
+        scope.find(id).update!(position: system_max + index + 1)
+      end
+    end
+
+    render json: { status: "ok" }
   end
 
   private
