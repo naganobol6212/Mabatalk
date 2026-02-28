@@ -66,9 +66,11 @@ class MessageCategoriesController < ApplicationController
 
     return head :forbidden unless (submitted_ids - allowed_ids).empty?
 
+    system_max = MessageCategory.where(user_id: nil).maximum(:position) || 0
+
     ActiveRecord::Base.transaction do
       submitted_ids.each_with_index do |id, index|
-        current_user.message_categories.find(id).update!(position: index + 1)
+        current_user.message_categories.find(id).update!(position: system_max + index + 1)
       end
     end
 

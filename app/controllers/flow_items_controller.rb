@@ -59,9 +59,11 @@ class FlowItemsController < ApplicationController
 
     return head :forbidden unless (submitted_ids - allowed_ids).empty?
 
+    system_max = @message_category.flow_items.where(user_id: nil).maximum(:position) || 0
+
     ActiveRecord::Base.transaction do
       submitted_ids.each_with_index do |id, index|
-        scope.find(id).update!(position: index + 1)
+        scope.find(id).update!(position: system_max + index + 1)
       end
     end
 
