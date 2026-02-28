@@ -8,9 +8,15 @@
   <div class="flex flex-col items-center px-4 pt-6 w-full max-w-md mx-auto">
 
     <!-- カテゴリ一覧 -->
-    <div class="grid grid-cols-2 gap-4 w-full">
+    <div class="grid grid-cols-2 gap-4 w-full"
+        data-controller="reorder"
+        data-reorder-url-value="<%= reorder_message_categories_path %>">
       <% @message_categories.each do |message_category| %>
-        <div class="relative">
+        <% if message_category.user_id? %>
+          <div class="relative" data-reorder-card data-id="<%= message_category.id %>">
+        <% else %>
+          <div class="relative" data-reorder-card>
+        <% end %>
           <%= render "shared/square_card",
               path: message_category_flow_items_path(message_category),
               icon: message_category.icon,
@@ -21,6 +27,14 @@
             <div data-edit-mode-target="editOnly"
                  class="hidden absolute top-2 right-2 z-10">
               <div class="flex flex-col gap-1">
+                <button data-action="click->reorder#moveUp"
+                        class="w-8 h-8 flex items-center justify-center rounded-full bg-stone-100 text-stone-600 hover:bg-stone-200 transition">
+                  <span class="material-symbols-outlined text-[18px]!">arrow_upward</span>
+                </button>
+                <button data-action="click->reorder#moveDown"
+                        class="w-8 h-8 flex items-center justify-center rounded-full bg-stone-100 text-stone-600 hover:bg-stone-200 transition">
+                  <span class="material-symbols-outlined text-[18px]!">arrow_downward</span>
+                </button>
                 <%= link_to edit_message_category_path(message_category),
                     class: "w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-500 hover:bg-blue-200 transition" do %>
                   <span class="material-symbols-outlined text-[18px]!">edit</span>

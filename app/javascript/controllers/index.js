@@ -15,3 +15,6 @@ application.register("password-toggle", PasswordToggleController)
 
 import EditModeController from "./edit_mode_controller"
 application.register("edit-mode", EditModeController)
+
+import ReorderController from "./reorder_controller"
+application.register("reorder", ReorderController)

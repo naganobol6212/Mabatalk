@@ -1,6 +1,6 @@
 class MessageCategoriesController < ApplicationController
   include MessageCategoriesHelper
-  before_action :authenticate_user!, only: %i[new create edit update destroy copy]
+  before_action :authenticate_user!, only: %i[new create edit update destroy copy reorder]
   before_action :set_message_category, only: %i[edit update destroy]
 
   def index
@@ -58,6 +58,21 @@ class MessageCategoriesController < ApplicationController
     redirect_to message_categories_path, notice: t("message_categories.destroy.success")
   rescue ActiveRecord::DeleteRestrictionError
     redirect_to message_categories_path, alert: t("message_categories.destroy.restricted")
+  end
+
+  def reorder
+    allowed_ids = current_user.message_categories.pluck(:id)
+    submitted_ids = params[:ids].map(&:to_i)
+
+    return head :forbidden unless (submitted_ids - allowed_ids).empty?
+
+    ActiveRecord::Base.transaction do
+      submitted_ids.each_with_index do |id, index|
+        current_user.message_categories.find(id).update!(position: index + 1)
+      end
+    end
+
+    render json: { status: "ok" }
   end
 
   private

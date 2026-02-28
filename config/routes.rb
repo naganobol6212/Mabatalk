@@ -8,8 +8,10 @@ Rails.application.routes.draw do
 
   resources :message_categories, only: %i[index new create edit update destroy] do
     get :copy, on: :member
+    collection { post :reorder }
     resources :flow_items, only: %i[index new create edit update destroy] do
       get :confirm, on: :member
+      collection { post :reorder }
     end
   end
 
