@@ -14,6 +14,53 @@ ja:
       confirm: "この項目を削除しますか？"
     update:
       success: "項目を更新しました"
+  detail_flows:
+    optional_hint: "くわしく伝えますか？"
+    step_of: "%{current} / %{total} ステップ"
+    answer_required: "選択してください"
+    next: "次へ"
+    tell: "伝える"
+    drink_detail:
+      button_label: "量と温度を伝える"
+      amount:
+        question: "量はどのくらいですか？"
+      temperature:
+        question: "温度はどうしますか？"
+    drink_amount_detail:
+      button_label: "量を伝える"
+      amount:
+        question: "量はどのくらいですか？"
+    pain_detail:
+      button_label: "どこが痛いか伝える"
+      place:
+        question: "どこが痛いですか？"
+    itch_detail:
+      button_label: "どこがかゆいか伝える"
+      place:
+        question: "どこがかゆいですか？"
+    hot_detail:
+      button_label: "どうしてほしいかを伝える"
+      action:
+        question: "どうしますか？"
+    cold_detail:
+      button_label: "どうしてほしいかを伝える"
+      action:
+        question: "どうしますか？"
+    bed_detail:
+      button_label: "ベッドの調整を伝える"
+      action:
+        question: "どうしますか？"
+    room_temp_detail:
+      button_label: "室温をどうしたいか伝える"
+      action:
+        question: "室温をどうしますか？"
+    light_detail:
+      button_label: "明かりをどうしたいか伝える"
+      action:
+        question: "明かりをどうしますか？"
+  message_logs:
+    created: "ログに自動保存されました"
+
   activerecord:
     attributes:
       message_category:

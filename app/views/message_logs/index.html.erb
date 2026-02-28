@@ -52,6 +52,11 @@
               <span class="text-xl font-bold text-stone-800 leading-snug">
                 <%= log.flow_item_name %>
               </span>
+              <% if log.detail_flow_text.present? %>
+                <p class="text-sm text-stone-500 mt-1">
+                  <%= log.detail_flow_text %>
+                </p>
+              <% end %>
             </div>
           </div>
         </div>

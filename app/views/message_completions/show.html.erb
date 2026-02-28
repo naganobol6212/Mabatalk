@@ -24,6 +24,11 @@
         <span class="text-2xl text-text-sub-light dark:text-text-sub-dark">
           を伝えました。
         </span>
+        <% if @detail_flow_text.present? %>
+          <span class="text-lg text-text-sub-light dark:text-text-sub-dark mt-2">
+            <%= @detail_flow_text %>
+          </span>
+        <% end %>
       </div>
     <% else %>
       <p class="text-text-sub-light">選択された内容が見つかりませんでした。</p>

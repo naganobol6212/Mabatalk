@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_02_27_040108) do
+ActiveRecord::Schema[7.2].define(version: 2026_02_27_175048) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -25,6 +25,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_02_27_040108) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "message_category_id"
+    t.string "detail_flow_key"
     t.index ["key"], name: "index_flow_items_on_key", unique: true
     t.index ["message_category_id"], name: "index_flow_items_on_message_category_id"
     t.index ["user_id"], name: "index_flow_items_on_user_id"
@@ -54,6 +55,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_02_27_040108) do
     t.string "flow_item_icon"
     t.string "flow_item_icon_color"
     t.string "message_category_icon_color"
+    t.string "detail_flow_text"
+    t.jsonb "detail_flow_data"
     t.index ["flow_item_id"], name: "index_message_logs_on_flow_item_id"
     t.index ["user_id"], name: "index_message_logs_on_user_id"
   end
