@@ -1,74 +1,92 @@
 <main class="flex-grow px-6 pb-24 pt-6 flex flex-col items-center">
 
-  <div class="w-full max-w-md space-y-2 mb-10 text-center">
+<div class="w-full max-w-md space-y-2 mb-10 text-center">
 
-    <!-- 選択したカテゴリ -->
-    <div class="bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm">
-      <p class="text-sm text-text-sub-light dark:text-text-sub-dark mb-1">
-        選択したカテゴリ
-      </p>
-      <p class="text-xl font-bold text-text-main-light dark:text-text-main-dark">
-        <%= @message_category.name %>
-      </p>
-    </div>
-
-    <div class="flex flex-col items-center py-2 text-text-sub-light dark:text-text-sub-dark">
-      <span class="material-symbols-outlined text-2xl">arrow_downward</span>
-    </div>
-
-    <!-- 選択した項目 -->
-    <div class="bg-card-light dark:bg-card-dark rounded-xl p-6 shadow-soft border-2 border-primary/20">
-      <p class="text-sm text-text-sub-light dark:text-text-sub-dark mb-2">
-        選択した項目
-      </p>
-
-      <div class="flex flex-col items-center">
-        <span class="material-symbols-outlined text-5xl mb-2 <%= icon_color_class(@flow_item.icon_color) %>">
-          <%= @flow_item.icon %>
-        </span>
-
-        <p class="text-3xl font-bold text-text-main-light dark:text-text-main-dark">
-          <%= @flow_item.name %>
-        </p>
-
-        <p class="text-sm text-text-sub-light dark:text-text-sub-dark mt-1">
-          <%= @flow_item.kana %>
-        </p>
-      </div>
-    </div>
+  <!-- 選択したカテゴリ -->
+  <div class="bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm">
+    <p class="text-sm text-text-sub-light dark:text-text-sub-dark mb-1">
+      選択したカテゴリ
+    </p>
+    <p class="text-xl font-bold text-text-main-light dark:text-text-main-dark">
+      <%= @message_category.name %>
+    </p>
   </div>
 
-  <!-- 確認文言 -->
-  <div class="w-full max-w-md text-center mb-8">
-    <h3 class="text-2xl font-bold text-text-main-light dark:text-white">
-      あっていますか？
-    </h3>
+  <div class="flex flex-col items-center py-2 text-text-sub-light dark:text-text-sub-dark">
+    <span class="material-symbols-outlined text-2xl">arrow_downward</span>
   </div>
 
-  <!-- はい / いいえ -->
-  <div class="w-full max-w-md grid grid-cols-2 gap-6 mt-auto mb-8">
+  <!-- 選択した項目 -->
+  <div class="bg-card-light dark:bg-card-dark rounded-xl p-6 shadow-soft border-2 border-primary/20">
+    <p class="text-sm text-text-sub-light dark:text-text-sub-dark mb-2">
+      選択した項目
+    </p>
 
-    <%= button_to message_logs_path(flow_item_id: @flow_item.id),
-      data: { turbo: false },
-      class: "w-full cursor-pointer bg-card-light dark:bg-card-dark border-2 border-green-500 rounded-2xl p-6 flex flex-col items-center justify-center shadow-soft text-center" do %>
-
-      <span class="material-symbols-outlined text-5xl text-green-600 mb-2">
-        check_circle
+    <div class="flex flex-col items-center">
+      <span class="material-symbols-outlined text-5xl mb-2 <%= icon_color_class(@flow_item.icon_color) %>">
+        <%= @flow_item.icon %>
       </span>
-      <span class="text-3xl font-bold">はい</span>
 
-    <% end %>
+      <p class="text-3xl font-bold text-text-main-light dark:text-text-main-dark">
+        <%= @flow_item.name %>
+      </p>
 
-    <!-- いいえ（戻る） -->
-    <%= link_to message_category_flow_items_path(@message_category),
-        class: "bg-card-light dark:bg-card-dark border-2 border-red-500 rounded-2xl p-6 flex flex-col items-center justify-center shadow-soft text-center" do %>
+      <p class="text-sm text-text-sub-light dark:text-text-sub-dark mt-1">
+        <%= @flow_item.kana %>
+      </p>
+    </div>
+  </div>
+</div>
 
-      <span class="material-symbols-outlined text-5xl text-red-600 mb-2">
-        cancel
+<!-- 確認文言 -->
+<div class="w-full max-w-md text-center mb-8">
+  <h3 class="text-2xl font-bold text-text-main-light dark:text-white">
+    あっていますか？
+  </h3>
+</div>
+
+<!-- はい / いいえ -->
+<div class="w-full max-w-md grid grid-cols-2 gap-6 mt-auto mb-8">
+
+  <%= button_to message_logs_path(flow_item_key: @flow_item.key),
+    data: { turbo: false },
+    class: "w-full cursor-pointer bg-card-light dark:bg-card-dark border-2 border-green-500 rounded-2xl p-6 flex flex-col items-center justify-center shadow-soft text-center" do %>
+
+    <span class="material-symbols-outlined text-5xl text-green-600 mb-2">
+      check_circle
+    </span>
+    <span class="text-3xl font-bold">はい</span>
+
+  <% end %>
+
+  <!-- いいえ（戻る） -->
+  <%= link_to message_category_flow_items_path(@message_category),
+      class: "bg-card-light dark:bg-card-dark border-2 border-red-500 rounded-2xl p-6 flex flex-col items-center justify-center shadow-soft text-center" do %>
+
+    <span class="material-symbols-outlined text-5xl text-red-600 mb-2">
+      cancel
+    </span>
+    <span class="text-3xl font-bold">いいえ</span>
+
+  <% end %>
+</div>
+
+  <% if @flow_item.detail_flow_key.present? %>
+  <div class="w-full max-w-md mt-2">
+    <p class="text-center text-sm text-text-sub-light dark:text-text-sub-dark mb-2">
+      <%= t("detail_flows.optional_hint") %>
+    </p>
+    <% dest = user_signed_in? ? detail_flow_step_path(@flow_item.key, 0) : new_user_session_path %>
+    <%= link_to dest,
+        class: "w-full block bg-card-light dark:bg-card-dark border border-stone-300
+                dark:border-stone-600 rounded-2xl p-4 flex flex-col items-center
+                justify-center shadow-sm text-center" do %>
+      <span class="text-xl font-bold text-text-sub-light dark:text-text-sub-dark">
+        <%= t("detail_flows.#{@flow_item.detail_flow_key}.button_label",
+          default: t("detail_flows.optional_hint")) %>
       </span>
-      <span class="text-3xl font-bold">いいえ</span>
-
     <% end %>
   </div>
+<% end %>
 
 </main>
