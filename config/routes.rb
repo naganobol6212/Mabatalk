@@ -13,6 +13,14 @@ Rails.application.routes.draw do
     end
   end
 
+  get  "detail_flows/:flow_item_key/step/:step_index",
+      to: "detail_flows#show",
+      as: :detail_flow_step
+
+  post "detail_flows/:flow_item_key/step/:step_index",
+      to: "detail_flows#submit",
+      as: :detail_flow_step_submit
+
   resources :message_logs, only: %i[index create]
 
   resource :message_completion, only: %i[show]
