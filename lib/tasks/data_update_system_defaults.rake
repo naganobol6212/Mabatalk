@@ -10,7 +10,7 @@ namespace :data do
           name: "体調",
           kana: "からだのちょうし",
           icon: "accessibility_new",
-          icon_color: "text-orange-600",
+          icon_color: "orange",
           position: 1
         },
         {
@@ -18,7 +18,7 @@ namespace :data do
           name: "飲みもの",
           kana: "のみもの",
           icon: "local_drink",
-          icon_color: "text-sky-600",
+          icon_color: "sky",
           position: 2
         },
         {
@@ -26,7 +26,7 @@ namespace :data do
           name: "お願い",
           kana: "やってほしいこと",
           icon: "volunteer_activism",
-          icon_color: "text-emerald-600",
+          icon_color: "emerald",
           position: 3
         },
         {
@@ -34,7 +34,7 @@ namespace :data do
           name: "気持ち",
           kana: "いまのきもち",
           icon: "sentiment_satisfied_alt",
-          icon_color: "text-rose-500",
+          icon_color: "rose",
           position: 4
         }
       ]
@@ -54,7 +54,7 @@ namespace :data do
           name: "苦しい",
           kana: "くるしい",
           icon: "sick",
-          icon_color: "text-purple-500",
+          icon_color: "violet",
           position: 1
         },
         "pain" => {
@@ -62,7 +62,7 @@ namespace :data do
           name: "痛い",
           kana: "いたい",
           icon: "sentiment_very_dissatisfied",
-          icon_color: "text-red-600",
+          icon_color: "red",
           position: 2,
           detail_flow_key: "pain_detail"
         },
@@ -71,7 +71,7 @@ namespace :data do
           name: "かゆい",
           kana: "かゆい",
           icon: "sentiment_stressed",
-          icon_color: "text-yellow-500",
+          icon_color: "yellow",
           position: 3,
           detail_flow_key: "itch_detail"
         },
@@ -80,7 +80,7 @@ namespace :data do
           name: "暑い",
           kana: "あつい",
           icon: "wb_sunny",
-          icon_color: "text-orange-500",
+          icon_color: "orange",
           position: 4,
           detail_flow_key: "hot_detail"
         },
@@ -89,7 +89,7 @@ namespace :data do
           name: "寒い",
           kana: "さむい",
           icon: "ac_unit",
-          icon_color: "text-cyan-600",
+          icon_color: "cyan",
           position: 5,
           detail_flow_key: "cold_detail"
         },
@@ -100,7 +100,7 @@ namespace :data do
           name: "水",
           kana: "みず",
           icon: "water_drop",
-          icon_color: "text-cyan-500",
+          icon_color: "cyan",
           position: 1,
           detail_flow_key: "drink_detail"
         },
@@ -109,7 +109,7 @@ namespace :data do
           name: "スポーツドリンク",
           kana: "すぽーつどりんく",
           icon: "water",
-          icon_color: "text-blue-600",
+          icon_color: "blue",
           position: 2,
           detail_flow_key: "drink_amount_detail"
         },
@@ -118,7 +118,7 @@ namespace :data do
           name: "お茶",
           kana: "おちゃ",
           icon: "emoji_food_beverage",
-          icon_color: "text-green-600",
+          icon_color: "green",
           position: 3,
           detail_flow_key: "drink_detail"
         },
@@ -127,7 +127,7 @@ namespace :data do
           name: "炭酸飲料",
           kana: "たんさんいんりょう",
           icon: "local_drink",
-          icon_color: "text-yellow-500",
+          icon_color: "yellow",
           position: 4,
           detail_flow_key: "drink_amount_detail"
         },
@@ -136,7 +136,7 @@ namespace :data do
           name: "フルーツジュース",
           kana: "ふるーつじゅーす",
           icon: "grocery",
-          icon_color: "text-orange-500",
+          icon_color: "orange",
           position: 5,
           detail_flow_key: "drink_amount_detail"
         },
@@ -147,7 +147,7 @@ namespace :data do
           name: "うれしい",
           kana: "うれしい",
           icon: "sentiment_excited",
-          icon_color: "text-amber-500",
+          icon_color: "amber",
           position: 1
         },
         "lonely" => {
@@ -155,7 +155,7 @@ namespace :data do
           name: "さみしい",
           kana: "さみしい",
           icon: "sentiment_dissatisfied",
-          icon_color: "text-blue-400",
+          icon_color: "blue",
           position: 2
         },
         "anxious" => {
@@ -163,7 +163,7 @@ namespace :data do
           name: "不安",
           kana: "ふあん",
           icon: "sentiment_worried",
-          icon_color: "text-purple-500",
+          icon_color: "violet",
           position: 3
         },
         "okay" => {
@@ -171,7 +171,7 @@ namespace :data do
           name: "大丈夫",
           kana: "だいじょうぶ",
           icon: "thumb_up",
-          icon_color: "text-emerald-500",
+          icon_color: "emerald",
           position: 4
         },
 
@@ -181,7 +181,7 @@ namespace :data do
           name: "トイレ",
           kana: "といれ",
           icon: "wc",
-          icon_color: "text-cyan-600",
+          icon_color: "cyan",
           position: 1
         },
         "temperature" => {
@@ -189,7 +189,7 @@ namespace :data do
           name: "温度",
           kana: "おんど",
           icon: "thermostat",
-          icon_color: "text-emerald-500",
+          icon_color: "emerald",
           position: 2,
           detail_flow_key: "room_temp_detail"
         },
@@ -198,7 +198,7 @@ namespace :data do
           name: "明かり",
           kana: "あかり",
           icon: "lightbulb",
-          icon_color: "text-amber-500",
+          icon_color: "amber",
           position: 3,
           detail_flow_key: "light_detail"
         },
@@ -207,7 +207,7 @@ namespace :data do
           name: "ベッド",
           kana: "べっど",
           icon: "bed",
-          icon_color: "text-indigo-500",
+          icon_color: "indigo",
           position: 4,
           detail_flow_key: "bed_detail"
         }

@@ -27,6 +27,7 @@ class MessageCategoriesController < ApplicationController
   def create
     @message_category =
       current_user.message_categories.build(message_category_params)
+    @message_category.position = MessageCategory.for_user(current_user).maximum(:position).to_i + 1
     ApplicationRecord.transaction do
       @message_category.save!
       copy_flow_items_from(params[:source_category_id]) if params[:source_category_id].present?
