@@ -60,6 +60,12 @@ ja:
         question: "明かりをどうしますか？"
   message_logs:
     created: "ログに自動保存されました"
+  analytics:
+    no_data: "この月のデータはありません"
+    future_month: "まだデータがありません"
+    chart_title: "項目別 件数"
+    detail_title: "詳細内訳"
+    count: "%{n}件"
 
   activerecord:
     attributes:

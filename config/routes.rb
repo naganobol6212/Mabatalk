@@ -25,6 +25,8 @@ Rails.application.routes.draw do
 
   resources :message_logs, only: %i[index create]
 
+  resource :analytics, only: [ :show ]
+
   resource :message_completion, only: %i[show]
 
   resource :settings, only: %i[show]

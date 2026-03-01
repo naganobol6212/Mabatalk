@@ -8,7 +8,7 @@
   controller_name == "flow_items"
 %>
 
-<% log_active = controller_name == "message_logs" %>
+<% analytics_active = controller_name == "analytics" %>
 
 <nav class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur border-t border-stone-200 pb-safe pt-2 px-6 shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.05)] z-50">
   <div class="flex justify-around items-end pb-2 max-w-md mx-auto">
@@ -33,22 +33,22 @@
 
     <% end %>
 
-    <!-- 履歴 -->
-    <%= link_to message_logs_path,
+    <!-- 振り返り -->
+    <%= link_to analytics_path,
       class: "flex flex-col items-center gap-1 min-w-[64px]" do %>
 
       <span class="
         material-symbols-outlined
-        <%= log_active ? active_icon : inactive_icon %>
+        <%= analytics_active ? active_icon : inactive_icon %>
       ">
-        history
+        insights
       </span>
 
       <span class="
         text-[11px]
-        <%= log_active ? active_text : inactive_text %>
+        <%= analytics_active ? active_text : inactive_text %>
       ">
-        履歴
+        振り返り
       </span>
 
     <% end %>

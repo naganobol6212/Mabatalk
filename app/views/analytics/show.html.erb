@@ -1,0 +1,80 @@
+<div class="max-w-md mx-auto px-4 pb-24">
+
+  <%# 月ナビゲーション %>
+  <div class="flex items-center justify-between py-4">
+    <%= link_to analytics_path(month: @prev_month.strftime("%Y-%m")),
+        class: "btn btn-ghost btn-sm" do %>
+      <span class="material-symbols-outlined">chevron_left</span>
+    <% end %>
+
+    <h2 class="text-base font-bold text-stone-700">
+      <%= @month.strftime("%Y年%-m月") %>
+    </h2>
+
+    <%= link_to analytics_path(month: @next_month.strftime("%Y-%m")),
+        class: "btn btn-ghost btn-sm #{'opacity-50 pointer-events-none' if @future_month}",
+        title: @future_month ? t("analytics.future_month") : nil do %>
+      <span class="material-symbols-outlined">chevron_right</span>
+    <% end %>
+  </div>
+
+  <% if @stats[:chart_data].empty? %>
+    <p class="text-center text-stone-400 py-16"><%= t("analytics.no_data") %></p>
+
+  <% else %>
+    <%# Chart.js グラフ %>
+    <section class="mb-8">
+      <h3 class="text-sm font-semibold text-stone-500 mb-3">
+        <%= t("analytics.chart_title") %>
+      </h3>
+      <canvas
+        data-controller="bar-chart"
+        data-bar-chart-data-value="<%= @stats[:chart_data].to_json %>">
+      </canvas>
+    </section>
+
+    <%# 詳細内訳リスト %>
+    <section>
+      <h3 class="text-sm font-semibold text-stone-500 mb-3">
+        <%= t("analytics.detail_title") %>
+      </h3>
+
+      <% @stats[:detail_data].each do |category, cat_data| %>
+        <div class="mb-6">
+          <div class="flex items-center gap-2 mb-2 border-b border-stone-200 pb-1">
+            <span class="font-bold text-stone-700 text-sm"><%= category %></span>
+            <span class="text-xs text-stone-400">
+              <%= t("analytics.count", n: cat_data[:total]) %>
+            </span>
+          </div>
+
+          <% cat_data[:items].each do |item, item_data| %>
+            <div class="ml-3 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="text-sm text-stone-600"><%= item %></span>
+                <span class="text-xs text-stone-600">
+                  <%= t("analytics.count", n: item_data[:total]) %>
+                </span>
+              </div>
+
+              <% item_data[:details].each do |detail, count| %>
+                <div class="ml-4 flex items-center gap-2 text-xs mt-0.5">
+                  <span class="text-stone-300">└</span>
+                  <span class="text-stone-600"><%= detail %></span>
+                  <span class="text-stone-600"><%= t("analytics.count", n: count) %></span>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </section>
+  <% end %>
+    <%# ログ一覧へのリンク %>
+    <div class="mt-8">
+      <%= link_to message_logs_path, class: "btn btn-outline btn-sm w-full" do %>
+        <span class="material-symbols-outlined text-base">history</span>
+        全ログを見る
+      <% end %>
+    </div>
+</div>
