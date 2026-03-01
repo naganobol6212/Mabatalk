@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  has_one :ai_summary, dependent: :destroy
   has_many :message_logs, dependent: :destroy
   has_many :message_categories, dependent: :destroy
   validates :name, presence: true
