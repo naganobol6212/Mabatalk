@@ -4,6 +4,12 @@
 
 import { application } from "./application"
 
+import BarChartController from "./bar_chart_controller"
+application.register("bar-chart", BarChartController)
+
+import EditModeController from "./edit_mode_controller"
+application.register("edit-mode", EditModeController)
+
 import FlashController from "./flash_controller"
 application.register("flash", FlashController)
 
@@ -12,9 +18,6 @@ application.register("hello", HelloController)
 
 import PasswordToggleController from "./password_toggle_controller"
 application.register("password-toggle", PasswordToggleController)
-
-import EditModeController from "./edit_mode_controller"
-application.register("edit-mode", EditModeController)
 
 import ReorderController from "./reorder_controller"
 application.register("reorder", ReorderController)
