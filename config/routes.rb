@@ -27,6 +27,8 @@ Rails.application.routes.draw do
 
   resource :analytics, only: [ :show ]
 
+  resource :ai_summary, only: [ :create ]
+
   resource :message_completion, only: %i[show]
 
   resource :settings, only: %i[show]
