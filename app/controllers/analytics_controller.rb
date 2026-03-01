@@ -7,6 +7,10 @@ class AnalyticsController < ApplicationController
     @prev_month  = @month.prev_month
     @next_month  = @month.next_month
     @future_month = @next_month > Date.current.beginning_of_month
+    @ai_summary = current_user.ai_summary
+    @recent_log_count = current_user.message_logs
+                                    .where(created_at: 30.days.ago..)
+                                    .count
   end
 
   private
