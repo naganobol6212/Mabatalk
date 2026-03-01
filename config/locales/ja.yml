@@ -66,6 +66,20 @@ ja:
     chart_title: "項目別 件数"
     detail_title: "詳細内訳"
     count: "%{n}件"
+  ai_summary:
+    title: "AI による振り返り"
+    generate: "AI で振り返る"
+    regenerate: "振り返りを更新する"
+    generating: "振り返り中..."
+    disclaimer: "この振り返りは、診断や評価を目的とするものではありません"
+    generated_at: "%{date} 時点の記録をもとにした振り返り"
+    next_regeneratable: "次回は %{date} 以降に更新できます"
+    create:
+      success: "AI による振り返りを生成しました"
+      too_soon: "次の振り返りは %{date} 以降に更新できます"
+      no_logs: "直近30日の記録がないため、振り返りを作成できません"
+      timeout: "AI の処理に時間がかかっています。しばらくしてからお試しください"
+      error: "振り返りの生成に失敗しました。しばらくしてからお試しください"
 
   activerecord:
     attributes:

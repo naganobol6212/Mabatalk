@@ -74,7 +74,50 @@
     <div class="mt-8">
       <%= link_to message_logs_path, class: "btn btn-outline btn-sm w-full" do %>
         <span class="material-symbols-outlined text-base">history</span>
-        全ログを見る
+        過去のメッセージを見る
       <% end %>
     </div>
+
+  <%# AI 要約セクション %>
+  <section class="mt-8">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="material-symbols-outlined text-amber-700">auto_awesome</span>
+      <h3 class="text-sm font-semibold text-stone-500"><%= t("ai_summary.title") %></h3>
+    </div>
+
+    <% if @ai_summary %>
+      <div class="bg-white rounded-2xl border border-stone-100 shadow-sm p-4 mb-3">
+        <p class="text-stone-700 text-sm leading-relaxed whitespace-pre-line">
+          <%= @ai_summary.content %>
+        </p>
+        <p class="text-xs text-stone-400 mt-3">
+          <%= t("ai_summary.generated_at", date: l(@ai_summary.generated_at.to_date)) %>
+        </p>
+      </div>
+      <p class="text-xs text-stone-400 mb-4"><%= t("ai_summary.disclaimer") %></p>
+    <% end %>
+
+    <% if @recent_log_count > 0 %>
+      <% if @ai_summary&.persisted? && !@ai_summary.regeneratable? %>
+        <p class="text-sm text-stone-400 text-center">
+          <%= t("ai_summary.next_regeneratable",
+                date: l(@ai_summary.next_regeneratable_at.to_date)) %>
+        </p>
+      <% else %>
+        <%= button_to ai_summary_path,
+                      method: :post,
+                      class: "w-full h-12 flex items-center justify-center gap-1 rounded-full bg-amber-600 text-white font-bold shadow hover:bg-amber-700 active:scale-[0.98] transition",
+                      data: { turbo_submits_with: t("ai_summary.generating") } do %>
+          <span class="material-symbols-outlined text-base">auto_awesome</span>
+          <%= t("ai_summary.#{@ai_summary ? 'regenerate' : 'generate'}") %>
+        <% end %>
+      <% end %>
+    <% else %>
+      <% unless @ai_summary %>
+        <p class="text-sm text-stone-400 text-center">
+          <%= t("ai_summary.create.no_logs") %>
+        </p>
+      <% end %>
+    <% end %>
+  </section>
 </div>

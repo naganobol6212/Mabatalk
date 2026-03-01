@@ -10,9 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_02_27_175048) do
+ActiveRecord::Schema[7.2].define(version: 2026_03_01_071837) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "ai_summaries", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.text "content", null: false
+    t.datetime "generated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_ai_summaries_on_user_id", unique: true
+  end
 
   create_table "flow_items", force: :cascade do |t|
     t.bigint "user_id"
@@ -76,6 +85,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_02_27_175048) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "ai_summaries", "users"
   add_foreign_key "flow_items", "message_categories"
   add_foreign_key "flow_items", "users"
   add_foreign_key "message_categories", "users"
