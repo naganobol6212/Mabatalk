@@ -12,4 +12,12 @@ module ApplicationHelper
   def icon_bg_class(key)
     IconDefinitions::ICON_COLORS.dig(key, :bg) || "bg-gray-400"
   end
+
+  def login_features
+    [
+      { icon: "edit_note",    title: "カテゴリ/項目をカスタマイズ",     description: "ご本人にあわせて、使いやすいように項目を自由に追加・調整できます。" },
+      { icon: "insights",     title: "履歴をグラフで可視化",             description: "メッセージの選択結果が自動で蓄積され、日々の変化をグラフで振り返れます。" },
+      { icon: "auto_awesome", title: "AIがメッセージの傾向を振り返り",   description: "履歴に保存された項目をAIがまとめて、振り返りコメントを届けます。" }
+    ]
+  end
 end
