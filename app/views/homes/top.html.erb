@@ -35,54 +35,7 @@
     </section>
 
     <!-- How it works -->
-    <section class="w-full mb-12">
-      <div class="flex items-center gap-2 mb-4 px-2">
-        <span class="material-symbols-outlined text-amber-700">touch_app</span>
-        <h3 class="text-lg font-bold text-stone-800">ご利用イメージ</h3>
-      </div>
-
-      <div class="flex flex-col gap-4 relative">
-        <div class="absolute left-[19px] top-6 bottom-6 w-0.5 bg-stone-300 -z-0"></div>
-
-        <% steps = [
-          [
-            "メッセージカテゴリを見せる",
-            "ご家族やスタッフが、画面を本人に見せます"
-          ],
-          [
-            "指差しで問いかける",
-            "順番に項目を指し、伝えたい内容があればまばたきしてもらいます"
-          ],
-          [
-            "メッセージを選んでいく",
-            "項目を選んでいくことで、本人の気持ちや困りごとが伝わります"
-          ]
-        ] %>
-
-        <% steps.each_with_index do |(title, text), i| %>
-          <div class="relative flex items-start gap-4 z-10">
-            <div class="
-              flex items-center justify-center
-              w-10 h-10
-              rounded-full
-              bg-white
-              border-2 border-amber-600
-              text-amber-700
-              font-bold text-lg
-              shadow-sm
-              shrink-0
-            ">
-              <%= i + 1 %>
-            </div>
-
-            <div class="flex-1 bg-white/80 p-4 rounded-2xl border border-white shadow-sm">
-              <h4 class="font-bold text-stone-800 mb-1"><%= title %></h4>
-              <p class="text-sm text-stone-600 leading-relaxed"><%= text %></p>
-            </div>
-          </div>
-        <% end %>
-      </div>
-    </section>
+    <%= render "shared/steps" %> 
 
     <!-- CTA -->
     <section class="w-full flex flex-col gap-6 mb-12">
