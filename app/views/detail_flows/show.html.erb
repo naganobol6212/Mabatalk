@@ -1,4 +1,4 @@
-<% back = @step_index > 0 ? detail_flow_step_path(@flow_item.key, @step_index - 1) : message_categories_path %>
+<% back = @step_index > 0 ? detail_flow_step_path(@flow_item.key, @step_index - 1) : confirm_message_category_flow_item_path(@flow_item.message_category, @flow_item) %>
 <% content_for :back_path, back %>
 <% content_for :page_title do %>
   <%= @flow_item.name %>
