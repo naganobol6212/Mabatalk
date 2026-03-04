@@ -90,40 +90,8 @@
     </section>
 
     <!-- Benefits -->
-    <section class="w-full mb-6">
-      <div class="flex items-center gap-2 mb-4 px-2">
-        <span class="material-symbols-outlined text-sky-500">verified_user</span>
-        <h3 class="text-lg font-bold text-stone-800">ログインで広がる機能</h3>
-      </div>
+    <%= render "shared/login_features" %>
 
-      <div class="bg-white rounded-2xl p-6 shadow border border-stone-100">
-        <ul class="space-y-4">
-          <% [
-            "メッセージの選択結果が自動で履歴に残ります",
-            "履歴をあとから振り返って確認できます",
-            "ご本人に合わせて、カテゴリや項目を自由に作れます"
-          ].each do |text| %>
-            <li class="flex items-start gap-3">
-              <div class="
-                w-6 h-6
-                rounded-full
-                bg-sky-100
-                flex items-center justify-center
-                shrink-0
-                mt-0.5
-              ">
-                <span class="material-symbols-outlined text-sky-500 text-[16px]">
-                  check
-                </span>
-              </div>
-              <span class="text-stone-800 font-medium leading-relaxed">
-                <%= text %>
-              </span>
-            </li>
-          <% end %>
-        </ul>
-      </div>
-    </section>
     <div class="mt-10 pt-6 border-t border-stone-300">
       <p class="text-[12px] text-stone-500 text-center leading-relaxed">
         ※本サービスは医療診断や治療を行うものではありません。<br>

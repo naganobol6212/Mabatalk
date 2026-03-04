@@ -19,76 +19,8 @@
     <!-- Steps -->
     <%= render "shared/steps" %>
 
-<!-- カスタマイズ機能 -->
-<section class="w-full mb-14">
-
-  <div class="flex items-center gap-2 mb-6 px-2">
-    <span class="material-symbols-outlined text-amber-700">tune</span>
-    <h3 class="text-lg font-bold text-stone-800">
-      ご本人に合わせてカスタマイズ
-    </h3>
-  </div>
-
-  <div class="bg-white rounded-2xl p-6 shadow-sm border border-stone-100 space-y-6">
-
-    <!-- ① -->
-    <div class="flex items-start gap-4">
-      <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-        <span class="material-symbols-outlined text-amber-700 text-[18px]">
-          add
-        </span>
-      </div>
-      <div>
-        <p class="font-semibold text-stone-800">
-          カテゴリや項目を追加できます
-        </p>
-        <p class="text-sm text-stone-600 leading-relaxed">
-          ログインすると自由に追加できます。
-        </p>
-        <p class="text-xs text-stone-500 leading-relaxed mt-1">
-          ※今後、編集や削除、並び替え機能を追加予定です。
-        </p>
-      </div>
-    </div>
-
-    <!-- ② -->
-    <div class="flex items-start gap-4">
-      <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-        <span class="material-symbols-outlined text-amber-700 text-[18px]">
-          favorite
-        </span>
-      </div>
-      <div>
-        <p class="font-semibold text-stone-800">
-          よく使う言葉だけを並べられます
-        </p>
-        <p class="text-sm text-stone-600 leading-relaxed">
-          生活や体調に合わせて調整できます。
-        </p>
-      </div>
-    </div>
-
-    <!-- ③ -->
-    <div class="flex items-start gap-4">
-      <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-        <span class="material-symbols-outlined text-amber-700 text-[18px]">
-          auto_awesome
-        </span>
-      </div>
-      <div>
-        <p class="font-semibold text-stone-800">
-          その人だけのコミュニケーション環境に
-        </p>
-        <p class="text-sm text-stone-600 leading-relaxed">
-          使い続けるほど、使いやすく育っていきます。
-        </p>
-      </div>
-    </div>
-
-  </div>
-
-</section>
-
+    <!-- ログインしたらできること -->
+    <%= render "shared/login_features" %>
 
     <!-- 戻る -->
     <section class="w-full mb-6">
