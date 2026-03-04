@@ -1,5 +1,7 @@
 ja:
   message_categories:
+    index:
+      title: "カテゴリ"
     destroy:
       success: "カテゴリを削除しました"
       restricted: "ログが記録されているため削除できません"

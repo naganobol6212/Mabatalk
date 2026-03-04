@@ -1,6 +1,6 @@
 <% content_for :back_path, message_categories_path %>
 <% content_for :page_title do %>
-  <%= @message_category[:title] %>
+  <%= @message_category.name %>
 <% end %>
 
 <% content_for :edit_mode_enabled, true %>
