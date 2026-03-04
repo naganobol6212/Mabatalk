@@ -1,8 +1,15 @@
 <header class="relative flex items-center justify-between px-6 py-4 sticky top-0 z-20 bg-stone-200/90 backdrop-blur border-b border-white/40">
   <div class="z-10">
-    <h1 class="flex items-center">
-      <%= render "shared/logo" %>
-    </h1>
+    <% if content_for?(:back_path) %>
+      <%= link_to yield(:back_path),
+          class: "text-xl font-bold text-stone-700 px-2 py-1" do %>
+        <span class="material-symbols-outlined">chevron_left</span>
+      <% end %>
+    <% else %>
+      <h1 class="flex items-center">
+        <%= render "shared/logo" %>
+      </h1>
+    <% end %>
   </div>
 
   <!-- 中央：ページタイトル -->
