@@ -6,10 +6,10 @@
 <% content_for :edit_mode_enabled, true %>
 
 <main class="relative min-h-screen w-full bg-stone-200 overflow-x-hidden pb-24">
-  <div class="flex flex-col items-center px-4 pt-6 w-full max-w-md mx-auto">
+  <div class="flex flex-col items-center px-4 pt-6 w-full max-w-md md:max-w-4xl mx-auto">
 
     <!-- フロー項目一覧 -->
-    <div class="grid grid-cols-2 gap-4 w-full"
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 w-full"
          data-controller="reorder"
          data-reorder-url-value="<%= reorder_message_category_flow_items_path(@message_category) %>">
       <% @flow_items.each do |item| %>
