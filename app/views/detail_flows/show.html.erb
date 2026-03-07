@@ -5,7 +5,7 @@
 <% end %>
 
 <main class="flex-grow px-6 pb-24 pt-6 flex flex-col items-center">
-    <div class="w-full max-w-md">
+    <div class="w-full max-w-md md:max-w-xl">
       <p class="text-sm text-text-sub-light dark:text-text-sub-dark mb-4">
         <%= t("detail_flows.step_of", current: @step_index + 1, total: @flow_definition[:steps].length) %>
       </p>
