@@ -2,3 +2,26 @@
 @plugin "daisyui" {
   themes: light --default;
 }
+
+@layer utilities {
+  /* 視線が当たっている状態（候補ハイライト） */
+  .gaze-highlight {
+    outline: 3px solid var(--color-amber-500);
+    outline-offset: 2px;
+    background-color: color-mix(in srgb, var(--color-amber-50) 90%, transparent);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-amber-200) 40%, transparent);
+    animation: gaze-pulse 1s ease-in-out infinite;
+  }
+
+  /* dwell安定後の確定待ち状態 */
+  .gaze-confirm {
+    outline: 3px solid var(--color-orange-500);
+    outline-offset: 2px;
+    background-color: color-mix(in srgb, var(--color-orange-50) 90%, transparent);
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--color-orange-300) 50%, transparent);
+  }
+}
+@keyframes gaze-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-amber-200) 40%, transparent); }
+  50%       { box-shadow: 0 0 0 8px color-mix(in srgb, var(--color-amber-200) 20%, transparent); }
+}
