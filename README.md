@@ -38,7 +38,7 @@ MabaTalkは、発声や身体操作が困難で、まばたきによるYes/Noの
 
 既存の意思疎通手段は「本人が自ら操作できる」ことを前提としたものが多く、身体操作が困難な方への配慮が不十分です。
 
-| 手段 | 課題 |
+| 既存サービス | 課題 |
 |------|------|
 | 既存AACアプリ（単語カード型） | カードが小さく介護者が見せる用途に不向き。その場限りで記録が残らない |
 | 五十音表アプリ | 本人による文字入力が前提 |
@@ -65,8 +65,8 @@ MabaTalkはこれらの課題に対して以下の点で差別化しています
 
 | カテゴリ別メッセージ選択 | 月次コミュニケーション履歴 | AI振り返り機能 |
 |:---:|:---:|:---:|
-| ![カテゴリ別メッセージ選択](https://github.com/user-attachments/assets/9479ca22-abe4-4fe2-876b-b1bdf8b61df6) | ![月次グラフ](https://github.com/user-attachments/assets/e97e0791-5a32-4a58-83af-d72f97bfe48c) | ![AI振り返り](https://github.com/user-attachments/assets/f19a4513-fcbf-4f97-8442-e39ffd539a7b) |
-| カテゴリごとに項目を整理して表示。介護者が項目を指差しで示し、本人にまばたきでYes/Noを確認してもらいます。 | 選択結果が自動で蓄積され、日々の変化をグラフで振り返れます。 | 履歴に保存された項目をAIがまとめて、傾向や気づきをコメントで届けます。 |
+| ![カテゴリ別メッセージ選択](https://github.com/user-attachments/assets/f7b6af8e-fa31-45b5-8c4f-9321e9f5997d) | ![月次グラフ](https://github.com/user-attachments/assets/e97e0791-5a32-4a58-83af-d72f97bfe48c) | ![AI振り返り](https://github.com/user-attachments/assets/f19a4513-fcbf-4f97-8442-e39ffd539a7b) |
+| 介護者が項目を指差しで示し、本人にまばたきでYes/Noを確認してもらいます。 | 選択結果が自動で蓄積され、日々の変化をグラフで振り返れます。 | 履歴に保存された項目をAIがまとめて、傾向や気づきをコメントで届けます。 |
 
 ### 今後の実装予定
 - 自動音声読み上げ機能（Web Speech API）
@@ -92,19 +92,19 @@ MabaTalkはこれらの課題に対して以下の点で差別化しています
 
 ### 技術選定の理由
 
-**Ruby on Rails**
+**Ruby on Rails**：
 MVC設計・ルーティング・DB設計など必要な要素が整理されており、「この処理はどこに書くべきか」という設計判断を実装と並行して鍛えられる。技術を増やすことよりユーザー目線での一貫した開発を優先する判断をした。
 
-**Hotwire（Turbo / Stimulus）**
+**Hotwire（Turbo / Stimulus）**：
 アプリの要件上クライアントサイドで複雑な状態管理は不要と判断。SPA化による複雑性を持ち込まず、Railsの構成を維持したまま画面体験を向上できるHotwireが適切と判断。
 
-**PostgreSQL（Neon）**
+**PostgreSQL（Neon）**：
 PostgreSQLへの純粋な互換性を重視。Supabaseは独自拡張が多く責務が広いため、DB単体の代替としてNeonを選定。ストレージとコンピュートを分離したServerless設計により自動スケールに対応。DBブランチ機能でマイグレーションを本番に影響なく検証できる点も評価した。
 
-**Anthropic Claude Haiku**
+**Anthropic Claude Haiku**：
 ログ要約という用途はHaikuの性能で十分であり、SonnetやOpusと比べてコストを大幅に抑えられる。Constitutional AIという設計思想のもと誠実・安全な回答を重視して設計されている点が介護という文脈に適していると判断。AnthropicのRuby SDKが整備されておりRails環境への導入もスムーズだった。
 
-**Render**
+**Render**：
 個人開発フェーズではインフラ構築より機能開発・UX改善に集中することを優先し、Renderを選定。AWSも検討したが、設定の複雑さが現フェーズの開発速度に対してオーバースペックと判断した。GitHubとの自動デプロイ連携により、pushからデプロイまでのサイクルを短縮している。
 
 ## 画面遷移図
