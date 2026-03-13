@@ -1,5 +1,8 @@
 ## サービス名：MabaTalk
 サービスURL：[https://mabatalk.com/](https://mabatalk.com/)
+
+開発背景note記事：["伝えたいのに伝えられない"を減らしたい。未完成のまま「MabaTalk」を公開しました。](https://note.com/prime_snail5740/n/n02d9f797d46a)
+
 ![MabaTalk](https://github.com/user-attachments/assets/99e0d087-32cf-4afe-8732-b44878384cc2)
 
 ## 目次
