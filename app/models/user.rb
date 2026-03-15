@@ -3,6 +3,9 @@ class User < ApplicationRecord
   has_many :message_logs, dependent: :destroy
   has_many :message_categories, dependent: :destroy
   validates :name, presence: true
+  validates :password,
+            format: { with: /\A\S+\z/, message: :no_whitespace },
+            allow_nil: true
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable

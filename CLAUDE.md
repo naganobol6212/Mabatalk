@@ -93,7 +93,7 @@ bin/brakeman --no-pager || [ $? -eq 5 ]
 ## ブランチ運用
 
 - main へ直接 push 禁止
-- `feature/<機能名>` または `hotfix/<内容>`
+- `feature/<機能名>`、`fix/<内容>`、`hotfix/<内容>`、`chore/<内容>` など一般的なプレフィックスを使う
 
 ---
 

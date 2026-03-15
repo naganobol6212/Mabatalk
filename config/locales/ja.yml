@@ -101,3 +101,8 @@ ja:
               taken: "はすでに登録されています"
             current_password:
               invalid: "が正しくありません"
+            password:
+              no_whitespace: "に空白文字は使用できません"
+  helpers:
+    password_field:
+      no_whitespace: "※ 空白文字は使用できません"
