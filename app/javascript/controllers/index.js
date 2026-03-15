@@ -21,3 +21,6 @@ application.register("password-toggle", PasswordToggleController)
 
 import ReorderController from "./reorder_controller"
 application.register("reorder", ReorderController)
+
+import PasswordWhitespaceController from "./password_whitespace_controller"
+application.register("password-whitespace", PasswordWhitespaceController)
