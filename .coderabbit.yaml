@@ -1,0 +1,19 @@
+language: "ja-JP"
+early_access: false
+reviews:
+  profile: "chill"
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: true
+  review_status: true
+  review_details: false
+  auto_review:
+    enabled: true
+    drafts: false
+  path_instructions:
+    - path: "app/models/**"
+      instructions: "バリデーション、スコープ、セキュリティの観点でレビューしてください"
+    - path: "app/controllers/**"
+      instructions: "current_userスコープの適用漏れ、認可チェックを重点的に確認してください"
+chat:
+  auto_reply: true
