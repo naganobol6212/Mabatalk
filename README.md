@@ -116,6 +116,6 @@ MabaTalkは介護現場での使用を想定しており、複雑なインタラ
 [Figma で確認する](https://www.figma.com/design/g6Abp89o94QmVMzuZFKqDm/mabatalk%E7%94%BB%E9%9D%A2%E9%81%B7%E7%A7%BB%E5%9B%B3?node-id=58-1184&t=9EmZEC3xpibLixda-0)
 
 ## 🔗 ER図
-※ 主要テーブル（users / message_categories / flow_items / message_logs）を記載しています。
+※ 主要テーブル（users / message_categories / flow_items / message_logs / ai_summaries）を記載しています。
 
-[![ER図](https://i.gyazo.com/174d4bc283e64dc2a66861e38c531393.png)](https://gyazo.com/174d4bc283e64dc2a66861e38c531393)
+[![Image from Gyazo](https://i.gyazo.com/32077e5fda40c215d39128c9543d13e1.png)](https://gyazo.com/32077e5fda40c215d39128c9543d13e1)
