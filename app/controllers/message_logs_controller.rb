@@ -2,7 +2,7 @@ class MessageLogsController < ApplicationController
   before_action :authenticate_user!, only: [ :index ]
 
   def index
-    @message_logs = MessageLog.for_viewer(current_user)
+    @message_logs = MessageLog.for_viewer(current_user).includes(:user)
   end
 
   def create
