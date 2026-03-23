@@ -1,4 +1,6 @@
 ja:
+  pwa:
+    description: "声が出せなくても、身体が動かせなくても。まばたきでつながるコミュニケーション支援アプリ"
   message_categories:
     index:
       title: "カテゴリ"
