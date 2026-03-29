@@ -30,5 +30,13 @@ RSpec.describe MessageCategory do
       expect(result).to include(system_category)
       expect(result).not_to include(message_category_b)
     end
+
+    it "for_user(nil)はsystem共通のみレコードを返す(ゲストユーザーのケース)" do
+      user_message_category = create(:message_category, user: create(:user))
+      system_message_category= create(:message_category, user: nil)
+      result = MessageCategory.for_user(nil)
+      expect(result).to include(system_message_category)
+      expect(result).not_to include(user_message_category)
+    end
   end
 end
