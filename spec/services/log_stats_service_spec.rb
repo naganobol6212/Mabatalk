@@ -4,7 +4,7 @@ RSpec.describe LogStatsService do
   describe '.call' do
     it "ログが0件のとき空のデータを返す" do
       user = create(:user)
-      month = Date.new(2026, 3, 1)
+      month = Time.zone.local(2026, 3, 1, 12, 0, 0)
       result = LogStatsService.call(user: user, month: month)
       expect(result[:chart_data]).to eq([])
       expect(result[:detail_data]).to eq({})
@@ -12,7 +12,7 @@ RSpec.describe LogStatsService do
 
     it "ログがあるとき集計結果を正しく返す" do
       user = create(:user)
-      month = Date.new(2026, 3, 1)
+      month = Time.zone.local(2026, 3, 1, 12, 0, 0)
       create(:message_log, user: user, created_at: month)
       result = LogStatsService.call(user: user, month: month)
       expect(result[:chart_data]).not_to be_empty
@@ -21,9 +21,9 @@ RSpec.describe LogStatsService do
 
     it "指定した月以外のログを含まない" do
       user = create(:user)
-      month = Date.new(2026, 3, 1)
+      month = Time.zone.local(2026, 3, 1, 12, 0, 0)
       create(:message_log, user: user, created_at: month)
-      create(:message_log, user: user, created_at: Date.new(2026, 4, 1))
+      create(:message_log, user: user, created_at: Time.zone.local(2026, 4, 1, 12, 0, 0))
       result = LogStatsService.call(user: user, month: month)
       expect(result[:chart_data].size).to eq(1)
       expect(result[:detail_data].size).to eq(1)
