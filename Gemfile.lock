@@ -76,7 +76,7 @@ GEM
       tzinfo (~> 2.0, >= 2.0.5)
     addressable (2.8.8)
       public_suffix (>= 2.0.2, < 8.0)
-    anthropic (1.25.0)
+    anthropic (1.26.0)
       cgi
       connection_pool
     ast (2.4.3)
@@ -431,7 +431,7 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
-  anthropic (~> 1.25)
+  anthropic (~> 1.26)
   bootsnap
   brakeman (~> 8.0.4)
   bullet
