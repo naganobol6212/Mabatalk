@@ -29,4 +29,26 @@ RSpec.describe "MessageLogs", type: :request do
       end
     end
   end
+
+  describe "POST /message_logs" do
+    context "未認証ユーザーの場合" do
+      it "MessageLogが作成されない" do
+        flow_item = create(:flow_item)
+        expect { post message_logs_path,
+          params: { flow_item_key: flow_item.key }
+        }.not_to change(MessageLog, :count)
+      end
+    end
+
+    context "認証ユーザーの場合" do
+      it "MessageLogが作成される" do
+        user = create(:user)
+        sign_in user
+        flow_item = create(:flow_item)
+        expect { post message_logs_path,
+          params: { flow_item_key: flow_item.key }
+        }.to change(MessageLog, :count)
+      end
+    end
+  end
 end
