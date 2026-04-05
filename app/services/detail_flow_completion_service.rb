@@ -11,8 +11,11 @@ class DetailFlowCompletionService
   end
 
   def call
+    allowed_keys = @steps.map { |step| step[:key] }
+    filtered_answers = @answers.slice(*allowed_keys)
+
     parts = @steps.filter_map do |step|
-      ans = @answers[step[:key]]
+      ans = filtered_answers[step[:key]]
       next unless ans
       "#{step[:label]}：#{ans['label']}"
     end
@@ -20,7 +23,7 @@ class DetailFlowCompletionService
       user: @user,
       flow_item: @flow_item,
       detail_flow_text: parts.join("、").presence,
-      detail_flow_data: @answers.presence
+      detail_flow_data: filtered_answers.presence
     )
   end
 end
