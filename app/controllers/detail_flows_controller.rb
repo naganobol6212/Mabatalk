@@ -40,24 +40,15 @@ class DetailFlowsController < ApplicationController
     if next_index < @flow_definition[:steps].length
       redirect_to detail_flow_step_path(@flow_item.key, next_index)
     else
-      if user_signed_in?
-        answers = session[:detail_flow]&.dig("answers") || {}
-        parts = @flow_definition[:steps].filter_map do |step|
-          ans = answers[step[:key]]
-          next unless ans
-          "#{step[:label]}：#{ans['label']}"
-        end
-        MessageLog.create!(
-          user: current_user,
-          flow_item: @flow_item,
-          detail_flow_text: parts.join("、").presence,
-          detail_flow_data: answers.presence
-        )
-        session.delete(:detail_flow)
-        flash[:notice] = t("message_logs.created")
-      else
-        session[:last_flow_item_key] = @flow_item.key
-      end
+      answers = session.dig(:detail_flow, "answers") || {}
+      DetailFlowCompletionService.call(
+        user: current_user,
+        flow_item: @flow_item,
+        steps: @flow_definition[:steps],
+        answers: answers
+      )
+      session.delete(:detail_flow)
+      flash[:notice] = t("message_logs.created")
       redirect_to message_completion_path
     end
   end
