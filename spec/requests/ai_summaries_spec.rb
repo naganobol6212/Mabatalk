@@ -15,6 +15,8 @@ RSpec.describe "AiSummaries", type: :request do
       before { sign_in user }
 
       context "インターバル未経過（生成から1日以内）の場合" do
+        before { create(:message_log, user: user, created_at: 1.day.ago) }
+
         it "analytics_path にリダイレクトされる" do
           create(:ai_summary, user: user, generated_at: 1.hour.ago)
           post ai_summary_path
@@ -31,6 +33,7 @@ RSpec.describe "AiSummaries", type: :request do
       context "インターバルの境界値（ちょうど24時間後）の場合" do
         it "再生成できない" do
           freeze_time do
+            create(:message_log, user: user, created_at: 1.day.ago)
             create(:ai_summary, user: user, generated_at: 24.hours.ago)
             expect(AiSummaryService).not_to receive(:call)
             post ai_summary_path
