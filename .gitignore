@@ -43,3 +43,5 @@
 /vendor/bundle
 
 backup.dump
+
+/coverage
