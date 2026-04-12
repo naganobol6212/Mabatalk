@@ -21,7 +21,7 @@ RSpec.describe AiSummaryService do
       before do
         category = create(:message_category, user: nil, name: "飲み物")
         flow_item = create(:flow_item, message_category: category, user: nil, name: "お茶")
-        3.times { create(:message_log, user: user, message_category_name: "飲み物", flow_item_name: "お茶") }
+        3.times { create(:message_log, user: user, flow_item: flow_item) }
       end
 
       it "要約テキストを返す" do
