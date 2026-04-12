@@ -117,6 +117,31 @@ RSpec.describe "AiSummaries", type: :request do
           expect { post ai_summary_path }.not_to change(AiSummary, :count)
         end
       end
+
+      context "Anthropic::Errors::APIError が発生した場合" do
+        before do
+          create(:message_log, user: user, created_at: 1.day.ago)
+          allow(AiSummaryService).to receive(:call)
+            .and_raise(Anthropic::Errors::APIError.new(url: "https://api.anthropic.com", status: 500))
+        end
+
+        it "analytics_path にリダイレクトされる" do
+          post ai_summary_path
+          expect(response).to redirect_to(analytics_path)
+        end
+      end
+
+      context "StandardError が発生した場合" do
+        before do
+          create(:message_log, user: user, created_at: 1.day.ago)
+          allow(AiSummaryService).to receive(:call).and_raise(StandardError)
+        end
+
+        it "analytics_path にリダイレクトされる" do
+          post ai_summary_path
+          expect(response).to redirect_to(analytics_path)
+        end
+      end
     end
   end
 end
