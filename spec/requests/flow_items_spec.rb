@@ -144,7 +144,7 @@ RSpec.describe "FlowItems", type: :request do
     context "認証済みユーザーが他ユーザーのIDを混ぜた場合" do
       it "403 になる" do
         own_flow_item = create(:flow_item, user: user, message_category: category)
-        other_flow_item = create(:flow_item, user: create(:user))
+        other_flow_item = create(:flow_item, message_category: category, user: create(:user))
         sign_in user
         post reorder_message_category_flow_items_path(category),
              params: { ids: [own_flow_item.id, other_flow_item.id] }
