@@ -28,10 +28,12 @@ RSpec.describe User do
     end
 
     context "該当ユーザーがすでに存在する場合" do
-      before { create(:user, provider: "google_oauth2", uid: "123456", email: "test@example.com") }
+      let!(:existing_user) { create(:user, provider: "google_oauth2", uid: "123456", email: "test@example.com") }
 
       it "既存ユーザーを返す" do
-        expect { User.from_omniauth(auth) }.not_to change(User, :count)
+        returned_user = nil
+        expect { returned_user = User.from_omniauth(auth) }.not_to change(User, :count)
+        expect(returned_user).to eq(existing_user)
       end
     end
   end
