@@ -5,12 +5,16 @@ RSpec.describe "MessageCompletions", type: :request do
     context "認証済みユーザー・ログありの場合" do
       it "200 OK を返し、最終ログの flow_item_name が表示される" do
         user = create(:user)
-        flow_item = create(:flow_item)
-        create(:message_log, user: user, flow_item: flow_item)
+        old_item = create(:flow_item, name: "old-name")
+        latest_item = create(:flow_item, name: "latest-snapshot-name")
+        create(:message_log, user: user, flow_item: old_item, created_at: 2.days.ago)
+        create(:message_log, user: user, flow_item: latest_item, created_at: 1.day.ago)
+        latest_item.update!(name: "latest-current-name")
         sign_in user
         get message_completion_path
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include(flow_item.name)
+        expect(response.body).to include("latest-snapshot-name")
+        expect(response.body).not_to include("latest-current-name")
       end
     end
 
