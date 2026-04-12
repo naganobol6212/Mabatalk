@@ -49,6 +49,22 @@ RSpec.describe "MessageLogs", type: :request do
           params: { flow_item_key: flow_item.key }
         }.to change(MessageLog, :count)
       end
+
+      it "message_completion_path にリダイレクトされる" do
+        user = create(:user)
+        sign_in user
+        flow_item = create(:flow_item)
+        post message_logs_path, params: { flow_item_key: flow_item.key }
+        expect(response).to redirect_to(message_completion_path)
+      end
+    end
+
+    context "未認証ユーザーの場合" do
+      it "session[:last_flow_item_key] に flow_item のキーが保存される" do
+        flow_item = create(:flow_item)
+        post message_logs_path, params: { flow_item_key: flow_item.key }
+        expect(session[:last_flow_item_key]).to eq(flow_item.key)
+      end
     end
   end
 end
