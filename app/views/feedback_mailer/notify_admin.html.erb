@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+</head>
+<body style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h2 style="color: #0ea5e9;">ご意見箱に新しいご意見が届きました</h2>
+
+  <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+    <tr>
+      <td style="padding: 8px; border-bottom: 1px solid #e5e5e5; font-weight: bold; width: 30%;">カテゴリ</td>
+      <td style="padding: 8px; border-bottom: 1px solid #e5e5e5;"><%= @feedback.category_label %></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px; border-bottom: 1px solid #e5e5e5; font-weight: bold;">送信者</td>
+      <td style="padding: 8px; border-bottom: 1px solid #e5e5e5;"><%= @feedback.user&.email || "匿名" %></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px; border-bottom: 1px solid #e5e5e5; font-weight: bold;">送信日時</td>
+      <td style="padding: 8px; border-bottom: 1px solid #e5e5e5;"><%= @feedback.created_at.strftime("%Y年%m月%d日 %H:%M") %></td>
+    </tr>
+  </table>
+
+  <h3 style="border-bottom: 2px solid #0ea5e9; padding-bottom: 8px;">内容</h3>
+  <p style="white-space: pre-wrap; background-color: #f9f9f9; padding: 15px; border-radius: 8px;"><%= @feedback.body %></p>
+
+  <% if @feedback.screenshots.attached? %>
+    <h3 style="border-bottom: 2px solid #0ea5e9; padding-bottom: 8px;">スクリーンショット</h3>
+    <ul>
+      <% @feedback.screenshots.each_with_index do |screenshot, i| %>
+        <li>
+          <a href="<%= rails_blob_url(screenshot) %>" style="color: #0ea5e9;">
+            <%= i + 1 %>. <%= screenshot.filename %>
+          </a>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</body>
+</html>
