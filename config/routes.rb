@@ -1,6 +1,4 @@
 Rails.application.routes.draw do
-  get "feedbacks/new"
-  get "feedbacks/create"
   devise_for :users, controllers: { omniauth_callbacks: "users/omniauth_callbacks",
                                     registrations: "users/registrations"
                                   }

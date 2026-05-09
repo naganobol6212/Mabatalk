@@ -84,6 +84,21 @@ ja:
       no_logs: "直近30日の記録がないため、振り返りを作成できません"
       timeout: "AI の処理に時間がかかっています。しばらくしてからお試しください"
       error: "振り返りの生成に失敗しました。しばらくしてからお試しください"
+  feedbacks:
+    create:
+      rate_limit_exceeded: "1日の送信上限に達しました。明日またお試しください。"
+      success: "貴重なご意見をいただきありがとうございます。今後のサービス改善に活かしてまいります。"
+    new:
+      title: "ご意見箱"
+      description: "改善のご意見をお送りください"
+      submit: "送信する"
+    categories:
+      bug: "バグ報告"
+      request: "機能要望"
+      other: "その他"
+  feedback_mailer:
+    notify_admin:
+      subject: "[MabaTalk] %{category}が届きました"
 
   activerecord:
     attributes:
@@ -95,6 +110,10 @@ ja:
         name: "項目名"
         kana: "よみかた"
         icon: "アイコン"
+      feedback:
+        category: "カテゴリ"
+        body: "ご意見内容"
+        screenshots: "スクリーンショット"
     errors:
       models:
         user:
@@ -105,6 +124,12 @@ ja:
               invalid: "が正しくありません"
             password:
               no_whitespace: "に空白文字は使用できません"
+        feedback:
+          attributes:
+            screenshots:
+              too_many: "は最大%{count}枚までです"
+              invalid_content_type: "は JPEG, PNG, GIFのいずれかにしてください"
+              too_large: "は1枚あたり%{size}MB以下にしてください"
   helpers:
     password_field:
       no_whitespace: "※ 空白文字は使用できません"
