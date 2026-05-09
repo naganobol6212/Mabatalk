@@ -2,16 +2,21 @@ require "rails_helper"
 
 RSpec.describe FeedbackMailer, type: :mailer do
   describe "#notify_admin" do
+    let(:admin_email) { "admin@example.com" }
     let(:user) { create(:user, email: "tester@example.com") }
     let(:feedback) { create(:feedback, user: user, category: :bug, body: "ボタンが反応しない") }
     let(:mail) { described_class.notify_admin(feedback) }
+
+    before do
+      allow(Rails.application.credentials).to receive(:dig).and_call_original
+      allow(Rails.application.credentials).to receive(:dig).with(:admin, :email).and_return(admin_email)
+    end
 
     it "件名にカテゴリラベルが含まれる" do
       expect(mail.subject).to include("バグ報告")
     end
 
     it "credentials の管理者メアドに送信される" do
-      admin_email = Rails.application.credentials.dig(:admin, :email)
       expect(mail.to).to eq([admin_email])
     end
 
