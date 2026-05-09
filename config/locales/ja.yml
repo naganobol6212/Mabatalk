@@ -96,6 +96,11 @@ ja:
       bug: "バグ報告"
       request: "機能要望"
       other: "その他"
+  admin:
+    feedbacks:
+      index:
+        title: "ご意見一覧"
+        empty: "まだご意見はありません"
   feedback_mailer:
     notify_admin:
       subject: "[MabaTalk] %{category}が届きました"

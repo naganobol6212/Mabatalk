@@ -37,6 +37,10 @@ Rails.application.routes.draw do
 
   resources :feedbacks, only: %i[new create]
 
+  namespace :admin do
+    resources :feedbacks, only: %i[index show]
+  end
+
   # --- 以下はRails標準の補助機能 ---
   get "up" => "rails/health#show", as: :rails_health_check
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker

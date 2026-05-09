@@ -78,6 +78,43 @@
     </section>
 
     <%# =========================
+        管理（adminのみ表示）
+        ========================= %>
+    <% if user_signed_in? && current_user.admin? %>
+      <section class="w-full">
+        <div class="flex items-center gap-2 mb-3 px-2">
+          <span class="material-symbols-outlined text-amber-700">admin_panel_settings</span>
+          <h3 class="text-lg font-bold text-stone-800">管理</h3>
+        </div>
+
+        <div class="bg-white/90 backdrop-blur rounded-2xl shadow border border-stone-100 overflow-hidden">
+          <%= link_to admin_feedbacks_path,
+                      class: "w-full flex items-center gap-3 p-5 hover:bg-stone-100/60 active:scale-[0.99] transition focus:outline-none focus:ring-4 focus:ring-stone-300" do %>
+
+            <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-amber-700 text-[26px]">
+                inbox
+              </span>
+            </div>
+
+            <div class="flex-1 text-left">
+              <div class="text-[18px] font-bold text-stone-900 leading-tight">
+                ご意見一覧
+              </div>
+              <div class="text-sm text-stone-600 mt-1 leading-relaxed">
+                届いたご意見を確認できます
+              </div>
+            </div>
+
+            <span class="material-symbols-outlined text-stone-400">
+              chevron_right
+            </span>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
+
+    <%# =========================
         アカウント（Devise既存機能へ誘導）
         ========================= %>
     <section class="w-full">
