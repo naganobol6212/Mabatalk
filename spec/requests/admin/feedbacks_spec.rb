@@ -3,9 +3,9 @@ require 'rails_helper'
 RSpec.describe "Admin::Feedbacks", type: :request do
   describe "GET /admin/feedbacks" do
     context "未認証ユーザーの場合" do
-      it "ログインページにリダイレクトされる" do
+      it "404 になる（管理画面の存在を隠す）" do
         get admin_feedbacks_path
-        expect(response).to redirect_to(new_user_session_path)
+        expect(response).to have_http_status(:not_found)
       end
     end
 

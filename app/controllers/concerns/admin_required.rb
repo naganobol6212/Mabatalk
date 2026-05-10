@@ -2,7 +2,6 @@ module AdminRequired
   extend ActiveSupport::Concern
 
   included do
-    before_action :authenticate_user!
     before_action :require_admin
   end
 
