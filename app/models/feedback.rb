@@ -14,6 +14,9 @@ class Feedback < ApplicationRecord
 
   enum :category, { bug: 0, request: 1, other: 2 }
 
+  before_validation :set_key, on: :create
+
+  validates :key, presence: true, uniqueness: true
   validates :body, presence: true, length: { maximum: BODY_MAX_LENGTH }
   validates :category, presence: true
   validate :validate_screenshots_count
@@ -24,7 +27,15 @@ class Feedback < ApplicationRecord
     I18n.t("feedbacks.categories.#{category}")
   end
 
+  def to_param
+    key
+  end
+
   private
+
+  def set_key
+    self.key ||= SecureRandom.uuid
+  end
 
   def validate_screenshots_count
     return if screenshots.size <= MAX_SCREENSHOTS

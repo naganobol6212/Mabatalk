@@ -49,7 +49,7 @@ RSpec.describe "Admin::Feedbacks", type: :request do
       end
 
       it "存在しないIDの場合 404 になる" do
-        get admin_feedback_path(id: 999_999)
+        get admin_feedback_path(key: "non-existent-uuid")
         expect(response).to have_http_status(:not_found)
       end
     end

@@ -38,7 +38,7 @@ Rails.application.routes.draw do
   resources :feedbacks, only: %i[new create]
 
   namespace :admin do
-    resources :feedbacks, only: %i[index show]
+    resources :feedbacks, only: %i[index show], param: :key
   end
 
   # --- 以下はRails標準の補助機能 ---

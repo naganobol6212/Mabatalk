@@ -7,8 +7,7 @@ class Admin::FeedbacksController < ApplicationController
   end
 
   def show
-    @feedback = Feedback.with_attached_screenshots
-                        .includes(:user)
-                        .find(params[:id])
+    @feedback = Feedback.includes(:screenshots_attachments, :user)
+                        .find_by!(key: params[:key])
   end
 end
