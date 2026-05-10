@@ -87,6 +87,24 @@ RSpec.describe Feedback do
       end
     end
 
+    context '正しい添付（1枚）の場合' do
+      it '有効' do
+        feedback = build(:feedback)
+        feedback.screenshots.attach(io: File.open(png_path), filename: 'sample.png', content_type: 'image/png')
+        expect(feedback).to be_valid
+      end
+    end
+
+    context '上限ちょうど（3枚）の場合' do
+      it '有効' do
+        feedback = build(:feedback)
+        Feedback::MAX_SCREENSHOTS.times do
+          feedback.screenshots.attach(io: File.open(png_path), filename: 'sample.png', content_type: 'image/png')
+        end
+        expect(feedback).to be_valid
+      end
+    end
+
     context '上限枚数を超える場合' do
       it '無効' do
         feedback = build(:feedback)

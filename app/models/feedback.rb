@@ -1,12 +1,11 @@
 class Feedback < ApplicationRecord
   MAX_SCREENSHOTS = 3
   MAX_SCREENSHOT_SIZE = 5.megabytes
-  ALLOWED_CONTENT_TYPES = %w[
-    image/png
-    image/jpeg
-    image/gif
-  ].freeze
-  ALLOWED_EXTENSIONS = %w[.png .jpg .jpeg .gif].freeze
+  ALLOWED_TYPES_AND_EXTENSIONS = {
+    "image/png" => [".png"],
+    "image/jpeg" => [".jpg", ".jpeg"],
+    "image/gif" => [".gif"]
+  }.freeze
   BODY_MAX_LENGTH = 1000
 
   belongs_to :user, optional: true
@@ -45,10 +44,9 @@ class Feedback < ApplicationRecord
 
   def validate_screenshots_content_type
     screenshots.each do |screenshot|
-      type_ok = ALLOWED_CONTENT_TYPES.include?(screenshot.content_type)
       extension = File.extname(screenshot.filename.to_s).downcase
-      extension_ok = ALLOWED_EXTENSIONS.include?(extension)
-      next if type_ok && extension_ok
+      allowed_extensions = ALLOWED_TYPES_AND_EXTENSIONS[screenshot.content_type]
+      next if allowed_extensions&.include?(extension)
 
       errors.add(:screenshots, :invalid_content_type)
       break
