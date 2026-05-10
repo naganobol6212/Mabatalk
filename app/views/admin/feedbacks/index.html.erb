@@ -1,0 +1,52 @@
+<% content_for :page_title do %>
+  <%= t("admin.feedbacks.index.title") %>
+<% end %>
+
+<main class="min-h-screen w-full bg-stone-200 pb-24">
+  <div class="max-w-3xl mx-auto px-4 pt-10">
+
+    <h1 class="text-2xl font-bold text-stone-800 mb-6">
+      <%= t("admin.feedbacks.index.title") %>
+      <span class="text-sm font-normal text-stone-500 ml-2">
+        (<%= @feedbacks.size %>件)
+      </span>
+    </h1>
+
+    <% if @feedbacks.empty? %>
+      <div class="bg-white/90 rounded-2xl shadow border border-stone-100 p-8 text-center text-stone-500">
+        <%= t("admin.feedbacks.index.empty") %>
+      </div>
+    <% else %>
+      <div class="space-y-3">
+        <% @feedbacks.each do |feedback| %>
+          <%= link_to admin_feedback_path(feedback),
+                class: "block bg-white/90 rounded-2xl shadow border border-stone-100 p-4 hover:bg-stone-50 transition" do %>
+
+            <div class="flex items-start justify-between gap-3 mb-2">
+              <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700">
+                <%= feedback.category_label %>
+              </span>
+              <time class="text-xs text-stone-500">
+                <%= feedback.created_at.strftime("%Y/%m/%d %H:%M") %>
+              </time>
+            </div>
+
+            <p class="text-stone-800 line-clamp-2">
+              <%= feedback.body %>
+            </p>
+
+            <div class="mt-2 flex items-center gap-2 text-xs text-stone-500">
+              <span class="material-symbols-outlined text-[16px]">person</span>
+              <%= feedback.user&.email || "匿名" %>
+              <% if feedback.screenshots.attached? %>
+                <span class="ml-2 material-symbols-outlined text-[16px]">image</span>
+                <%= feedback.screenshots.size %>枚
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+
+  </div>
+</main>

@@ -1,6 +1,4 @@
 Rails.application.routes.draw do
-  get "feedbacks/new"
-  get "feedbacks/create"
   devise_for :users, controllers: { omniauth_callbacks: "users/omniauth_callbacks",
                                     registrations: "users/registrations"
                                   }
@@ -38,6 +36,10 @@ Rails.application.routes.draw do
   get "/privacy_policy", to: "pages#privacy_policy", as: :privacy_policy
 
   resources :feedbacks, only: %i[new create]
+
+  namespace :admin do
+    resources :feedbacks, only: %i[index show], param: :key
+  end
 
   # --- 以下はRails標準の補助機能 ---
   get "up" => "rails/health#show", as: :rails_health_check
