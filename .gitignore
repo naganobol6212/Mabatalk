@@ -45,3 +45,4 @@
 backup.dump
 
 /coverage
+.claude/settings.local.json
