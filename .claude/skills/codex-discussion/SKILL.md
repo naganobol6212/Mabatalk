@@ -9,17 +9,19 @@ Claude（Anthropic）の成果物・設計判断を、別ベンダーのモデ�
 
 ## この環境で確認済みの実行方法（2026-07-04 確認・codex-cli 0.132.0）
 
-- 認証: ChatGPT アカウント（`~/.codex/auth.json`）。API キー不要
-- 既定モデル: `gpt-5.5` / reasoning effort `medium`（`~/.codex/config.toml`）
+- 認証: ChatGPT アカウントで認証済み。API キー不要
+- 既定モデル: `gpt-5.5` / reasoning effort `medium`（Codex CLI のユーザー設定による）
 - 非対話実行は `codex exec`（承認プロンプトなしで走る。安全性はサンドボックスフラグで担保する）
 
 ### 基本形
+
+`<リポジトリルートの絶対パス>` は実行時に `git rev-parse --show-toplevel` で解決する（個人環境のパスを直書きしない）。
 
 ```bash
 codex exec \
   --sandbox read-only \
   --ephemeral \
-  -C /Users/naganoma/Projects/Mabatalk \
+  -C <リポジトリルートの絶対パス> \
   -o <出力ファイルの絶対パス> \
   "<依頼文>"
 ```
@@ -32,7 +34,7 @@ codex exec \
 codex exec \
   --sandbox read-only \
   --ephemeral \
-  -C /Users/naganoma/Projects/Mabatalk \
+  -C <リポジトリルートの絶対パス> \
   --output-schema <スキーマファイルの絶対パス> \
   -o <出力ファイルの絶対パス> \
   "<依頼文>"
@@ -51,7 +53,7 @@ codex exec \
 
 ## 依頼文の型（レビュー依頼）
 
-```
+```text
 あなたは独立した設計レビュアーです。以下を読んでレビューしてください。
 
 対象: <ファイルパス（例: /path/to/context.md）> を読むこと
@@ -69,7 +71,7 @@ codex exec \
 
 既出の指摘・主張を疑わせる（反証専用）ときは、依頼文を次の形にする:
 
-```
+```text
 あなたは懐疑的な検証者です。以下の指摘を「反証」することだけを目的に検討してください。
 
 対象コンテキスト: <ファイルパス> を読むこと

@@ -29,7 +29,10 @@
 //   testCommand       : 例 "bundle exec rspec" / "npm test"（必須）
 //   tokenBudgetPerRun?: このループ実行全体で許す Claude トークン累計の上限（省略可）
 //   loopMinBudget?    : budget（+500k 指定等）使用時の残量下限。既定 60000
-//   timestamp?        : ブランチ名に使う（ワークフロー内では Date.now() が使えないため外から渡す）
+//   timestamp         : ブランチ名の一意化に使う（必須。ワークフロー内では Date.now() が使えず
+//                       一意な名前を自力で作れないため外から渡す。固定名だと再実行で
+//                       git switch -c が衝突する）
+//   repo?             : リポジトリの絶対パス。省略時はカレントの git リポジトリを使う
 //
 // トークン記録: Claude 分は budget.spent() の差分で毎周実測する。Codex レンズの消費は
 // OpenAI 側で発生するため計測できない — 「実行した回数」だけを分けて記録する。
@@ -90,12 +93,16 @@ const input = typeof args === 'string' ? JSON.parse(args) : args
 if (!input || !input.contextPath || !Array.isArray(input.dimensions) || !input.testCommand) {
   throw new Error('args には { contextPath, dimensions: [{key, prompt}], testCommand } が必須です')
 }
+if (!input.timestamp) {
+  // 固定のブランチ名は再実行時に git switch -c が衝突する。Date.now() は使えないため呼び出し側で渡す
+  throw new Error('args.timestamp は必須です（ブランチ名 review-loop/<timestamp> の一意化に使う）')
+}
 const maxRounds = input.maxRounds || 3
 const tokenBudgetPerRun = input.tokenBudgetPerRun || null
 const loopMinBudget = input.loopMinBudget || 60000
 const fixModel = (input.routing && input.routing.fixModel) || 'sonnet'
-const branch = `review-loop/${input.timestamp || 'run'}`
-const repo = '/Users/naganoma/Projects/Mabatalk'
+const branch = `review-loop/${input.timestamp}`
+const repo = input.repo || null // 省略時はカレントの git リポジトリ（エージェントの作業ディレクトリ）
 
 // ---- ループが保持する状態（すべてコード側） --------------------------------
 
@@ -259,9 +266,14 @@ while (true) {
   roundRec.test = test ? { passed: test.passed, committed: test.committed, reverted: !!test.reverted } : { passed: false, committed: false, error: 'テスト担当が結果を返さなかった' }
 
   if (test && test.passed) {
-    // 次周の再レビューは「今周の変更関数＋直接の呼び出し元」に限定
-    lastScope = fix.changedFunctions
-    log(`Round ${round}: テスト通過・コミット済み。次周は変更 ${fix.changedFunctions.length} 関数に限定して再レビュー`)
+    // 次周の再レビューは「今周の変更関数＋直接の呼び出し元」に限定。
+    // ただし報告が空配列だと限定範囲が実質ゼロ（何も読まないレビュー）になるため全域に戻す
+    lastScope = fix.changedFunctions && fix.changedFunctions.length > 0 ? fix.changedFunctions : null
+    log(
+      lastScope
+        ? `Round ${round}: テスト通過・コミット済み。次周は変更 ${lastScope.length} 関数に限定して再レビュー`
+        : `Round ${round}: テスト通過・コミット済み。変更関数の報告が空のため次周は全域レビュー`
+    )
   } else {
     // 失敗は history に残した。変更は revert 済みなので次周は同じコードを見る
     // → 同じ指摘が出て「堂々巡り」条件で止まる（無限に修正リトライしない）
@@ -300,7 +312,7 @@ const report = await agent(
     '',
     '## やること',
     branchCreated
-      ? `1. \`git diff ${baseSha || 'HEAD'} ${branch} --stat\` と必要なら本文を確認し、全体の変更を要約する（リポジトリ: ${repo}）`
+      ? `1. \`git diff ${baseSha || 'HEAD'} ${branch} --stat\` と必要なら本文を確認し、全体の変更を要約する${repo ? `（リポジトリ: ${repo}）` : '（カレントの git リポジトリで実行。必要なら `git rev-parse --show-toplevel` で確認）'}`
       : '1. ブランチは作成されていない（修正前に停止）。その旨を明記する',
     '2. 確定した指摘・棄却された指摘・各周のトークン消費（Claude は実測値、Codex は OpenAI 側のため実行回数のみ）・最終テスト結果を表で整理する',
     '3. 未解消の指摘が残っていれば、マージ判断に必要な残リスクとして明示する',

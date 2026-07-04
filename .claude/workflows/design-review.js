@@ -126,7 +126,7 @@ const codexReviewPrompt = (d) =>
     'あなたは Codex CLI の実行係です。設計レビューの中身はあなた自身では行わず、必ず Codex（別ベンダーの独立レビュアー）に実行させ、その結果を回収・正規化してください。',
     '',
     '## 手順',
-    '1. まず /Users/naganoma/Projects/Mabatalk/.claude/skills/codex-discussion/SKILL.md を Read し、そこに書かれた実行コマンド形・運用ルール（--sandbox read-only 必須、-o で結果回収、Bash timeout 600000 など）に厳密に従う',
+    '1. まずリポジトリルート直下の .claude/skills/codex-discussion/SKILL.md を Read し（ルートは `git rev-parse --show-toplevel` で解決する。個人環境の絶対パスを仮定しない）、そこに書かれた実行コマンド形・運用ルール（--sandbox read-only 必須、-o で結果回収、Bash timeout 600000 など）に厳密に従う',
     '2. 下記レンズの観点でのレビュー依頼文を SKILL.md の「依頼文の型」に沿って組み立て、codex exec を実行する',
     '3. 回収した出力を FINDINGS スキーマ（findings + okPoints）に正規化して返す。Codex が言っていない指摘を足さない・severity を付け直さない（欠損フィールドの補完のみ可）',
     '',
