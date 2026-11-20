@@ -4,6 +4,15 @@ SimpleCov.start 'rails'
 
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
+require_relative '../config/application'
+# テスト環境と CI には credentials の鍵が無く、config/initializers/devise.rb の
+# Google 設定が読み込まれない。そのままだと OmniAuth のミドルウェアが入らず、
+# Google ログインの request spec を本番と同じ経路で通せないため、ダミー値で登録する。
+# （credentials がある環境では何もしない。外部には接続しない）
+Rails.application.class.initializer "spec.omniauth_google_provider",
+                                    after: :load_config_initializers, before: "devise.omniauth" do
+  Devise.omniauth :google_oauth2, "test-client-id", "test-client-secret" if Devise.omniauth_configs.empty?
+end
 require_relative '../config/environment'
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
