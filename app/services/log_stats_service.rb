@@ -11,7 +11,7 @@ class LogStatsService
   def call
     logs = MessageLog
       .for_viewer(@user)
-      .where(created_at: @month..@month.end_of_month)
+      .where(created_at: @month.in_time_zone.all_month)
 
     return { chart_data: [], detail_data: {} } if logs.none?
 
