@@ -81,7 +81,7 @@ README内容は繰り返さない。
 ```bash
 bin/rails db:prepare
 bin/rubocop -f github
-bin/brakeman --no-pager || [ $? -eq 5 ]
+bin/brakeman --no-pager
 ```
 
 すべて成功して初めて完了。
