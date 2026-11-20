@@ -1,0 +1,108 @@
+# block-dangerous-bash.sh の確認表。書式: 期待する終了コード<TAB>コマンド
+# テストは HOME=/home/tester、作業ブランチ上のリポジトリとして実行する（run.sh 参照）。
+# --- 止める: 強制 push ---
+2	git push --force
+2	git push -f origin feature/x
+2	git push --force-with-lease origin feature/x
+2	git push -uf origin feature/x
+2	git push origin +feature/x
+2	git -C . push --force origin feature/x
+2	git add . && git commit -m wip && git push -f
+# --- 止める: main / master への直接 push ---
+2	git push origin main
+2	git push origin master
+2	git push origin HEAD:main
+2	git push -u origin refs/heads/main
+2	sudo git push origin main
+# --- 止める: rm -rf とその変形 ---
+2	rm -rf /tmp/mabatalk-hook-test
+2	rm -fr node_modules
+2	rm -Rf log
+2	rm -r -f tmp/cache
+2	rm --recursive --force tmp/cache
+2	rm -rf tmp/cache
+2	cd tmp && rm -rf cache
+2	find . -name '*.log' | xargs rm -rf
+# --- 止める: 別のコマンドに包んだ形、パス指定 ---
+2	bash -c "rm -rf tmp/x"
+2	sh -c 'git push --force'
+2	zsh -lc "git push origin main"
+2	eval "rm -rf tmp/x"
+2	/bin/rm -rf tmp/x
+2	\rm -rf tmp/x
+2	nohup rm -rf tmp/x
+2	exec git push -f
+2	echo $(rm -rf tmp/x)
+2	echo `rm -rf tmp/x`
+2	find . -print0 | xargs -0 rm -rf
+2	/usr/bin/git push origin main
+2	if true; then rm -rf tmp/x; fi
+# --- 止める: 引数を実行時に組み立てる形（事前に確かめられない） ---
+2	git push origin $(echo main)
+2	git push $(echo --force) origin feature/x
+2	git push origin `echo main`
+2	git push origin HEAD:$(echo main)
+2	git push -u origin "$BRANCH"
+2	rm $(echo -rf) tmp/x
+2	rm -r $(echo -f) tmp/x
+# --- 止める: データベースの破壊 ---
+2	psql -c "DROP TABLE users"
+2	psql -c 'drop database mabatalk_development'
+2	bin/rails db:drop
+2	bundle exec rails db:reset
+2	bin/rails db:drop db:create db:migrate
+# --- 止める: 本番への操作 ---
+2	RAILS_ENV=production bin/rails db:migrate
+2	RAILS_ENV="production" bin/rails console
+2	bin/rails console -e production
+2	bin/rails runner --environment=production 'puts 1'
+2	render deploy
+2	render deploys create srv-abc
+2	psql postgres://user@ep-x.ap-southeast-1.aws.neon.tech/db
+2	DATABASE_URL="$DATABASE_URL_DIRECT" bundle exec rails db:migrate
+# --- 止める: 保護ツリー（$HOME/Projects/Mabatalk）への移動・書き込み ---
+2	cd /home/tester/Projects/Mabatalk
+2	cd ~/Projects/Mabatalk && git status
+2	cd "$HOME/Projects/Mabatalk" && bin/rails test
+2	git -C ${HOME}/Projects/Mabatalk checkout main
+2	echo hi > /home/tester/Projects/Mabatalk/tmp/x.txt
+2	echo hi >> ~/Projects/Mabatalk/README.md
+2	touch /home/tester/Projects/Mabatalk/tmp/x
+2	cp CLAUDE.md /home/tester/Projects/Mabatalk/CLAUDE.md
+2	mv /home/tester/Projects/Mabatalk/a /home/tester/Projects/Mabatalk/b
+2	sed -i '' 's/a/b/' /home/tester/Projects/Mabatalk/README.md
+2	ls | tee /home/tester/Projects/Mabatalk/list.txt
+# --- 通す: 普通のコマンド ---
+0	git status
+0	git log -1 --oneline
+0	bundle exec rspec
+0	bin/rubocop -f github
+0	bin/rails db:prepare
+0	bin/rails db:create db:schema:load
+0	RAILS_ENV=test bin/rails db:migrate
+0	git push -u origin feature/claude-hooks
+0	git push
+0	git push -u origin chore/claude-hooks && gh pr create --base main
+0	git push --follow-tags origin feature/x
+0	git fetch origin main
+0	git diff main...HEAD
+0	git checkout -b feature/main-menu
+0	rm tmp/x.rb
+0	rm -r tmp/hook-test-dir
+0	rm -f tmp/x.rb
+0	rm tmp/a.rb && grep -rf patterns.txt app
+0	rm -r "$dir"
+0	echo "$(git status --short)" && git push -u origin feature/x
+0	bash -c "git status"
+0	echo "done" && rm tmp/x.rb
+0	bin/rails tmp:clear
+0	grep -rn "production" config/environments
+0	grep -e production config/database.yml
+0	cat bin/render-build.sh
+# --- 通す: worktree と似た名前のディレクトリ、保護ツリーを読むだけ ---
+0	cd /home/tester/orca/workspaces/Mabatalk/chore-claude-hooks && git status
+0	touch /home/tester/orca/workspaces/Mabatalk/chore-claude-hooks/tmp/x
+0	cd /home/tester/Projects/Mabatalk-lab && git status
+0	cat /home/tester/Projects/Mabatalk/README.md
+0	ls ~/Projects/Mabatalk/app/models 2>/dev/null
+0	diff CLAUDE.md /home/tester/Projects/Mabatalk/CLAUDE.md
