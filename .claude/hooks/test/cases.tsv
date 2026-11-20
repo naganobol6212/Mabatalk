@@ -23,6 +23,20 @@
 2	rm -rf tmp/cache
 2	cd tmp && rm -rf cache
 2	find . -name '*.log' | xargs rm -rf
+# --- 止める: 別のコマンドに包んだ形、パス指定 ---
+2	bash -c "rm -rf tmp/x"
+2	sh -c 'git push --force'
+2	zsh -lc "git push origin main"
+2	eval "rm -rf tmp/x"
+2	/bin/rm -rf tmp/x
+2	\rm -rf tmp/x
+2	nohup rm -rf tmp/x
+2	exec git push -f
+2	echo $(rm -rf tmp/x)
+2	echo `rm -rf tmp/x`
+2	find . -print0 | xargs -0 rm -rf
+2	/usr/bin/git push origin main
+2	if true; then rm -rf tmp/x; fi
 # --- 止める: データベースの破壊 ---
 2	psql -c "DROP TABLE users"
 2	psql -c 'drop database mabatalk_development'
@@ -69,6 +83,8 @@
 0	rm -r tmp/hook-test-dir
 0	rm -f tmp/x.rb
 0	rm tmp/a.rb && grep -rf patterns.txt app
+0	bash -c "git status"
+0	echo "done" && rm tmp/x.rb
 0	bin/rails tmp:clear
 0	grep -rn "production" config/environments
 0	grep -e production config/database.yml

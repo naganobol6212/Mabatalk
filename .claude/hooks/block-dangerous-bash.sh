@@ -24,11 +24,12 @@ sp='[[:space:]]'
 # コマンド全体を拡張正規表現（大文字小文字を区別しない）で調べる。
 has() { grep -Eiq -- "$1" <<<"$cmd"; }
 
-# && || ; | で区切った 1 コマンドずつ。「git push ... && gh pr create --base main」の
+# && || ; | $( ` で区切った 1 コマンドずつ。「git push ... && gh pr create --base main」の
 # main を push の引数と取り違えないために使う。
-segments="$(sed -e 's/&&/;/g' -e 's/||/;/g' <<<"$cmd" | tr ';|' '\n\n')"
-# 区切ったコマンドの先頭（sudo / env / xargs / 括弧 / VAR=値 は読み飛ばす）。
-head="^[[:space:](]*((sudo|env|xargs|command|time)${sp}+|[A-Za-z_][A-Za-z0-9_]*=[^[:space:]]*${sp}+)*"
+segments="$(sed -e 's/&&/;/g' -e 's/||/;/g' -e 's/\$(/;/g' <<<"$cmd" | tr ';|`' '\n\n\n')"
+# 区切ったコマンドの先頭。次のものは読み飛ばして、その後ろの rm / git を見つける:
+# sudo や xargs などの前置き、bash -c / eval と引用符、$( )、VAR=値、/bin/ のようなパス、\rm の \。
+head="^[[:space:](]*((sudo|env|xargs|command|time|exec|nohup|nice|eval|then|do|else)${sp}+(-[^[:space:]]+${sp}+)*|(bash|sh|zsh)${sp}+(-[a-zA-Z]+${sp}+)*|[A-Za-z_][A-Za-z0-9_]*=[^[:space:]]*${sp}+|[\"'\`{]${sp}*|\\\$\\(${sp}*)*([^[:space:]]*/)?\\\\?"
 
 # --- 強制 push と main/master への直接 push ---
 git_push="${head}git(${sp}+-[^[:space:]]+(${sp}+[^-[:space:]][^[:space:]]*)?)*${sp}+push(${sp}|\$)"
@@ -36,7 +37,7 @@ push_lines="$(grep -E -- "$git_push" <<<"$segments" || true)"
 if [ -n "$push_lines" ]; then
   in_push() { grep -Eq -- "$1" <<<"$push_lines"; }
 
-  if in_push "${sp}(--force|--force-with-lease|--force-if-includes|-[a-zA-Z]*f[a-zA-Z]*)(=|${sp}|\$)" \
+  if in_push "${sp}(--force|--force-with-lease|--force-if-includes|-[a-zA-Z]*f[a-zA-Z]*)(=|${sp}|[\"')]|\$)" \
     || in_push "${sp}\\+[^[:space:]]+"; then
     block "強制 push（--force / -f / --force-with-lease / +refspec）は禁止です。"
   fi
