@@ -73,11 +73,11 @@ class FlowItemsController < ApplicationController
   private
 
   def set_message_category
-    @message_category = MessageCategory.find(params[:message_category_id])
+    @message_category = MessageCategory.for_user(current_user).find(params[:message_category_id])
   end
 
   def set_flow_item
-    @flow_item = FlowItem.find(params[:id])
+    @flow_item = FlowItem.for_user(current_user).find(params[:id])
   end
 
   def set_flow_item_for_owner
