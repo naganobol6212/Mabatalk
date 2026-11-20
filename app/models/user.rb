@@ -2,6 +2,8 @@ class User < ApplicationRecord
   has_one :ai_summary, dependent: :destroy
   has_many :message_logs, dependent: :destroy
   has_many :message_categories, dependent: :destroy
+  has_many :flow_items, dependent: :destroy
+  has_many :feedbacks, dependent: :nullify
   validates :name, presence: true
   validates :password,
             format: { with: /\A\S+\z/, message: :no_whitespace },
