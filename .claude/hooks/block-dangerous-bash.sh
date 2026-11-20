@@ -24,9 +24,15 @@ sp='[[:space:]]'
 # コマンド全体を拡張正規表現（大文字小文字を区別しない）で調べる。
 has() { grep -Eiq -- "$1" <<<"$cmd"; }
 
-# && || ; | $( ` で区切った 1 コマンドずつ。「git push ... && gh pr create --base main」の
+# && || ; | で区切った 1 コマンドずつ。「git push ... && gh pr create --base main」の
 # main を push の引数と取り違えないために使う。
-segments="$(sed -e 's/&&/;/g' -e 's/||/;/g' -e 's/\$(/;/g' <<<"$cmd" | tr ';|`' '\n\n\n')"
+segments="$(sed -e 's/&&/;/g' -e 's/||/;/g' <<<"$cmd" | tr ';|' '\n\n')"
+# $( ) やバッククォートの中に書いたコマンドも見つけるため、そこでも区切った行を足す。
+# 元の行も残すので、引数の確認は区切る前の 1 コマンド全体に対して行われる。
+segments="${segments}
+$(sed -e 's/\$(/;/g' <<<"$segments" | tr ';`' '\n\n')"
+# 実行するまで中身が決まらないもの（$( )、バッククォート、$変数）。
+dynamic='\$|`'
 # 区切ったコマンドの先頭。次のものは読み飛ばして、その後ろの rm / git を見つける:
 # sudo や xargs などの前置き、bash -c / eval と引用符、$( )、VAR=値、/bin/ のようなパス、\rm の \。
 head="^[[:space:](]*((sudo|env|xargs|command|time|exec|nohup|nice|eval|then|do|else)${sp}+(-[^[:space:]]+${sp}+)*|(bash|sh|zsh)${sp}+(-[a-zA-Z]+${sp}+)*|[A-Za-z_][A-Za-z0-9_]*=[^[:space:]]*${sp}+|[\"'\`{]${sp}*|\\\$\\(${sp}*)*([^[:space:]]*/)?\\\\?"
@@ -43,6 +49,9 @@ if [ -n "$push_lines" ]; then
   fi
   if in_push "(${sp}|:|/)(main|master)[\"']?(${sp}|\\)|\$)"; then
     block "main / master への直接 push は禁止です。作業ブランチを push して PR を作ってください。"
+  fi
+  if in_push "$dynamic"; then
+    block "変数やコマンド置換を含む push は、push 先を事前に確かめられないので禁止です。ブランチ名をそのまま書いてください。"
   fi
   # push 先のブランチを書いていない（引数がリモート名までの）push は、
   # 今いるブランチが main / master なら止める。
@@ -62,6 +71,9 @@ if [ -n "$rm_lines" ]; then
   if { in_rm "${sp}-[a-zA-Z]*[rR]" || in_rm "${sp}--recursive"; } \
     && { in_rm "${sp}-[a-zA-Z]*f" || in_rm "${sp}--force"; }; then
     block "rm -rf（再帰＋強制の削除）は場所を問わず禁止です。消す対象を確かめ、-f なしで個別に消してください。"
+  fi
+  if in_rm '\$\(|`'; then
+    block "コマンド置換を含む rm は、オプションと対象を事前に確かめられないので禁止です。対象をそのまま書いてください。"
   fi
 fi
 
