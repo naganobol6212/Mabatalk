@@ -37,4 +37,26 @@ RSpec.describe User do
       end
     end
   end
+
+  describe "退会（destroy）" do
+    let(:user) { create(:user) }
+
+    it "ご意見を送信済みでも削除でき、ご意見は user_id が nil になって残る" do
+      feedback = create(:feedback, user: user)
+
+      expect { user.destroy! }.to change(User, :count).by(-1)
+      expect(feedback.reload.user_id).to be_nil
+    end
+
+    it "共通カテゴリに自作の項目があっても削除でき、自作の項目は削除される" do
+      shared_category = create(:message_category, user: nil)
+      shared_item = create(:flow_item, message_category: shared_category, user: nil)
+      own_item = create(:flow_item, message_category: shared_category, user: user)
+
+      expect { user.destroy! }.to change(User, :count).by(-1)
+      expect(FlowItem.exists?(own_item.id)).to be(false)
+      expect(FlowItem.exists?(shared_item.id)).to be(true)
+      expect(MessageCategory.exists?(shared_category.id)).to be(true)
+    end
+  end
 end
