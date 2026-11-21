@@ -9,11 +9,18 @@ RSpec.describe "Google ログインの往復", type: :request do
   around do |example|
     original_test_mode = OmniAuth.config.test_mode
     original_logger = OmniAuth.config.logger
+    # 差し替える前の認証情報。もともとキーが無かったのか、値が入っていたのかも覚えておく
+    had_mock_auth = OmniAuth.config.mock_auth.key?(:google_oauth2)
+    original_mock_auth = OmniAuth.config.mock_auth[:google_oauth2]
     OmniAuth.config.test_mode = true
     OmniAuth.config.logger = Logger.new(IO::NULL)
     example.run
   ensure
-    OmniAuth.config.mock_auth[:google_oauth2] = nil
+    if had_mock_auth
+      OmniAuth.config.mock_auth[:google_oauth2] = original_mock_auth
+    else
+      OmniAuth.config.mock_auth.delete(:google_oauth2)
+    end
     OmniAuth.config.logger = original_logger
     OmniAuth.config.test_mode = original_test_mode
   end
