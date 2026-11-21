@@ -75,19 +75,26 @@ RSpec.describe "CSRF 保護", type: :request do
   end
 
   describe "ご意見の送信" do
-    def submit(token)
+    def send_feedback(token)
       post feedbacks_path, params: { feedback: { category: "bug", body: "テスト本文" }, authenticity_token: token }.compact
+    end
+
+    # 拒否される 3 つの例から呼ばれる。管理者への通知メールは後から送る（deliver_later）ので、
+    # 届いたメールの一覧（deliveries）ではなく「送信待ちのキューに入らないこと」を、送信をはさんで確かめる。
+    def submit(token)
+      expect { send_feedback(token) }.not_to have_enqueued_mail(FeedbackMailer, :notify_admin)
     end
 
     def expect_nothing_happened
       expect(Feedback.count).to eq(0)
-      expect(ActionMailer::Base.deliveries).to be_empty
     end
 
-    it "送信フォームのトークン付きなら保存される" do
+    it "送信フォームのトークン付きなら保存され、管理者への通知メールが送信待ちに入る" do
       token = form_token(new_feedback_path, action: feedbacks_path)
 
-      expect { submit(token) }.to change(Feedback, :count).by(1)
+      expect { send_feedback(token) }
+        .to change(Feedback, :count).by(1)
+        .and have_enqueued_mail(FeedbackMailer, :notify_admin)
       expect(response).to redirect_to(settings_path)
     end
 
