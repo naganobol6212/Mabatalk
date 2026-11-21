@@ -102,13 +102,12 @@ RSpec.describe "ご意見箱のスクリーンショット添付", type: :reques
       expect_rejected_with(screenshots_error(:invalid_content_type))
     end
 
-    it "4 枚以上は保存されず、エラーが表示される" do
-      files = Array.new(Feedback::MAX_SCREENSHOTS + 1) { |i| png_upload("shot#{i}.png") }
-
-      expect { send_feedback(*files) }
+    # 枚数と文言は仕様（3 枚まで）をそのまま書く。アプリの定数から計算すると、上限を緩めても気付けない。
+    it "4 枚目は受け付けず、何も保存されず、「3 枚まで」のエラーが表示される" do
+      expect { send_feedback(png_upload("a.png"), png_upload("b.png"), png_upload("c.png"), png_upload("d.png")) }
         .not_to change { saved_record_counts }
 
-      expect_rejected_with(screenshots_error(:too_many, count: Feedback::MAX_SCREENSHOTS))
+      expect_rejected_with("スクリーンショットは最大3枚までです")
     end
   end
 
