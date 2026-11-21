@@ -145,10 +145,14 @@ RSpec.describe "CSRF 保護", type: :request do
   end
 
   describe "ログイン中の操作" do
-    # 先に画面を 1 つ開いて、ログイン済みのセッション cookie を持った状態にする
+    # ログイン画面のフォームから実際にログインして、ログイン済みのセッション cookie を持った状態にする。
+    # （テスト用の近道 sign_in は、このグループが最初に実行されると
+    #   「Could not find a valid mapping」で落ちるので使わない）
     before do
-      sign_in user
+      token = form_token(new_user_session_path, action: user_session_path)
+      post user_session_path, params: { user: { email: "taro@example.com", password: password }, authenticity_token: token }
       get settings_path
+      expect(response).to have_http_status(:ok)
     end
 
     describe "ログアウト" do

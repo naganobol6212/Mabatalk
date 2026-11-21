@@ -148,7 +148,10 @@ RSpec.describe "ご意見箱のスクリーンショット添付", type: :reques
   end
 
   describe "添付付きのご意見を管理者以外が見ようとした場合" do
-    let(:feedback) do
+    # let! で、ログインより先にご意見を送っておく。
+    # （この例が最初に実行されたとき、最初のリクエストより前に sign_in すると
+    #   「Could not find a valid mapping」で落ちるため）
+    let!(:feedback) do
       send_feedback(png_upload)
       Feedback.last
     end
