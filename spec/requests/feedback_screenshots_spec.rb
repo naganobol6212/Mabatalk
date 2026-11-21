@@ -6,6 +6,12 @@ require 'support/form_helpers'
 RSpec.describe "ご意見箱のスクリーンショット添付", type: :request do
   let(:png_bytes) { file_fixture("screenshot.png").binread }
 
+  # テストで保存した画像のファイル（tmp/storage の下）を、例ごとに片付ける。
+  # DB の行は例が終わると巻き戻るが、ディスクに書いたファイルは残り続けるため。
+  # 消すのはこの例の中で作られた分だけ（Blob#delete はファイルだけを消す）。
+  before { @blob_ids_before_example = ActiveStorage::Blob.ids }
+  after { ActiveStorage::Blob.where.not(id: @blob_ids_before_example).find_each(&:delete) }
+
   def send_feedback(*files)
     post feedbacks_path, params: { feedback: { category: "bug", body: "画面が崩れています", screenshots: files } }
   end
