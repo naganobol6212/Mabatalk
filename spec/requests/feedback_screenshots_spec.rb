@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'support/form_helpers'
 
 # ご意見箱のスクリーンショット添付を、利用者と管理者の操作の順に通す。
 # 送信フォーム（multipart）→ 保存 → 管理画面に画像が出る → 画像の URL を開くと送った中身が返る
@@ -71,6 +72,35 @@ RSpec.describe "ご意見箱のスクリーンショット添付", type: :reques
       send_feedback
 
       expect(screenshot_image_urls(Feedback.last)).to be_empty
+    end
+  end
+
+  # ここまでの例は送信先と欄の名前をテストに直接書いている。
+  # この例は画面のフォームを読み取り、そこに書かれた送信先と欄の名前で送る。
+  describe "ご意見の新規画面のフォームから送る" do
+    it "画面のファイル選択欄は複数選べて、フォームの送信先へその欄の名前で送った画像が 2 枚とも保存される" do
+      get new_feedback_path
+      form = form_containing("input[type='file']")
+      file_input = form.at_css("input[type='file']")
+
+      # ブラウザがファイルを送るには、フォームが multipart であることが必要
+      expect(form["enctype"]).to eq("multipart/form-data")
+      expect(file_input["multiple"]).to be_present
+
+      expect do
+        submit_form(form, hidden_fields(form) + [
+          [ form.at_css("input[type='radio'][value='bug']")["name"], "bug" ],
+          [ form.at_css("textarea")["name"], "画面が崩れています" ],
+          [ file_input["name"], png_upload("a.png") ],
+          [ file_input["name"], png_upload("b.png") ]
+        ])
+      end.to change(Feedback, :count).by(1).and change(ActiveStorage::Attachment, :count).by(2)
+
+      expect(response).to redirect_to(settings_path)
+      feedback = Feedback.last
+      expect(feedback.body).to eq("画面が崩れています")
+      expect(feedback.screenshots.map { |screenshot| screenshot.filename.to_s }).to contain_exactly("a.png", "b.png")
+      expect(feedback.screenshots.map(&:download)).to all(eq(png_bytes))
     end
   end
 

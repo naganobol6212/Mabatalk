@@ -1,5 +1,6 @@
 require 'rails_helper'
 require 'support/login_state_helpers'
+require 'support/form_helpers'
 
 # パスワード再設定を利用者の操作の順に通す。
 # 申し込み → メールが 1 通届く → メールのリンクを開く → 新しいパスワードを設定 → 新しいパスワードでログイン
@@ -88,6 +89,20 @@ RSpec.describe "Users::Passwords", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("user[password]", "user[password_confirmation]")
+    end
+
+    # ほかの例は送信先・メソッド・トークンをテストに直接書いている。
+    # この例はリンク先の画面のフォームを読み取り、そこに入っている値のまま送る。
+    it "リンク先の画面のフォームを、入っている送信先・メソッド・隠しトークンのまま送ると、新しいパスワードで再ログインできる" do
+      get reset_link_in_mail
+      form = form_containing("input[type='password']")
+      password_fields = form.css("input[type='password']").map { |input| [ input["name"], "new-password" ] }
+
+      submit_form(form, hidden_fields(form) + password_fields)
+
+      expect(response).to redirect_to(message_categories_path)
+      expect(login_succeeds?("new-password")).to be(true)
+      expect(login_succeeds?("old-password")).to be(false)
     end
 
     it "新しいパスワードを設定するとログイン状態になり、カテゴリ一覧へリダイレクトされる" do
