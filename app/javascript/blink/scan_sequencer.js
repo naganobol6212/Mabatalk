@@ -18,8 +18,23 @@
 //   { type: "resumed" }                   休止から戻った
 //
 // 時計は「開眼（eyePhase が open）を続けて見ていた時間」だけ進む。
+// 前の tick と今の tick の両方が開眼だった区間だけを数えるので、
 // 閉眼中・顔なし・準備中・安定待ちなどの間と、tick が途切れた間は、残り時間のまま止まる。
+// 目を閉じたことを受け取った tick の区間も数えない（閉じた目で固定した候補を、
+// 同じ tick の時間切れで取り消さないため）。
 // state.generation は画面の状態（mode）が変わるたびに進む。光る項目が移るだけでは進まない。
+//
+// blink_switch とつなぐ時の呼び出し順（この順を守ること。spec/javascript/blink_scan_integration.test.mjs）:
+//   1. フレームを撮る時に、その時点の highlightedKey(state) と state.generation をフレームに付ける
+//   2. 結果が届いたら stepBlinkSwitch（currentGeneration は今の state.generation）
+//   3. 出てきた select イベントを、その場で stepScan の select へ渡す
+//   4. 最後に stepScan の tick（eyePhase は 2. のあとの blink_switch の phase）
+// 先に tick を呼ぶと、届いたばかりの閉じた目を知らないまま時計が進み、
+// 項目の切り替わりや時間切れが先に起きてしまう。フレームが届かない間の tick は、最後に分かっている phase で呼ぶ。
+//
+// 用語: ここの「休止（paused）」は、スキャンを止めて長いまばたきを待つ画面の状態。
+// blink_switch の「休憩（rest）」は、目を長く閉じたままなので決定しないという判定の状態で、別のもの。
+// 休憩になってもスキャンは休止にならず、開眼に戻れば残り時間から続く。
 
 import { FIXED } from "./config.js"
 
@@ -116,7 +131,7 @@ function onTick(state, { now, eyePhase }, settings, events) {
   if (state.lastTickAt !== null && now < state.lastTickAt) return state
   const isOpen = eyePhase === "open"
   const gap = state.lastTickAt === null ? 0 : now - state.lastTickAt
-  const elapsed = state.wasOpen && gap <= FIXED.maxFrameGapMs ? gap : 0
+  const elapsed = state.wasOpen && isOpen && gap <= FIXED.maxFrameGapMs ? gap : 0
   const ticked = { ...state, lastTickAt: now, wasOpen: isOpen }
 
   if (state.mode === "scanning") return advanceScan(ticked, elapsed, settings, events)

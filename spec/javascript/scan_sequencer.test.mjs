@@ -93,11 +93,12 @@ for (const phase of ["closing", "noface"]) {
   test(`${phase} の間は残り時間だけ止まり、目が開くと続きから再開する`, () => {
     const d = driver()
     d.run(0, 1000)
-    // 1050 の時点で閉じた。1000→1050 の 50ms は開いていた時間として数える
+    // 1050 の tick で閉じたと分かった。前後とも開眼だった区間だけ数えるので、
+    // 1000→1050 と 1600→1650 も止まっていた時間に入る（止まっていたのは 650ms）
     d.run(1050, 1600, phase)
-    d.run(1650, 3550)
-    assert.equal(d.highlighted, "a", "600ms 止まっていたので 3000 では切り替わらない")
-    d.tick(3600)
+    d.run(1650, 3600)
+    assert.equal(d.highlighted, "a", "650ms 止まっていたので 3000 でも 3600 でも切り替わらない")
+    d.tick(3650)
     assert.equal(d.highlighted, "b")
   })
 }
