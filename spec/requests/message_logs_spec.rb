@@ -342,6 +342,24 @@ RSpec.describe "MessageLogs", type: :request do
           expect(user.message_logs.pluck(:flow_item_id)).to eq([ another_item.id ])
         end
       end
+
+      # 「もう一方が先に保存した」と読み替えるのは、送信ID の重なり（taken）だけ。
+      # ほかの理由で保存できなかった時まで「保存済み」や「見つからない」にすると、本当の原因が隠れる
+      describe "送信ID の重なり以外の理由で保存できなかった時" do
+        before do
+          allow_any_instance_of(MessageLog).to receive(:valid?).and_wrap_original do |original, *args|
+            original.call(*args)
+            original.receiver.errors.add(:flow_item, :blank)
+            false
+          end
+        end
+
+        it "保存済み（200）にも見つからない（404）にもせず、検査エラー（422）のまま返し、記録は作られない" do
+          expect { post_json(flow_item.key, sid) }.not_to change(MessageLog, :count)
+
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
     end
 
     context "ゲスト（未ログイン）の場合" do
