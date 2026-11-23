@@ -128,7 +128,7 @@ export default class extends Controller {
     this.session = stepped.state
     for (const effect of stepped.effects) {
       if (effect.type === "send") this.send(effect)
-      if (effect.type === "cancelSend") this.abortSend?.abort()
+      if (effect.type === "cancelSend") this.cancelSend?.()
       if (effect.type === "resetInput") this.source.reset()
     }
     this.syncClock()
@@ -148,8 +148,12 @@ export default class extends Controller {
   // 返事が来ない時は sendTimeoutMs（10 秒）で打ち切る。通信エラー・時間切れ・読めない返事は「届いたか不明」
   async send({ attempt, flowItemKey, submissionId }) {
     const abort = new AbortController()
-    this.abortSend = abort
     const timeout = setTimeout(() => abort.abort(), FIXED.sendTimeoutMs)
+    // 打ち切る時は、時間切れの見張りもその場で外す（fetch が打ち切りに気づいて終わるのを待たない）
+    this.cancelSend = () => {
+      clearTimeout(timeout)
+      abort.abort()
+    }
     let response = null
     try {
       const res = await fetch(this.urlValue, {
