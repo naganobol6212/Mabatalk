@@ -302,6 +302,49 @@ test("壊れた保存値は使わない", () => {
   for (const raw of broken) assert.deepEqual(check(raw), { status: "invalid" }, raw)
 })
 
+// 数値としては読めるが、意味が通らない調整結果。[説明, 上書きする値, 設定作成で返る理由]
+// もとの値は O=0.1 / C=0.9 / 閉じ 0.58 / 開き 0.3
+const MEANINGLESS = [
+  ["開きしきい値が 0 より小さい", { openThreshold: -1 }, "openThresholdOutOfRange"],
+  ["開きしきい値が 1 より大きい", { openThreshold: 1.2, closeThreshold: 0.9, closed: 0.95 }, "openThresholdOutOfRange"],
+  ["開いた目のスコアが 0 より小さい", { open: -0.1 }, "openOutOfRange"],
+  ["閉じた目のスコアが 1 より大きい", { closed: 1.2 }, "closedOutOfRange"],
+  ["開いた目と閉じた目のスコアが逆", { open: 0.9, closed: 0.1 }, "lowContrast"],
+  ["開いた目と閉じた目の差が 0.29 に足りない", { open: 0.5, closed: 0.7, closeThreshold: 0.62, openThreshold: 0.52 }, "lowContrast"],
+  ["開きしきい値が、開いた目のスコアより低い", { open: 0.4, openThreshold: 0.3 }, "openThresholdBelowOpen"],
+  ["閉じしきい値が、閉じた目のスコアより高い", { closed: 0.5, closeThreshold: 0.58 }, "closeThresholdAboveClosed"]
+]
+
+for (const [label, overrides, error] of MEANINGLESS) {
+  test(`意味が通らない保存値は使わない: ${label}`, () => {
+    assert.deepEqual(check(savedRaw(overrides)), { status: "invalid" })
+  })
+
+  test(`意味が通らない調整結果からは設定を作らない: ${label}`, () => {
+    const calibration = { ...JSON.parse(savedRaw()), ...overrides }
+    const result = settingsFromCalibration(calibration)
+    assert.equal(result.ok, false)
+    assert.ok(result.errors.includes(error), `${error} が入っている: ${result.errors}`)
+  })
+}
+
+test("保存値の検査を通った調整結果からは、必ず設定を作れる", () => {
+  const result = check(savedRaw())
+  assert.equal(result.status, "ok")
+  assert.equal(settingsFromCalibration(result.calibration).ok, true)
+})
+
+test("しきい値がスコアの端（開き = O、閉じ = C）にちょうど重なる調整結果は通す", () => {
+  const overrides = { open: 0.3, closed: 0.58 }
+  assert.equal(check(savedRaw(overrides)).status, "ok")
+  assert.equal(settingsFromCalibration({ ...JSON.parse(savedRaw()), ...overrides }).ok, true)
+})
+
+test("開きしきい値が 0〜1 の外にある設定は拒否する", () => {
+  assert.ok(validateSettings({ ...VALID, openThreshold: -0.2 }).errors.includes("openThresholdOutOfRange"))
+  assert.ok(validateSettings({ ...VALID, closeThreshold: 0.9, openThreshold: 0 }).ok)
+})
+
 test("保存値に余計な項目が混ざっていても、返す調整結果には含めない", () => {
   const result = check(savedRaw({ userId: 42 }))
   assert.equal(result.status, "ok")
