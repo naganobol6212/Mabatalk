@@ -249,6 +249,58 @@ test("安定待ち中の顔ロストも 300ms までは待ち、300ms を超え�
   assert.equal(d.phase, "noface")
 })
 
+const NO_FACE = { faceDetected: false, face: null }
+
+test("開眼中の顔ロストが 300ms を超えてから顔が戻ったら、準備中からやり直す（そのまま閉じても決定しない）", () => {
+  const d = opened()
+  d.run(350, 650, null, NO_FACE)
+  assert.equal(d.phase, "open", "消えてから 300ms ちょうどはまだ開眼")
+  // 最初に顔が消えた 350ms から 350ms たって、閉じた目で戻ってきた
+  d.feed(700, CLOSED)
+  assert.equal(d.phase, "arming", "猶予が切れているので、開いた目をもう一度確認する")
+  d.run(750, 1500, CLOSED)
+  d.feed(1550, OPEN)
+  assert.equal(d.count("holdReached"), 0)
+  assert.equal(d.count("select"), 0)
+})
+
+test("開眼中の顔ロストが 300ms ちょうどで戻ったなら開眼のままで、長いまばたきを決定できる", () => {
+  const d = opened()
+  d.run(350, 600, null, NO_FACE)
+  d.feed(650, CLOSED)
+  assert.equal(d.phase, "closing")
+  d.run(700, 1450, CLOSED)
+  d.feed(1500, OPEN)
+  assert.equal(d.count("select"), 1)
+})
+
+test("安定待ち中の顔ロストが 300ms を超えてから顔が戻ったら、準備中からやり直す", () => {
+  const d = opened()
+  d.run(350, 1150, CLOSED)
+  d.feed(1200, OPEN)
+  assert.equal(d.phase, "refractory")
+  d.run(1250, 1550, null, NO_FACE)
+  assert.equal(d.phase, "refractory", "消えてから 300ms ちょうどはまだ安定待ち")
+  d.feed(1600, OPEN)
+  assert.equal(d.phase, "arming")
+  // 安定待ちの 800ms（2000ms）を過ぎても、開眼の確認 300ms（1900ms）を通るまでは開眼にしない
+  d.run(1650, 1850, OPEN)
+  assert.equal(d.phase, "arming")
+  d.feed(1900, OPEN)
+  assert.equal(d.phase, "open")
+})
+
+test("安定待ち中の顔ロストが 300ms ちょうどで戻ったなら安定待ちのまま", () => {
+  const d = opened()
+  d.run(350, 1150, CLOSED)
+  d.feed(1200, OPEN)
+  d.run(1250, 1500, null, NO_FACE)
+  d.feed(1550, OPEN)
+  assert.equal(d.phase, "refractory")
+  d.run(1600, 2000, OPEN)
+  assert.equal(d.phase, "open")
+})
+
 for (const [label, missing] of [["null", null], ["NaN", NaN], ["undefined", undefined]]) {
   test(`欠けたスコア（${label}）を開眼扱いしない: 決定待ちで届いても決定しない`, () => {
     const d = opened()
