@@ -31,6 +31,9 @@ export const RANGES = Object.freeze({
   calibrationStaleHours: Object.freeze({ min: 1, max: 48 })
 })
 
+// 目の「閉じ具合」のスコアと、そのしきい値が取りうる範囲
+export const SCORE_RANGE = Object.freeze({ min: 0, max: 1 })
+
 // 利用者が調整しない値
 export const FIXED = Object.freeze({
   maxFrameGapMs: 250,
@@ -46,7 +49,9 @@ export const FIXED = Object.freeze({
 export const THRESHOLD_RULES = Object.freeze({
   closeRatio: 0.6,
   openRatio: 0.25,
+  // 閉じしきい値 − 開きしきい値 ≧ 0.1（ちょうど 0.1 は通す）
   minGap: 0.1,
+  // C − O ≧ 0.29（ちょうど 0.29 は通す。この時しきい値の差がほぼ 0.1 になる）
   minContrast: 0.29,
   holdRestMarginMs: 1000
 })

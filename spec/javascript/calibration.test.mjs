@@ -335,9 +335,11 @@ test("保存値の検査を通った調整結果からは、必ず設定を作�
 })
 
 test("しきい値がスコアの端（開き = O、閉じ = C）にちょうど重なる調整結果は通す", () => {
-  const overrides = { open: 0.3, closed: 0.58 }
-  assert.equal(check(savedRaw(overrides)).status, "ok")
-  assert.equal(settingsFromCalibration({ ...JSON.parse(savedRaw()), ...overrides }).ok, true)
+  // 両方いっぺんに重ねると C−O が 0.28 になって差不足で落ちるので、片方ずつ確かめる
+  for (const overrides of [{ open: 0.3 }, { closed: 0.58 }]) {
+    assert.equal(check(savedRaw(overrides)).status, "ok")
+    assert.equal(settingsFromCalibration({ ...JSON.parse(savedRaw()), ...overrides }).ok, true)
+  }
 })
 
 test("開きしきい値が 0〜1 の外にある設定は拒否する", () => {

@@ -1,7 +1,7 @@
 // 調整（しきい値の計算）、値どうしの決まりの検査、片目のすすめ、保存値の検査。
 // どれも引数だけで結果が決まる関数。localStorage の読み書きはここではしない。
 
-import { CALIBRATION, DEFAULTS, EYES, RANGES, THRESHOLD_RULES } from "./config.js"
+import { CALIBRATION, DEFAULTS, EYES, RANGES, SCORE_RANGE, THRESHOLD_RULES } from "./config.js"
 import { eyeScore } from "./blink_switch.js"
 
 const EPSILON = 1e-9
@@ -81,23 +81,50 @@ function inRange(value, range) {
   return true
 }
 
+// しきい値そのものの決まり。調整結果の検査と設定の検査の両方が使う。
+function thresholdErrors({ closeThreshold, openThreshold }) {
+  if (!isNumber(closeThreshold) || !isNumber(openThreshold)) return ["notCalibrated"]
+  const errors = []
+  if (!inRange(closeThreshold, RANGES.closeThreshold)) errors.push("closeThresholdOutOfRange")
+  if (!inRange(openThreshold, SCORE_RANGE)) errors.push("openThresholdOutOfRange")
+  if (closeThreshold - openThreshold < THRESHOLD_RULES.minGap - EPSILON) errors.push("thresholdGapTooSmall")
+  return errors
+}
+
+// 調整結果（使う目・O・C・しきい値）の意味が通っているか。破った決まりの名前の一覧を返す。
+// 保存値の検査（checkSavedCalibration）と設定作成（settingsFromCalibration）の両方がここを通るので、
+// 「保存値としては ok なのに設定は作れない」「数値なら何でも通る」という食い違いが起きない。
+// しきい値が式（O + 0.6×(C−O) など）と一致することまでは求めない（あとから手で調整した値もありうる）。
+function calibrationErrors(calibration) {
+  const { eye, open, closed, closeThreshold, openThreshold } = calibration
+  const errors = EYES.includes(eye) ? [] : ["eyeInvalid"]
+  const openOk = inRange(open, SCORE_RANGE)
+  const closedOk = inRange(closed, SCORE_RANGE)
+  if (!openOk) errors.push("openOutOfRange")
+  if (!closedOk) errors.push("closedOutOfRange")
+  errors.push(...thresholdErrors(calibration))
+  if (!openOk || !closedOk || errors.includes("notCalibrated")) return errors
+
+  // C > O で、かつ差が足りていること（逆転した値もここで落ちる）
+  if (closed - open < THRESHOLD_RULES.minContrast - EPSILON) errors.push("lowContrast")
+  // しきい値は O と C のあいだに置く。外にあると、ふだんの開いた目・閉じた目がしきい値に届かない
+  if (openThreshold < open - EPSILON) errors.push("openThresholdBelowOpen")
+  if (closeThreshold > closed + EPSILON) errors.push("closeThresholdAboveClosed")
+  return errors
+}
+
 // 設定（初期値 + 調整したしきい値 + 利用者の上書き）が、調整範囲と値どうしの決まりを守っているか。
 // 1つでも破っていれば ok: false と、破った決まりの名前の一覧を返す。
 export function validateSettings(settings) {
-  const errors = []
-  const calibrated = isNumber(settings.closeThreshold) && isNumber(settings.openThreshold)
-  if (!calibrated) errors.push("notCalibrated")
+  const errors = thresholdErrors(settings)
   if (!EYES.includes(settings.eye)) errors.push("eyeInvalid")
 
   for (const [field, range] of Object.entries(RANGES)) {
-    if (field === "closeThreshold" && !calibrated) continue
+    if (field === "closeThreshold") continue
     if (field === "firstStepRatio" && isNumber(settings[field]) && settings[field] < range.min) continue
     if (!inRange(settings[field], range)) errors.push(`${field}OutOfRange`)
   }
 
-  if (calibrated && settings.closeThreshold - settings.openThreshold < THRESHOLD_RULES.minGap - EPSILON) {
-    errors.push("thresholdGapTooSmall")
-  }
   if (settings.holdMs + THRESHOLD_RULES.holdRestMarginMs > settings.restMs) errors.push("holdTooCloseToRest")
   if (settings.stepMs * settings.firstStepRatio < settings.stepMs) errors.push("firstStepShorterThanStep")
 
@@ -114,8 +141,8 @@ export function settingsFromCalibration(calibration, overrides = {}) {
     closeThreshold: calibration.closeThreshold,
     openThreshold: calibration.openThreshold
   }
-  const { ok, errors } = validateSettings(settings)
-  return ok ? { ok: true, settings } : { ok: false, errors }
+  const errors = [...new Set([...calibrationErrors(calibration), ...validateSettings(settings).errors])]
+  return errors.length === 0 ? { ok: true, settings } : { ok: false, errors }
 }
 
 // 端末に保存する中身。誰の値かを示すもの（ユーザー ID など）は入れない。
@@ -166,8 +193,5 @@ function isValidSaved(saved, now, modelVersion) {
   if (!isNumber(saved.savedAt) || saved.savedAt > now) return false
   if (typeof saved.method !== "string" || saved.method === "") return false
   if (saved.modelVersion !== modelVersion) return false
-  if (!EYES.includes(saved.eye)) return false
-  if (!isNumber(saved.open) || !isNumber(saved.closed)) return false
-  if (!inRange(saved.closeThreshold, RANGES.closeThreshold) || !isNumber(saved.openThreshold)) return false
-  return saved.closeThreshold - saved.openThreshold >= THRESHOLD_RULES.minGap - EPSILON
+  return calibrationErrors(saved).length === 0
 }
