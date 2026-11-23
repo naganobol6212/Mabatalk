@@ -10,7 +10,8 @@ class BlinkScansController < ApplicationController
     @flow_items = @message_category.flow_items.for_user(current_user).order(:position, :id).load
     @too_many_items = @flow_items.size > ITEM_NOTICE_THRESHOLD
 
-    # 出た先の画面（GA がある）に「前にいたページ」としてこの URL を渡さない・ブラウザに残さない
+    # 出た先の画面（GA がある）に「前にいたページ」としてこの URL を渡さない・ブラウザに残さない。
+    # 付くのは、この画面を表示できた時の応答だけ（カテゴリが見つからない 404 など、例外の応答には付かない）
     response.headers["Referrer-Policy"] = "no-referrer"
     response.headers["Cache-Control"] = "no-store"
   end

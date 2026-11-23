@@ -41,6 +41,8 @@ class MessageLogsController < ApplicationController
   # まばたき画面からの送信。送り直しでも同じ送信ID が来るので、二重に記録しない。
   # flash・詳細の回答・session[:detail_flow] には触らない。
   def create_json(flow_item)
+    # 付くのは、ここから返す JSON（201・200・409・送信ID の 422）だけ。
+    # ここに来る前に起きる例外の応答（定型文が見つからない 404・CSRF の 422 など）には付かない
     response.headers["Cache-Control"] = "no-store"
 
     submission_id = params[:submission_id].to_s.strip.downcase
