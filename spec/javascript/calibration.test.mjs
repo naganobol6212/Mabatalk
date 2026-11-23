@@ -105,6 +105,26 @@ test("開いた時と閉じた時のばらつきが重なりすぎると失敗�
   assert.equal(result.reason, "overlap")
 })
 
+test("閉じた時の外れ値がちょうど 1 割（40 件中 4 件）なら、除いて考えるので成功する", () => {
+  const closedFrames = [...frames(4, 0.05), ...frames(36, 0.9)]
+  const result = calibrate({ openFrames: frames(40, 0.1), closedFrames, eye: "both" })
+  assert.equal(result.ok, true)
+})
+
+test("閉じた時の外れ値が 1 割を超える（40 件中 5 件）と、重なりとして失敗する", () => {
+  const closedFrames = [...frames(5, 0.05), ...frames(35, 0.9)]
+  const result = calibrate({ openFrames: frames(40, 0.1), closedFrames, eye: "both" })
+  assert.equal(result.reason, "overlap")
+})
+
+test("開いた時の外れ値も同じ: ちょうど 1 割（40 件中 4 件）は成功、5 件は重なりとして失敗", () => {
+  const closedFrames = frames(40, 0.9)
+  const four = calibrate({ openFrames: [...frames(36, 0.1), ...frames(4, 0.95)], closedFrames, eye: "both" })
+  const five = calibrate({ openFrames: [...frames(35, 0.1), ...frames(5, 0.95)], closedFrames, eye: "both" })
+  assert.equal(four.ok, true)
+  assert.equal(five.reason, "overlap")
+})
+
 test("両目では差が足りず右目なら足りる時は、右目をすすめる", () => {
   // 左はまったく動かない（0.1→0.1）、右はよく動く（0.1→0.6）。両目の平均は 0.1→0.35 で差 0.25
   const result = calibrate({ openFrames: frames(40, 0.1, 0.1), closedFrames: frames(40, 0.1, 0.6), eye: "both" })
