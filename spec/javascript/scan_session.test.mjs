@@ -339,6 +339,80 @@ test("送信中に停止したら、あとから届いた返事で画面を進�
   assert.equal(d.view.done, null)
 })
 
+// 保存はできたのに返事が届く前に介助者が「停止」を押した、という並び。
+// 止めても「届いたか分からない送信」は残す（捨てると、次の「はい」が新しい送信ID になり二重に記録される）
+test("送信中に停止 → 開始すると、スキャンには戻らず「確認できません」に戻る。送り直しは同じ送信ID", () => {
+  const d = driver()
+  const yesAt = sending(d)
+  d.stop()
+  d.result(yesAt + 500, SAVED)
+  assert.equal(d.screen, "idle")
+  d.press(yesAt + 600)
+  d.run(yesAt + 650, yesAt + 5000)
+  assert.equal(d.sends.length, 1, "止まっているあいだは送らない")
+
+  d.start()
+  assert.equal(d.screen, "unknown")
+  assert.equal(d.highlighted, null)
+  assert.equal(d.view.pendingKey, "b")
+  d.press(yesAt + 6000)
+  assert.equal(d.sends.length, 1, "スキャン入力では送り直さない")
+
+  d.retry()
+  assert.equal(d.screen, "sending")
+  assert.equal(d.sends.length, 2)
+  assert.equal(d.sends[1].flowItemKey, "b")
+  assert.equal(d.sends[1].submissionId, d.sends[0].submissionId)
+  assert.notEqual(d.sends[1].attempt, d.sends[0].attempt)
+})
+
+test("「確認できません」で停止 → 開始しても「確認できません」のまま。送り直しは同じ送信IDで、記録できたら次は新しい送信ID", () => {
+  const d = driver()
+  const yesAt = sending(d)
+  d.result(yesAt + 10000, { kind: "unknown" })
+  d.stop()
+  assert.equal(d.screen, "idle")
+  d.start()
+  assert.equal(d.screen, "unknown")
+  assert.equal(d.view.pendingKey, "b")
+
+  d.retry()
+  assert.equal(d.sends[1].submissionId, "id-1")
+  d.result(yesAt + 11000, SAVED)
+  assert.equal(d.screen, "done")
+
+  const againAt = sending(d, d.runUntil(yesAt + 11050, () => d.screen === "scanning"))
+  assert.ok(againAt > yesAt)
+  assert.equal(d.sends.length, 3)
+  assert.equal(d.sends[2].submissionId, "id-2")
+})
+
+test("送信の失敗が続いたことは、停止 → 開始をはさんでも数え続ける（「何度も続く場合は」を出すため）", () => {
+  const d = driver()
+  const yesAt = sending(d)
+  d.result(yesAt + 10000, { kind: "unknown" })
+  assert.equal(d.view.failures, 1)
+  d.retry()
+  d.stop()
+  d.start()
+  assert.equal(d.screen, "unknown")
+  assert.equal(d.view.failures, 2, "打ち切った送り直しも、届いたか分からない 1 回")
+  d.stop()
+  d.start()
+  assert.equal(d.view.failures, 2, "止めて始めただけでは増えない")
+})
+
+test("届いたか分からない送信を残して止めているあいだは、画面が隠れて戻っても自動では再開しない", () => {
+  const d = driver()
+  sending(d)
+  d.stop()
+  d.suspend()
+  d.resume()
+  assert.equal(d.screen, "idle")
+  d.start()
+  assert.equal(d.screen, "unknown")
+})
+
 test("「はい」が光っている時に画面が隠れ、戻ってきたら先頭からやり直す（戻ってすぐ押しても送信にならない）", () => {
   const d = driver()
   const yesAt = atYes(d)

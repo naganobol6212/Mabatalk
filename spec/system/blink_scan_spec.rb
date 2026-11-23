@@ -58,6 +58,38 @@ RSpec.describe "まばたきスキャン画面で選んで伝える", type: :sys
     expect(page).to have_css(highlighted("confirm:yes"), wait: 10)
   end
 
+  # 1 回目の送信だけ「サーバーには届いて保存されたが、返事はまだ届いていない」ことにする。
+  # 返事は deliver_held_response を呼ぶまで渡さない（打ち切られても渡す = 遅れて届いた返事）。送った送信ID は控える
+  def hold_first_response
+    page.execute_script(<<~JS)
+      const realFetch = window.fetch.bind(window)
+      window.sentSubmissionIds = []
+      window.fetch = (url, options) => {
+        window.sentSubmissionIds.push(JSON.parse(options.body).submission_id)
+        const { signal, ...withoutSignal } = options
+        if (window.sentSubmissionIds.length > 1) return realFetch(url, options)
+        const answered = realFetch(url, withoutSignal).then(async (res) => {
+          const body = await res.json()
+          return { status: res.status, json: async () => body }
+        })
+        window.firstRequestAnswered = answered
+        return new Promise((resolve) => {
+          window.deliverHeldResponse = () => answered.then(resolve)
+        })
+      }
+    JS
+  end
+
+  # サーバーが 1 回目の送信に答え終わる（= 保存が終わる）まで待つ
+  def wait_until_first_request_is_answered
+    page.evaluate_async_script("window.firstRequestAnswered.then(() => arguments[0]())")
+  end
+
+  # 止めておいた返事を画面に渡し、画面がそれを受け取り終わるまで待つ
+  def deliver_held_response
+    page.evaluate_async_script("window.deliverHeldResponse().then(() => setTimeout(arguments[0], 0))")
+  end
+
   it "ゲスト: Space で選ぶ → 確認 → 「はい」→ 完了 → スキャンに戻る。記録は増えず、履歴に残らないと出る" do
     start_scan
 
@@ -237,6 +269,37 @@ RSpec.describe "まばたきスキャン画面で選んで伝える", type: :sys
 
       click_button t("unknown.retry")
 
+      expect(page).to have_content(t("done_html", name: "おちゃ"), wait: 10)
+      sent = page.evaluate_script("window.sentSubmissionIds")
+      expect(sent.size).to eq(2)
+      expect(sent.uniq.size).to eq(1)
+      expect(user.message_logs.sole.submission_id).to eq(sent.first)
+    end
+
+    it "保存はできたが返事が届く前に「停止」→「開始」: スキャンには戻らず「届いたか確認できません」に戻り、「もう一度送る」は同じ送信IDで、記録は 1 件だけ" do
+      user = create(:user, email: "taro@example.com", password: "password123")
+      log_in(user)
+      start_scan
+      hold_first_response
+      choose_tea_and_wait_for_yes
+      press
+      expect(page).to have_content(t("sending_html", name: "おちゃ"))
+      wait_until_first_request_is_answered
+      expect(user.message_logs.count).to eq(1)
+
+      click_button t("stop")
+      expect(page).to have_button(t("start"))
+      # 止めたあとで返事が届いても、完了表示にはしない
+      deliver_held_response
+      expect(page).to have_button(t("start"))
+      expect(page).to have_no_content(t("done_html", name: "おちゃ"))
+
+      click_button t("start")
+      expect(page).to have_content(t("unknown.title"))
+      expect(page).to have_content(t("unknown.target_html", name: "おちゃ"))
+      expect(page).to have_no_css("[data-highlighted]")
+
+      click_button t("unknown.retry")
       expect(page).to have_content(t("done_html", name: "おちゃ"), wait: 10)
       sent = page.evaluate_script("window.sentSubmissionIds")
       expect(sent.size).to eq(2)
