@@ -1,8 +1,16 @@
 class MessageLog < ApplicationRecord
+  # 送信ID の形: 8-4-4-4-12 桁の 16 進数（ブラウザの crypto.randomUUID() が作る形）
+  SUBMISSION_ID_FORMAT = /\A\h{8}-\h{4}-\h{4}-\h{4}-\h{12}\z/
+
   belongs_to :user
   belongs_to :flow_item, optional: true
 
   validates :flow_item, presence: true, on: :create
+  # 送信ID なし（今までのタップ操作）は nil のまま通す。同じ人の中で同じ ID は 1 件だけ
+  validates :submission_id,
+            format: { with: SUBMISSION_ID_FORMAT },
+            uniqueness: { scope: :user_id },
+            allow_nil: true
 
   before_create :capture_snapshot
 
