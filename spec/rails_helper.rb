@@ -22,6 +22,12 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
 
+# Rails 8 のテスト環境（eager_load が false のとき）は、config/routes.rb を最初のリクエストまで読み込まない。
+# Devise のマッピング（User → :user）は routes.rb の devise_for で作られるため、
+# リクエストより前に sign_in を呼ぶ例が最初に実行されると「Could not find a valid mapping」で落ちる。
+# CI は eager_load が true で起動時に読み込まれるので、ローカルもここで同じ状態にそろえる。
+Rails.application.reload_routes_unless_loaded
+
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
 # run as spec files by default. This means that files in spec/support that end
