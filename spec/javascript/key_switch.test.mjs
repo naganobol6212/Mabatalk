@@ -79,7 +79,7 @@ test("入力源（createKeySource）: 押した結果を、画面へ渡す形 { 
   assert.deepEqual(source.press(300, "b"), { now: 300, phase: "refractory", events: [{ type: "select", key: "b" }] })
 })
 
-const key = (fields) => ({ key: " ", repeat: false, altKey: false, ctrlKey: false, metaKey: false, onControl: false, ...fields })
+const key = (fields) => ({ key: " ", repeat: false, altKey: false, ctrlKey: false, metaKey: false, shiftKey: false, onControl: false, ...fields })
 
 test("キーの扱い: Space と Enter は「押した」になる", () => {
   assert.equal(keyIntent(key({ key: " " })), "press")
@@ -102,4 +102,10 @@ test("キーの扱い: Space / Enter 以外と、修飾キー（Ctrl・Alt・Cmd
   assert.equal(keyIntent(key({ ctrlKey: true })), "ignore")
   assert.equal(keyIntent(key({ altKey: true })), "ignore")
   assert.equal(keyIntent(key({ key: "Enter", metaKey: true })), "ignore")
+})
+
+test("キーの扱い: Shift 付きも、スキャン入力にしない（Shift+Space は上へのスクロール。くり返しも受け取らない）", () => {
+  assert.equal(keyIntent(key({ key: " ", shiftKey: true })), "ignore")
+  assert.equal(keyIntent(key({ key: "Enter", shiftKey: true })), "ignore")
+  assert.equal(keyIntent(key({ key: " ", shiftKey: true, repeat: true })), "ignore")
 })
