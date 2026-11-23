@@ -2,7 +2,7 @@
 // 「今の状態 + 入力」から「次の状態 + してほしいこと（effects）」を返すだけ。
 //
 // phase（scanView(state).screen で読める）:
-//   idle 開始前・介助者が止めた / running スキャン中（中身は scan_sequencer: scanning・confirming・paused）/
+//   idle 開始前・介助者が止めた（届いたか分からない送信があれば pending に残したまま止まる）/ running スキャン中（中身は scan_sequencer: scanning・confirming・paused）/
 //   suspended 画面が隠れている（戻ったら先頭から再開する）/ sending 送信中 / done 完了表示 /
 //   unknown 届いたか確認できない / halted 介助者を呼ぶ（読み込み直すまで動かない）
 //
@@ -20,6 +20,9 @@
 //   { type: "resetInput" }   入力源を最初の状態に戻す（前の押下・閉眼を持ち越さない）
 //
 // 送信ID は「はい」を決めた時に 1 回だけ作り、送り直しでも同じ値を使う。
+// 「止める」（入力を受けない）と「届いたか」（pending）は別に持つ: 記録できた・介助者を呼ぶ、のどちらかの
+// 返事が来るまで pending は消さない。送信中・「確認できません」で停止しても残し、次の「開始」は
+// スキャンではなく「確認できません」に戻す（消すと、次の「はい」が新しい送信ID になり二重に記録される）。
 // attempt は送信のたびに進む通し番号。止めたあと・送り直したあとに届いた古い返事を見分けて捨てる。
 
 import { DEFAULTS } from "./config.js"
@@ -120,6 +123,14 @@ function toIdle(state) {
   }
 }
 
+// 届いたか分からない送信を残したまま止める。failures: これまでに「届いたか分からない」で終わった回数
+function toIdleKeepingPending(state, failures) {
+  return {
+    state: { ...state, phase: "idle", scan: null, failures, attempt: state.attempt + 1 },
+    effects: [CANCEL_SEND, RESET_INPUT]
+  }
+}
+
 function send(state, pending) {
   const attempt = state.attempt + 1
   return {
@@ -159,9 +170,16 @@ function onSendResult(state, { now, attempt, outcome }) {
 
 // 入力ごとの「どの phase の時に、どうするか」。ここに無い組み合わせは何もしない。
 const handlers = {
-  start: { idle: restart },
+  start: { idle: (state) => (state.pending ? { state: { ...state, phase: "unknown" }, effects: [] } : restart(state)) },
 
-  stop: { running: toIdle, suspended: toIdle, sending: toIdle, done: toIdle, unknown: toIdle },
+  stop: {
+    running: toIdle,
+    suspended: toIdle,
+    done: toIdle,
+    // 返事を待たずに打ち切る（サーバーが保存を終えているかもしれない）
+    sending: (state) => toIdleKeepingPending(state, state.failures + 1),
+    unknown: (state) => toIdleKeepingPending(state, state.failures)
+  },
 
   suspend: {
     running: (state) => ({ state: { ...state, phase: "suspended", scan: null }, effects: [RESET_INPUT] }),
