@@ -102,6 +102,19 @@ for (const phase of ["closing", "noface"]) {
   })
 }
 
+test("目を閉じたことを受け取った tick では、時計を進めない（残り 50ms で閉じても切り替わらない）", () => {
+  const d = driver()
+  d.run(0, 2950)
+  d.tick(3000, "closing")
+  assert.equal(d.highlighted, "a", "閉じた目が届いた tick の 50ms は数えない")
+  d.run(3050, 3800, "closing")
+  d.tick(3850, "refractory")
+  d.tick(3900)
+  assert.equal(d.highlighted, "a")
+  d.tick(3950)
+  assert.equal(d.highlighted, "b", "開眼に戻ってから残りの 50ms で切り替わる")
+})
+
 test("3周だれも選ばなければ自動で休止する", () => {
   const d = driver()
   d.run(0, ROUND_MS * 3 - 50)
