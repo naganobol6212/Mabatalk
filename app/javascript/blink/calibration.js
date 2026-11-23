@@ -40,8 +40,9 @@ function measure(openFrames, closedFrames, eye) {
   const closed = median(closedScores)
   const thresholds = computeThresholds(open, closed)
   if (!thresholds.ok) return thresholds
-  const openHigh = percentile(openScores, CALIBRATION.spreadPercentile)
-  const closedLow = percentile(closedScores, 1 - CALIBRATION.spreadPercentile)
+  // 外れ値を除いたうえで、開いた目のいちばん高い値が、閉じた目のいちばん低い値に届いていたら重なり
+  const openHigh = openScores[openScores.length - 1 - outlierCount(openScores)]
+  const closedLow = closedScores[outlierCount(closedScores)]
   if (openHigh >= closedLow) return { ok: false, reason: "overlap" }
   return { ok: true, eye, open, closed, contrast: closed - open, ...thresholds }
 }
@@ -68,10 +69,9 @@ function median(sorted) {
   return sorted.length % 2 === 1 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2
 }
 
-// 小さい順に並んだ値の、下から ratio の位置にある値（nearest-rank）
-function percentile(sorted, ratio) {
-  const rank = Math.ceil(ratio * sorted.length - EPSILON)
-  return sorted[Math.min(sorted.length, Math.max(1, rank)) - 1]
+// 片側で外れ値として除く件数
+function outlierCount(scores) {
+  return Math.floor(scores.length * CALIBRATION.outlierRatio + EPSILON)
 }
 
 function inRange(value, range) {
