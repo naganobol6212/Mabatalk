@@ -1,6 +1,7 @@
 // blink_switch（まばたき判定）と scan_sequencer（スキャン順）を、公開されている入口だけでつないだテスト。
 // 画面側がつなぐ時と同じ順番で呼ぶ（scan_sequencer.js の先頭に書いた決まり）:
-//   フレームが届く → stepBlinkSwitch → 出てきた select を stepScan へ → stepScan の tick
+//   結果が届いた時: stepBlinkSwitch（frame）→ 出てきた select を stepScan へ → stepScan の tick
+//   届かない時:     stepBlinkSwitch（tick）→ その戻りの phase で stepScan の tick
 import { test } from "node:test"
 import assert from "node:assert/strict"
 import { DEFAULTS } from "../../app/javascript/blink/config.js"
@@ -25,6 +26,7 @@ function driver() {
   let scan = startScan(ITEMS, SETTINGS).state
   let seq = 0
   const events = []
+  const inFlight = []
   const d = {
     events,
     get phase() { return blink.phase },
@@ -72,6 +74,15 @@ function driver() {
     // 撮ってすぐ（latency ミリ秒後に）届く。撮影と到着のあいだに別の入力が無い時の近道。
     frame(capturedAt, score, latency = 0) {
       d.deliver(d.capture(capturedAt, score), capturedAt + latency)
+    },
+    // 結果がおくれて届く時の 1 コマ: now までに届く結果があれば順に到着、無ければ tick。
+    // そのあと score の目を撮り、latency ミリ秒後に届くよう預ける（score を渡さなければ撮らない）。
+    beat(now, score, latency = 0) {
+      const arrived = inFlight.filter((flying) => flying.arriveAt <= now)
+      inFlight.splice(0, arrived.length)
+      if (arrived.length === 0) d.tick(now)
+      for (const flying of arrived) d.deliver(flying.frame, now)
+      if (score !== undefined) inFlight.push({ frame: d.capture(now, score), arriveAt: now + latency })
     },
     run(from, to, score) {
       for (let t = from; t <= to; t += FRAME_MS) d.frame(t, score)
@@ -152,6 +163,96 @@ test("つないだ時: ふつうのまばたき（300ms）では何も選ばれ�
   assert.equal(d.count("select"), 0)
   assert.equal(d.mode, "scanning")
   assert.equal(d.highlighted, "a")
+  // 「a」の 3000ms は、閉じる前には 1 コマも使っていない（開眼と分かった 300ms の次が、もう閉眼）。
+  // 開眼に戻った 700ms から残り 3000ms を数えるので、3700ms で「b」へ移る
+  d.run(750, 3650, OPEN)
+  assert.equal(d.highlighted, "a")
+  d.frame(3700, OPEN)
+  assert.equal(d.highlighted, "b")
+  assert.equal(d.count("select"), 0)
+})
+
+test("つないだ時: 保持時間（800ms）に届いたフレームがもう開眼でも、合図・決定・確認開始が 1 回ずつ順に出る", () => {
+  const d = driver()
+  d.run(0, 300, OPEN)
+  // 350ms から閉じ、1100ms（750ms 目）まで閉眼。次の 1150ms（800ms 目）のフレームは開眼
+  d.run(350, 1100, CLOSED)
+  assert.equal(d.count("holdReached"), 0)
+  d.frame(1150, OPEN)
+  const types = ["holdReached", "select", "confirmStarted"]
+  assert.deepEqual(d.events.filter((e) => types.includes(e.type)), [
+    { type: "holdReached", key: "a" },
+    { type: "select", key: "a" },
+    { type: "confirmStarted", key: "a" }
+  ])
+  assert.equal(d.mode, "confirming")
+  // そのあと開眼が続いても、同じまばたきからもう 1 回は出ない
+  d.run(1200, 1500, OPEN)
+  assert.equal(d.count("holdReached"), 1)
+  assert.equal(d.count("select"), 1)
+  assert.equal(d.count("confirmStarted"), 1)
+})
+
+// 50ms ごとに撮った結果が、150 / 200 / 250 / 200ms … とばらついておくれて届く（届く順は撮った順のまま）
+const LATENCIES = [150, 200, 250, 200]
+const latencyAt = (t) => LATENCIES[(t / FRAME_MS) % LATENCIES.length]
+
+test("つないだ時: 結果が 150〜250ms おくれて届き、そのあいだに光る項目が移っても、長いまばたきは撮った時に光っていた項目の決定になる", () => {
+  const d = driver()
+  // 300ms に撮った開眼が 550ms に届いて開眼と分かる。「a」は 550ms から 3000ms 光り、3550ms で「b」へ移る。
+  // 3450ms（まだ「a」）に目を閉じたが、その結果が届くのは 3650ms（もう「b」）
+  for (let t = 0; t <= 3400; t += FRAME_MS) d.beat(t, OPEN, latencyAt(t))
+  assert.equal(d.highlighted, "a")
+  for (let t = 3450; t <= 3600; t += FRAME_MS) d.beat(t, CLOSED, latencyAt(t))
+  assert.equal(d.phase, "open", "閉じた結果は、まだ届いていない")
+  assert.equal(d.highlighted, "b")
+  d.beat(3650, CLOSED, latencyAt(3650))
+  assert.equal(d.phase, "closing")
+  // 4250ms まで閉じ（800ms）、4300ms に開ける。その結果は 4550ms に届く
+  for (let t = 3700; t <= 4250; t += FRAME_MS) d.beat(t, CLOSED, latencyAt(t))
+  for (let t = 4300; t <= 4500; t += FRAME_MS) d.beat(t, OPEN, latencyAt(t))
+  assert.equal(d.count("select"), 0)
+  d.beat(4550)
+  assert.deepEqual(d.last("select"), { type: "select", key: "a" })
+  assert.deepEqual(d.last("confirmStarted"), { type: "confirmStarted", key: "a" })
+  assert.equal(d.count("select"), 1)
+  assert.equal(d.count("cancel"), 0)
+})
+
+test("つないだ時: 結果が届く前の tick で確認が時間切れになったら、前の画面で撮った結果はあとから届いても捨てる", () => {
+  const d = driver()
+  const t = confirmingA(d)
+  d.run(t + FRAME_MS, t + 7950, OPEN)
+  assert.equal(d.highlighted, CONFIRM_YES)
+  // 「はい」が光っている t+7990 に閉じた目を撮ったが、結果が届く前に t+8000 の tick が来る
+  const late = d.capture(t + 7990, CLOSED)
+  d.tick(t + 8000)
+  assert.deepEqual(d.last("confirmCancelled"), { type: "confirmCancelled", reason: "timeout" })
+  assert.equal(d.mode, "scanning")
+  assert.equal(d.highlighted, "a")
+  d.deliver(late, t + 8010)
+  assert.deepEqual(d.events.at(-1), { type: "discard", reason: "generation" })
+  assert.equal(d.phase, "open")
+  assert.equal(d.count("confirmed"), 0)
+  assert.equal(d.count("select"), 1, "決定は、最初に「a」を選んだ 1 回だけ")
+})
+
+// PR1 の限界（まだ直していない。画面につなぐ PR2 で直す）:
+// 上の列の続き。前の画面の「はい」に向けて閉じた目が、時間切れのあとも閉じたままだと、
+// 新しい画面で最初に届いた閉眼フレームから数え直され、同じ 1 回のまばたきが先頭の「a」の決定になる。
+// 直す時の決まり: 画面が自動で切り替わったあとは、新しい画面で開眼を見るまで閉眼の始まりを受け付けない。
+// 今はこのテストは落ちる（select が 2 回になる）ので todo にしてある。
+test("つないだ時: 時間切れで画面が切り替わる前から閉じていた目は、新しい画面の項目の決定にならない", { todo: "PR2 で直す" }, () => {
+  const d = driver()
+  const t = confirmingA(d)
+  d.run(t + FRAME_MS, t + 7950, OPEN)
+  const late = d.capture(t + 7990, CLOSED)
+  d.tick(t + 8000)
+  d.deliver(late, t + 8010)
+  d.run(t + 8040, t + 8790, CLOSED)
+  d.frame(t + 8840, OPEN)
+  assert.equal(d.count("select"), 1)
+  assert.equal(d.count("confirmStarted"), 1)
 })
 
 test("つないだ時: フレームが届かなくなって 500ms たつと準備中へ戻ってスキャンが止まり、開眼を確かめ直すと残り時間から再開する", () => {
