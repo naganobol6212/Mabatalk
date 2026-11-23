@@ -74,6 +74,7 @@ export default class extends Controller {
       altKey: event.altKey,
       ctrlKey: event.ctrlKey,
       metaKey: event.metaKey,
+      shiftKey: event.shiftKey,
       onControl
     })
     if (intent === "ignore" || !SCANNING_SCREENS.includes(this.view.screen)) return
