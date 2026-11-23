@@ -45,9 +45,10 @@ RSpec.describe "まばたきスキャン画面で選んで伝える", type: :sys
       const visible = (element) => {
         const box = element.getBoundingClientRect()
         if (box.top < 0 || box.left < 0 || box.bottom > window.innerHeight || box.right > window.innerWidth) return false
-        const middle = [(box.left + box.right) / 2, (box.top + box.bottom) / 2]
-        const corners = [[box.left + 4, box.top + 4], [box.right - 4, box.top + 4], [box.left + 4, box.bottom - 4], [box.right - 4, box.bottom - 4]]
-        return [middle, ...corners].every(([x, y]) => element.contains(document.elementFromPoint(x, y)))
+        // 中央と、上下左右の辺の少し内側（角は丸いので使わない）で、いちばん手前にあるのがその項目であること
+        const [x, y] = [(box.left + box.right) / 2, (box.top + box.bottom) / 2]
+        const points = [[x, y], [x, box.top + 4], [x, box.bottom - 4], [box.left + 4, y], [box.right - 4, y]]
+        return points.every(([px, py]) => element.contains(document.elementFromPoint(px, py)))
       }
       const scan = document.querySelector("[data-controller~='scan']")
       window.scanWatch = { seen: {}, questionSeen: [] }
