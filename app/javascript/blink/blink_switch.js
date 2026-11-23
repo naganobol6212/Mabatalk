@@ -115,6 +115,9 @@ function acceptFrame(state, { now, frame }, settings, events) {
 
   next = { ...next, lastSeq: frame.seq, lastCapturedAt: t, lastReceivedAt: now }
   if (eye === "unusable") return onUnusable(next, t, settings, events)
+  // 顔が戻ったフレームでも猶予の期限を確かめる。使えないフレームが来た時だけ確かめると、
+  // 猶予を過ぎてから戻った顔が、開眼の確認（準備中）を通らずにそのまま続いてしまう。
+  if (graceExpired(next, t, settings)) next = toNoFace(next, events)
   next = { ...next, lastFace: frame.face, unusableSince: null }
   return onEye[next.phase](next, eye, t, frame, settings, events)
 }
@@ -141,9 +144,13 @@ function faceJumped(previous, current) {
 function onUnusable(state, t, settings, events) {
   if (state.phase === "noface") return state
   if (state.phase !== "open" && state.phase !== "refractory") return toNoFace(state, events)
-  const unusableSince = state.unusableSince ?? t
-  if (t - unusableSince > settings.faceLostGraceMs) return toNoFace(state, events)
-  return { ...state, unusableSince }
+  const waiting = { ...state, unusableSince: state.unusableSince ?? t }
+  return graceExpired(waiting, t, settings) ? toNoFace(waiting, events) : waiting
+}
+
+// 最初に使えなくなったフレームから数えて、猶予を超えたか（ちょうどは超えていない）。
+function graceExpired(state, t, settings) {
+  return state.unusableSince !== null && t - state.unusableSince > settings.faceLostGraceMs
 }
 
 // 状態ごとの「目の様子を見たらどうするか」。しきい値のあいだ（between）は、
