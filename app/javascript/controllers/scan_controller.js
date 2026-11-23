@@ -36,7 +36,8 @@ export default class extends Controller {
     if (!this.session) this.prepare()
     this.apply({ type: "start" })
     // 押した「開始」ボタンは隠れる。そのあとのキーがスキャン入力になるよう、スキャン領域へフォーカスを移す
-    if (this.view.screen !== "idle") this.stageTarget.focus()
+    // （フォーカスでページを動かさない。光っている項目を見える所に置くのは keepInView がする）
+    if (this.view.screen !== "idle") this.stageTarget.focus({ preventScroll: true })
   }
 
   stop() {
@@ -186,6 +187,8 @@ export default class extends Controller {
       element.toggleAttribute("data-highlighted", on)
     }
 
+    this.keepInView(view)
+
     // 名前は文字として入れる（HTML として解釈させない）
     const pendingName = this.itemTargets.find((item) => item.dataset.key === view.pendingKey)?.dataset.name ?? ""
     for (const element of this.pendingNameTargets) element.textContent = pendingName
@@ -193,5 +196,14 @@ export default class extends Controller {
     this.guestNoteTarget.hidden = !view.done || view.done.savedToHistory
     this.repeatedNoteTarget.hidden = view.failures < 2
     for (const element of this.haltReasonTargets) element.hidden = element.dataset.reason !== view.haltReason
+  }
+  // いま見てほしい所が画面の外にあれば、見える所までページを動かす（本人はスクロールできない）。
+  // 確認・完了などはその表示全体を先に、光っている項目をあとに合わせる（入りきらない時は光っている方を優先）。
+  // 固定表示のヘッダー・下のメニューに隠れない余白は、view 側の scroll-mt / scroll-mb で取っている
+  keepInView(view) {
+    if (view.screen === "idle") return
+    const panel = this.panelTargets.find((element) => element.dataset.screens === view.screen)
+    const highlighted = this.highlightableTargets.find((element) => element.dataset.key === view.highlightedKey)
+    for (const element of [panel, highlighted]) element?.scrollIntoView({ block: "nearest" })
   }
 }
