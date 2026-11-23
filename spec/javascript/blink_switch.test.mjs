@@ -462,6 +462,68 @@ test("撮影時刻が逆戻りしたフレームは捨てる（状態は変わ�
   assert.deepEqual(d.state, before)
 })
 
+// ---- 時計・通し番号がおかしい入力 ----
+
+test("撮影時刻が「今」より先のフレームは捨てる（状態は変わらない）", () => {
+  const d = opened()
+  d.run(350, 1150, CLOSED)
+  const before = d.state
+  const events = d.feed(1200, OPEN, { latency: -10 })
+  assert.deepEqual(events, [{ type: "discard", reason: "invalidTime" }])
+  assert.deepEqual(d.state, before)
+})
+
+test("撮影時刻が「今」と同じフレームは使う", () => {
+  const d = opened()
+  d.run(350, 1150, CLOSED)
+  d.feed(1200, OPEN, { latency: 0 })
+  assert.equal(d.count("select"), 1)
+})
+
+for (const [label, bad] of [["NaN", NaN], ["Infinity", Infinity], ["undefined", undefined], ["文字列", "1200"]]) {
+  test(`撮影時刻が数値でない（${label}）フレームは捨てる`, () => {
+    const d = opened()
+    d.run(350, 1150, CLOSED)
+    const before = d.state
+    const frame = { capturedAt: bad, seq: 999, generation: 0, highlightedKey: "A", faceDetected: true, leftScore: OPEN, rightScore: OPEN, face: FACE }
+    const result = stepBlinkSwitch(before, { type: "frame", now: 1200, currentGeneration: 0, frame }, SETTINGS)
+    assert.deepEqual(result.events, [{ type: "discard", reason: "invalidTime" }])
+    assert.deepEqual(result.state, before)
+  })
+
+  test(`「今」の時刻が数値でない（${label}）フレームは捨てる`, () => {
+    const d = opened()
+    d.run(350, 1150, CLOSED)
+    const before = d.state
+    const frame = { capturedAt: 1200, seq: 999, generation: 0, highlightedKey: "A", faceDetected: true, leftScore: OPEN, rightScore: OPEN, face: FACE }
+    const result = stepBlinkSwitch(before, { type: "frame", now: bad, currentGeneration: 0, frame }, SETTINGS)
+    assert.deepEqual(result.events, [{ type: "discard", reason: "invalidTime" }])
+    assert.deepEqual(result.state, before)
+  })
+
+  test(`時刻が数値でない（${label}）tick は無視する（保持を取り消さない）`, () => {
+    const d = opened()
+    d.run(350, 1150, CLOSED)
+    const before = d.state
+    const events = d.tick(bad)
+    assert.deepEqual(events, [{ type: "discard", reason: "invalidTime" }])
+    assert.deepEqual(d.state, before)
+    d.feed(1200, OPEN)
+    assert.equal(d.count("select"), 1)
+  })
+}
+
+for (const [label, bad] of [["小数", 20.5], ["NaN", NaN], ["undefined", undefined], ["文字列", "999"]]) {
+  test(`通し番号が整数でない（${label}）フレームは捨てる`, () => {
+    const d = opened()
+    d.run(350, 1150, CLOSED)
+    const before = d.state
+    const events = d.feed(1200, OPEN, { seq: bad })
+    assert.deepEqual(events, [{ type: "discard", reason: "invalidSeq" }])
+    assert.deepEqual(d.state, before)
+  })
+}
+
 test("通し番号が戻ったフレームは捨てる", () => {
   const d = opened()
   d.run(350, 1150, CLOSED)

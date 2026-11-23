@@ -306,6 +306,18 @@ test("時刻が逆戻りした tick は無視する", () => {
   assert.equal(d.highlighted, "b")
 })
 
+for (const [label, bad] of [["NaN", NaN], ["Infinity", Infinity], ["undefined", undefined]]) {
+  test(`時刻が数値でない（${label}）tick は無視する（そのあとも時計は正しく進む）`, () => {
+    const d = driver()
+    d.run(0, 1000)
+    assert.deepEqual(d.tick(bad), [])
+    d.run(1050, 2950)
+    assert.equal(d.highlighted, "a")
+    d.tick(3000)
+    assert.equal(d.highlighted, "b")
+  })
+}
+
 test("入力の状態オブジェクトを書き換えない", () => {
   const started = startScan(ITEMS, DEFAULTS)
   const frozen = Object.freeze({ ...started.state })
