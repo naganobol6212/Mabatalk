@@ -56,7 +56,7 @@ class DetailFlowsController < ApplicationController
   private
 
   def set_flow_item
-    @flow_item = FlowItem.find_by!(key: params[:flow_item_key])
+    @flow_item = FlowItem.for_user(current_user).find_by!(key: params[:flow_item_key])
   end
 
   def verify_system_flow_item
