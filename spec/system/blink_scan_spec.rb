@@ -181,6 +181,17 @@ RSpec.describe "まばたきスキャン画面で選んで伝える", type: :sys
     expect(page).to have_no_css("[data-highlighted]")
   end
 
+  it "Shift を押しながらの Space は、スキャン入力にならない（何も選ばれない）" do
+    start_scan
+
+    expect(page).to have_css(highlighted(tea.key), wait: 10)
+    page.driver.browser.action.key_down(:shift).send_keys(:space).key_up(:shift).perform
+
+    # 選ばれていれば、押した時点で確認に入っている。選ばれていないので確認は出ず、そのまま次の定型文が光る
+    expect(page).to have_no_content(t("confirm_question_html", name: "おちゃ"), wait: 0)
+    expect(page).to have_css(highlighted(water.key), wait: 10)
+  end
+
   it "「開始」を押す前は、Space を押しても何も選ばれない" do
     open_scan
 
