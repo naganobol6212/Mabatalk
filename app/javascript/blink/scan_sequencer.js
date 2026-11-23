@@ -128,6 +128,8 @@ const onSelect = {
 }
 
 function onTick(state, { now, eyePhase }, settings, events) {
+  // 有限の数値でない時刻は無視する（覚えてしまうと、そのあとの間隔が計算できず時計が止まったままになる）
+  if (typeof now !== "number" || !Number.isFinite(now)) return state
   if (state.lastTickAt !== null && now < state.lastTickAt) return state
   const isOpen = eyePhase === "open"
   const gap = state.lastTickAt === null ? 0 : now - state.lastTickAt

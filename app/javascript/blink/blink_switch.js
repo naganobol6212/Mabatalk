@@ -18,8 +18,17 @@
 //   { type: "rest", key }          閉じたままが長いので休憩とみなした（決定しない）
 //   { type: "cancel", reason, key } 候補を捨てた
 //       reason: shortBlink / faceLost / faceChanged / frameGap / watchdog / generationChanged
-//   { type: "discard", reason }    届いた結果を使わなかった（状態は変わらない）
-//       reason: generation / stale / outOfOrder
+//   { type: "discard", reason }    届いた入力を使わなかった（状態は変わらない）
+//       reason: generation / stale / outOfOrder /
+//               invalidTime（now や capturedAt が有限の数値でない・capturedAt が now より先）/
+//               invalidSeq（seq が整数でない）
+//
+// 時計の決まり: now と capturedAt は同じ単調な時計（performance.now()）の値で、capturedAt ≦ now。
+// 別の基準の時計（Worker 側の performance.now() など）で capturedAt を作り直さないこと。
+// 守られていない入力は、判定に使わず入口で捨てる（上の invalidTime / invalidSeq）。
+//
+// 用語: ここの「休憩（rest）」は、目を長く閉じたままなので決定しないという判定の状態。
+// scan_sequencer の「休止（paused）」は、スキャンを止めている画面の状態で、別のもの。
 //
 // 限界: 顔が1つ映っていることは、それが本人であることを意味しない。
 // 顔の位置・大きさの急変で取り消すのは、その取り違えを減らすための手当てにすぎない。
@@ -52,6 +61,9 @@ export function eyeScore(frame, eye) {
 }
 
 export function stepBlinkSwitch(state, input, settings) {
+  const invalid = invalidInputReason(input)
+  if (invalid) return { state, events: [{ type: "discard", reason: invalid }] }
+
   const events = []
   let next = syncGeneration(state, input.currentGeneration, events)
   if (input.type === "tick") next = watch(next, input.now, events)
@@ -61,6 +73,16 @@ export function stepBlinkSwitch(state, input, settings) {
     next = acceptFrame(next, input, settings, events)
   }
   return { state: next, events }
+}
+
+// 時計や通し番号がおかしい入力は、状態に触れる前に捨てる。
+// NaN は大小の比べ方がすべて false になるので、通すと「古くない」「途切れていない」と誤って扱われる。
+function invalidInputReason({ type, now, frame }) {
+  if (!isNumber(now)) return "invalidTime"
+  if (type !== "frame") return null
+  if (!isNumber(frame?.capturedAt) || frame.capturedAt > now) return "invalidTime"
+  if (!Number.isInteger(frame.seq)) return "invalidSeq"
+  return null
 }
 
 function toArming(state, reason, events) {
