@@ -14,6 +14,7 @@ export const DEFAULTS = Object.freeze({
   firstStepRatio: 1.5,
   autoPauseRounds: 3,
   confirmRounds: 2,
+  doneMs: 4000,
   calibrationStaleHours: 12
 })
 
@@ -28,6 +29,7 @@ export const RANGES = Object.freeze({
   firstStepRatio: Object.freeze({ min: 1, max: 2 }),
   autoPauseRounds: Object.freeze({ min: 1, max: 10, step: 1 }),
   confirmRounds: Object.freeze({ min: 1, max: 5, step: 1 }),
+  doneMs: Object.freeze({ min: 2000, max: 10000 }),
   calibrationStaleHours: Object.freeze({ min: 1, max: 48 })
 })
 
@@ -39,6 +41,8 @@ export const FIXED = Object.freeze({
   maxFrameGapMs: 250,
   maxResultAgeMs: 300,
   watchdogMs: 500,
+  // 記録の送信は、これだけ待って返事が無ければ「届いたか確認できません」にする
+  sendTimeoutMs: 10000,
   // 顔の連続性。設計書に数値が無いための仮の値で、実機の記録を見て決め直す。
   // 直前のフレームから、顔の中心が「顔の大きさ × 0.5」より大きく動くか、
   // 顔の大きさが 1.3 倍（または 1/1.3）を超えて変わったら、別の顔に切り替わった疑いとみなす。
