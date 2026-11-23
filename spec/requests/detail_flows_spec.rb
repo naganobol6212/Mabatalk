@@ -114,4 +114,78 @@ RSpec.describe "DetailFlows", type: :request do
       end
     end
   end
+
+  # 詳細フローで使える定型文（FlowItem）は「共有（user_id が nil）」だけ。
+  # 他人の非公開の定型文は、key を知っていても「存在しない key」と同じ 404 を返す。
+  describe "定型文の公開範囲" do
+    let(:other_user) { create(:user) }
+    let(:shared_item) do
+      create(:flow_item, user: nil, name: "共有の飲みもの", detail_flow_key: "drink_detail")
+    end
+    let(:others_private_item) do
+      create(:flow_item, user: other_user, icon_color: "gray",
+                         name: "他人の秘密の定型文", detail_flow_key: "drink_detail")
+    end
+
+    context "ログイン中のユーザーの場合" do
+      before { sign_in user }
+
+      it "共有の定型文は、表示から回答・完了画面まで進める" do
+        get detail_flow_step_path(shared_item.key, 0)
+        expect(response).to have_http_status(:ok)
+
+        post detail_flow_step_submit_path(shared_item.key, 0), params: { answer: "small" }
+        expect(response).to redirect_to(detail_flow_step_path(shared_item.key, 1))
+
+        expect {
+          post detail_flow_step_submit_path(shared_item.key, 1), params: { answer: "cold" }
+        }.to change { user.message_logs.count }.by(1)
+        expect(response).to redirect_to(message_completion_path)
+
+        get message_completion_path
+        expect(response.body).to include("共有の飲みもの")
+        expect(response.body).to include("量：少し、温度：冷たい")
+      end
+
+      it "他人の非公開の定型文を表示しようとすると 404 になり、session に入らない" do
+        get detail_flow_step_path(others_private_item.key, 0)
+
+        expect(response).to have_http_status(:not_found)
+        expect(session[:detail_flow]).to be_nil
+      end
+
+      it "他人の非公開の定型文に回答を送ると 404 になり、MessageLog が増えず、session に入らない" do
+        expect {
+          post detail_flow_step_submit_path(others_private_item.key, 0), params: { answer: "small" }
+        }.not_to change(MessageLog, :count)
+
+        expect(response).to have_http_status(:not_found)
+        expect(session[:detail_flow]).to be_nil
+      end
+
+      it "存在しない key を表示しようとすると 404 になる" do
+        get detail_flow_step_path("no-such-key", 0)
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "存在しない key に回答を送ると 404 になり、MessageLog が増えない" do
+        expect {
+          post detail_flow_step_submit_path("no-such-key", 0), params: { answer: "small" }
+        }.not_to change(MessageLog, :count)
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "ゲスト（未ログイン）の場合" do
+      it "他人の非公開の定型文でも、ログイン画面へ送られる" do
+        get detail_flow_step_path(others_private_item.key, 0)
+        expect(response).to redirect_to(new_user_session_path)
+
+        expect {
+          post detail_flow_step_submit_path(others_private_item.key, 0), params: { answer: "small" }
+        }.not_to change(MessageLog, :count)
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+  end
 end

@@ -44,5 +44,38 @@ RSpec.describe "MessageCompletions", type: :request do
         expect(response).to have_http_status(:ok)
       end
     end
+
+    # ゲストの完了画面は session[:last_flow_item_key] から定型文を引く。
+    # 引けるのは「共有（user_id が nil）」だけ。それ以外の key は「見つからない」表示にする。
+    describe "ゲストの session に残った定型文の key" do
+      let(:not_found_text) { "選択された内容が見つかりませんでした。" }
+
+      # 修正後は、他人の非公開の定型文の key を session に入れる正規の方法がない。
+      # そこで「共有のうちに選んで session に key が入り、そのあと他人の非公開になった」
+      # という流れで、古いセッションに他人の key が残っている状態を作る。
+      it "他人の非公開の定型文の key が残っていても、名前を出さず「見つからない」表示になる" do
+        item = create(:flow_item, user: nil, name: "あとで非公開になる定型文")
+        post message_logs_path, params: { flow_item_key: item.key }
+        item.update!(user: create(:user), icon_color: "gray")
+
+        get message_completion_path
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).not_to include("あとで非公開になる定型文")
+        expect(response.body).to include(not_found_text)
+      end
+
+      it "もう存在しない定型文の key が残っている場合も、同じ「見つからない」表示になる" do
+        item = create(:flow_item, user: nil, name: "あとで消える定型文")
+        post message_logs_path, params: { flow_item_key: item.key }
+        item.destroy!
+
+        get message_completion_path
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).not_to include("あとで消える定型文")
+        expect(response.body).to include(not_found_text)
+      end
+    end
   end
 end
