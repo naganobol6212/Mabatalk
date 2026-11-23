@@ -629,3 +629,38 @@ test("入力の状態オブジェクトを書き換えない", () => {
   assert.equal(frozen.phase, "noface")
   assert.equal(result.state.phase, "arming")
 })
+
+test("画面の世代が変わったあとは、新しい世代で開眼を見るまで、閉じた目を閉じ始めとして受け付けない", () => {
+  const d = opened()
+  // 開眼のまま画面が切り替わり（世代 0 → 1）、新しい画面の最初のフレームからもう閉じている
+  d.run(350, 1150, CLOSED, { generation: 1, currentGeneration: 1, highlightedKey: "B" })
+  assert.equal(d.phase, "open")
+  d.feed(1200, OPEN, { generation: 1, currentGeneration: 1, highlightedKey: "B" })
+  assert.deepEqual(d.events, [])
+})
+
+test("画面の世代が変わったあと、しきい値のあいだの目は開眼の確認にならない", () => {
+  const d = opened()
+  d.feed(350, BETWEEN, { generation: 1, currentGeneration: 1, highlightedKey: "B" })
+  d.run(400, 1200, CLOSED, { generation: 1, currentGeneration: 1, highlightedKey: "B" })
+  d.feed(1250, OPEN, { generation: 1, currentGeneration: 1, highlightedKey: "B" })
+  assert.deepEqual(d.events, [])
+})
+
+test("画面の世代が変わったあと、新しい世代で開眼を 1 フレーム見れば、次の長いまばたきはその画面の項目の決定になる", () => {
+  const d = opened()
+  d.feed(350, OPEN, { generation: 1, currentGeneration: 1, highlightedKey: "B" })
+  d.run(400, 1200, CLOSED, { generation: 1, currentGeneration: 1, highlightedKey: "B" })
+  d.feed(1250, OPEN, { generation: 1, currentGeneration: 1, highlightedKey: "B" })
+  assert.deepEqual(d.last("select"), { type: "select", key: "B" })
+  assert.equal(d.count("select"), 1)
+})
+
+test("見張りの tick で世代の変わり目を知った時も、新しい世代で開眼を見るまで閉じ始めを受け付けない", () => {
+  const d = opened()
+  d.tick(320, 1)
+  d.run(350, 1150, CLOSED, { generation: 1, currentGeneration: 1, highlightedKey: "B" })
+  d.feed(1200, OPEN, { generation: 1, currentGeneration: 1, highlightedKey: "B" })
+  assert.equal(d.count("select"), 0)
+  assert.equal(d.count("holdReached"), 0)
+})
