@@ -172,14 +172,16 @@ const onEye = {
     return { ...state, phase: "closing", candidateKey: frame.highlightedKey ?? null, since: t }
   },
 
-  closing(state, eye, t, _frame, settings, events) {
-    if (eye === "open") {
-      events.push({ type: "cancel", reason: "shortBlink", key: state.candidateKey })
-      return { ...state, phase: "open", candidateKey: null, since: null }
+  // 「保持時間の前に開いた」時だけ捨てる。保持時間に届いたフレームが開眼だった時は、
+  // 決定待ちに入ったうえで、同じフレームを決定待ちとして見る（holdReached と select を1回ずつ）。
+  closing(state, eye, t, frame, settings, events) {
+    if (t - state.since >= settings.holdMs) {
+      events.push({ type: "holdReached", key: state.candidateKey })
+      return onEye.ready({ ...state, phase: "ready" }, eye, t, frame, settings, events)
     }
-    if (t - state.since < settings.holdMs) return state
-    events.push({ type: "holdReached", key: state.candidateKey })
-    return { ...state, phase: "ready" }
+    if (eye !== "open") return state
+    events.push({ type: "cancel", reason: "shortBlink", key: state.candidateKey })
+    return { ...state, phase: "open", candidateKey: null, since: null }
   },
 
   ready(state, eye, t, _frame, settings, events) {
