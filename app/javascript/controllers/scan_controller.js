@@ -191,8 +191,6 @@ export default class extends Controller {
       element.toggleAttribute("data-highlighted", on)
     }
 
-    this.keepInView(view)
-
     // 名前は文字として入れる（HTML として解釈させない）
     const pendingName = this.itemTargets.find((item) => item.dataset.key === view.pendingKey)?.dataset.name ?? ""
     for (const element of this.pendingNameTargets) element.textContent = pendingName
@@ -200,7 +198,11 @@ export default class extends Controller {
     this.guestNoteTarget.hidden = !view.done || view.done.savedToHistory
     this.repeatedNoteTarget.hidden = view.failures < 2
     for (const element of this.haltReasonTargets) element.hidden = element.dataset.reason !== view.haltReason
+
+    // 中身（名前など）を入れ終えて、大きさが決まってから合わせる
+    this.keepInView(view)
   }
+
   // いま見てほしい所が画面の外にあれば、見える所までページを動かす（本人はスクロールできない）。
   // 確認・完了などはその表示全体を先に、光っている項目をあとに合わせる（入りきらない時は光っている方を優先）。
   // 固定表示のヘッダー・下のメニューに隠れない余白は、view 側の scroll-mt / scroll-mb で取っている
