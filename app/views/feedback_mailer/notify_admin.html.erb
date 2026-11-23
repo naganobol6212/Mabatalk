@@ -29,7 +29,7 @@
     <ul>
       <% @feedback.screenshots.each_with_index do |screenshot, i| %>
         <li>
-          <a href="<%= rails_blob_url(screenshot) %>" style="color: #0ea5e9;">
+          <a href="<%= admin_feedback_screenshot_url(@feedback, screenshot.blob.signed_id(purpose: Feedback::SCREENSHOT_SIGNED_ID_PURPOSE)) %>" style="color: #0ea5e9;">
             <%= i + 1 %>. <%= screenshot.filename %>
           </a>
         </li>

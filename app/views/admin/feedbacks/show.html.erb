@@ -41,7 +41,7 @@
           <div class="space-y-3">
             <% @feedback.screenshots.each do |screenshot| %>
               <div>
-                <%= image_tag screenshot, class: "rounded-xl border border-stone-200 max-w-full" %>
+                <%= image_tag admin_feedback_screenshot_path(@feedback, screenshot.blob.signed_id(purpose: Feedback::SCREENSHOT_SIGNED_ID_PURPOSE)), class: "rounded-xl border border-stone-200 max-w-full" %>
                 <p class="text-xs text-stone-500 mt-1">
                   <%= screenshot.filename %>
                 </p>

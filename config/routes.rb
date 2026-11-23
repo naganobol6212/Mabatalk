@@ -38,7 +38,9 @@ Rails.application.routes.draw do
   resources :feedbacks, only: %i[new create]
 
   namespace :admin do
-    resources :feedbacks, only: %i[index show], param: :key
+    resources :feedbacks, only: %i[index show], param: :key do
+      resources :screenshots, only: %i[show], param: :signed_id, controller: "feedback_screenshots"
+    end
   end
 
   # --- 以下はRails標準の補助機能 ---

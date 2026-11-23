@@ -21,6 +21,11 @@ module Myapp
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
+    # Active Storage が最初から用意する URL（/rails/active_storage/...）は、ログインを確かめずにファイルを返す。
+    # 添付（ご意見箱のスクリーンショット）は管理者だけに見せるため、この URL は全環境で作らない。
+    # 画像は Admin::FeedbackScreenshotsController から返す。
+    config.active_storage.draw_routes = false
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

@@ -7,6 +7,8 @@ class Feedback < ApplicationRecord
     "image/gif" => [".gif"]
   }.freeze
   BODY_MAX_LENGTH = 1000
+  # 添付画像の URL に入れる署名つき id の用途名。Active Storage 標準の signed_id（用途 :blob_id）とは互換にしない
+  SCREENSHOT_SIGNED_ID_PURPOSE = :feedback_screenshot
 
   belongs_to :user, optional: true
   has_many_attached :screenshots

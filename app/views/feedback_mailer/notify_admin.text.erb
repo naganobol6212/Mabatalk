@@ -12,7 +12,7 @@
 <% if @feedback.screenshots.attached? %>
 【スクリーンショット】
 <% @feedback.screenshots.each_with_index do |screenshot, i| %>
-  <%= i + 1 %>. <%= rails_blob_url(screenshot) %>
+  <%= i + 1 %>. <%= admin_feedback_screenshot_url(@feedback, screenshot.blob.signed_id(purpose: Feedback::SCREENSHOT_SIGNED_ID_PURPOSE)) %>
 <% end %>
 <% end %>
 
