@@ -218,6 +218,59 @@ RSpec.describe "CSRF 保護", type: :request do
     end
   end
 
+  # まばたきスキャン画面は、記録を fetch（JSON）で送る。フォームではないので、
+  # 画面の <meta name="csrf-token"> のトークンを X-CSRF-Token ヘッダーに付ける。
+  describe "まばたきスキャン画面からの記録（JSON）" do
+    let(:category) { create(:message_category, user: nil) }
+    let!(:flow_item) { create(:flow_item, message_category: category, user: nil, name: "まばたきで伝えた文") }
+    let(:scan_path) { message_category_blink_scan_path(category) }
+
+    def submit(token)
+      post message_logs_path,
+           params: { flow_item_key: flow_item.key, submission_id: SecureRandom.uuid }.to_json,
+           headers: { "Content-Type" => "application/json", "Accept" => "application/json", "X-CSRF-Token" => token }.compact
+    end
+
+    context "ゲスト（未ログイン）の場合" do
+      # ゲストは記録（MessageLog）を作らず、「最後に伝えた文」を session に覚える。完了画面に出なければ、覚えていない
+      def expect_nothing_happened
+        expect(MessageLog.count).to eq(0)
+        get message_completion_path
+        expect(response.body).not_to include("まばたきで伝えた文")
+      end
+
+      it "スキャン画面の meta トークン付きなら 201 で受け付ける" do
+        submit(meta_token(scan_path))
+
+        expect(response).to have_http_status(:created)
+        get message_completion_path
+        expect(response.body).to include("まばたきで伝えた文")
+      end
+
+      it_behaves_like "トークンが正しくない送信を拒否する"
+    end
+
+    context "ログイン中の場合" do
+      before do
+        token = form_token(new_user_session_path, action: user_session_path)
+        post user_session_path, params: { user: { email: "taro@example.com", password: password }, authenticity_token: token }
+      end
+
+      def expect_nothing_happened
+        expect(MessageLog.count).to eq(0)
+      end
+
+      it "スキャン画面の meta トークン付きなら 201 で記録される" do
+        token = meta_token(scan_path)
+
+        expect { submit(token) }.to change { user.message_logs.count }.by(1)
+        expect(response).to have_http_status(:created)
+      end
+
+      it_behaves_like "トークンが正しくない送信を拒否する"
+    end
+  end
+
   # Google ログインの開始（POST /users/auth/google_oauth2）は Rails のコントローラーではなく
   # OmniAuth のミドルウェアが受ける。omniauth-rails_csrf_protection がここでもトークンを確かめる。
   describe "Google ログインの開始" do
