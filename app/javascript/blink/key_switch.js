@@ -52,8 +52,9 @@ export function createKeySource(settings) {
 //   "swallow" … 押しっぱなしのくり返し。押したことにはしないが、画面がスクロールしないようキーは受け取る
 //   "ignore"  … スキャン入力ではない（ブラウザのふつうの動きに任せる）
 // onControl: フォーカスがボタン・リンク・入力欄などにある（介助者がふつうに押せるよう、スキャン入力にしない）
-export function keyIntent({ key, repeat, altKey, ctrlKey, metaKey, onControl }) {
-  if (onControl || altKey || ctrlKey || metaKey) return "ignore"
+// 修飾キー（Ctrl・Alt・Cmd・Shift）付きは、ブラウザの操作（Shift+Space は上へのスクロールなど）なので除く
+export function keyIntent({ key, repeat, altKey, ctrlKey, metaKey, shiftKey, onControl }) {
+  if (onControl || altKey || ctrlKey || metaKey || shiftKey) return "ignore"
   if (key !== " " && key !== "Enter") return "ignore"
   return repeat ? "swallow" : "press"
 }
