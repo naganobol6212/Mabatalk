@@ -29,7 +29,8 @@
     <meta name="color-scheme" content="light">
     <%= yield :head %>
 
-    <% if Rails.env.production? && ENV["GA_MEASUREMENT_ID"].present? %>
+    <%# content_for :skip_analytics を立てた画面（まばたきスキャン画面）には GA を出さない %>
+    <% if Rails.env.production? && ENV["GA_MEASUREMENT_ID"].present? && !content_for?(:skip_analytics) %>
       <!-- Google tag (gtag.js) -->
       <script async src="https://www.googletagmanager.com/gtag/js?id=<%= ENV["GA_MEASUREMENT_ID"] %>"></script>
       <script>
@@ -58,7 +59,8 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-<body data-controller="edit-mode">
+<%# content_for :turbo_disabled を立てた画面は、ヘッダー・フッターも含めて Turbo を使わない（出る時は読み込み直す） %>
+<body data-controller="edit-mode"<%= ' data-turbo="false"'.html_safe if content_for?(:turbo_disabled) %>>
   <%= render 'shared/header' %>
 
   <% flash.each do |type, message| %>
