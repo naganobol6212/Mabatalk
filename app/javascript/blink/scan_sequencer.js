@@ -25,12 +25,21 @@
 // state.generation は画面の状態（mode）が変わるたびに進む。光る項目が移るだけでは進まない。
 //
 // blink_switch とつなぐ時の呼び出し順（この順を守ること。spec/javascript/blink_scan_integration.test.mjs）:
-//   1. フレームを撮る時に、その時点の highlightedKey(state) と state.generation をフレームに付ける
-//   2. 結果が届いたら stepBlinkSwitch（currentGeneration は今の state.generation）
-//   3. 出てきた select イベントを、その場で stepScan の select へ渡す
-//   4. 最後に stepScan の tick（eyePhase は 2. のあとの blink_switch の phase）
-// 先に tick を呼ぶと、届いたばかりの閉じた目を知らないまま時計が進み、
-// 項目の切り替わりや時間切れが先に起きてしまう。フレームが届かない間の tick は、最後に分かっている phase で呼ぶ。
+//   フレームを撮る時:
+//     その時点の highlightedKey(state) と state.generation をフレームに付ける
+//   結果が届いた時:
+//     1. stepBlinkSwitch({ type: "frame", now, currentGeneration, frame })（currentGeneration は今の state.generation）
+//     2. 出てきた select イベントを、その場で stepScan の select へ渡す
+//     3. 最後に stepScan の tick（eyePhase は 1. のあとの blink_switch の phase）
+//   結果が届かないまま時間だけ進める時（定期の tick）:
+//     1. 先に stepBlinkSwitch({ type: "tick", now, currentGeneration })（結果が来ているかの見張り）
+//     2. その戻りの phase を eyePhase にして stepScan の tick
+// どちらの時も、stepScan の tick より先に stepBlinkSwitch を呼ぶ。
+// 結果が届いた時に先に tick を呼ぶと、届いたばかりの閉じた目を知らないまま時計が進み、
+// 項目の切り替わりや時間切れが先に起きてしまう。
+// 届かない時に見張りの tick を飛ばして前の phase のまま stepScan の tick だけ呼ぶと、
+// 推論が止まっても phase が open のまま残り、誰も見ていないのにスキャンが進み続ける
+// （見張りは最後の結果から 500ms で準備中へ戻し、開眼を確かめ直すまで時計を止める）。
 //
 // 用語: ここの「休止（paused）」は、スキャンを止めて長いまばたきを待つ画面の状態。
 // blink_switch の「休憩（rest）」は、目を長く閉じたままなので決定しないという判定の状態で、別のもの。

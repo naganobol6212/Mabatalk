@@ -8,6 +8,8 @@
 // 入力:
 //   { type: "frame", now, currentGeneration, frame }  推論結果が1つ届いた
 //   { type: "tick", now, currentGeneration }          結果が来ているかの見張り
+//       結果が届かない間も定期的に呼ぶ。scan_sequencer の tick より先に呼び、戻りの phase を渡す
+//       （呼び出し順は scan_sequencer.js の先頭）
 //   frame = { capturedAt, seq, generation, highlightedKey, faceDetected,
 //             leftScore, rightScore, face: { x, y, size } }
 //   leftScore / rightScore は本人から見た左右の「閉じ具合」（0〜1）。
