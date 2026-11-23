@@ -30,25 +30,23 @@ function driver() {
     get phase() { return blink.phase },
     get mode() { return scan.mode },
     get highlighted() { return highlightedKey(scan) },
-    // capturedAt に撮ったフレームが latency ミリ秒おくれて届く。
-    // 撮ってから届くまでの間に画面は変わっていない（間に別の入力が無い）前提。
-    frame(capturedAt, score, latency = 0) {
-      const now = capturedAt + latency
-      const judged = stepBlinkSwitch(blink, {
-        type: "frame",
-        now,
-        currentGeneration: scan.generation,
-        frame: {
-          capturedAt,
-          seq: seq++,
-          generation: scan.generation,
-          highlightedKey: highlightedKey(scan),
-          faceDetected: true,
-          leftScore: score,
-          rightScore: score,
-          face: FACE
-        }
-      }, SETTINGS)
+    // 撮影: その時に光っている項目と画面の世代を付けたフレームを作るだけ（判定はまだ進めない）
+    capture(capturedAt, score) {
+      return {
+        capturedAt,
+        seq: seq++,
+        generation: scan.generation,
+        highlightedKey: highlightedKey(scan),
+        faceDetected: true,
+        leftScore: score,
+        rightScore: score,
+        face: FACE
+      }
+    },
+    // 到着: 撮っておいたフレームの結果が now に届いた。
+    // stepBlinkSwitch → 出てきた select を stepScan へ → stepScan の tick の順。
+    deliver(frame, now) {
+      const judged = stepBlinkSwitch(blink, { type: "frame", now, currentGeneration: scan.generation, frame }, SETTINGS)
       blink = judged.state
       events.push(...judged.events)
       for (const event of judged.events) {
@@ -57,9 +55,23 @@ function driver() {
         scan = selected.state
         events.push(...selected.events)
       }
+      d.tickScan(now)
+    },
+    // フレームが届かない時の tick: 先に stepBlinkSwitch の見張り tick → その戻りの phase で stepScan の tick。
+    tick(now) {
+      const watched = stepBlinkSwitch(blink, { type: "tick", now, currentGeneration: scan.generation }, SETTINGS)
+      blink = watched.state
+      events.push(...watched.events)
+      d.tickScan(now)
+    },
+    tickScan(now) {
       const ticked = stepScan(scan, { type: "tick", now, eyePhase: blink.phase }, SETTINGS)
       scan = ticked.state
       events.push(...ticked.events)
+    },
+    // 撮ってすぐ（latency ミリ秒後に）届く。撮影と到着のあいだに別の入力が無い時の近道。
+    frame(capturedAt, score, latency = 0) {
+      d.deliver(d.capture(capturedAt, score), capturedAt + latency)
     },
     run(from, to, score) {
       for (let t = from; t <= to; t += FRAME_MS) d.frame(t, score)
@@ -140,4 +152,29 @@ test("つないだ時: ふつうのまばたき（300ms）では何も選ばれ�
   assert.equal(d.count("select"), 0)
   assert.equal(d.mode, "scanning")
   assert.equal(d.highlighted, "a")
+})
+
+test("つないだ時: フレームが届かなくなって 500ms たつと準備中へ戻ってスキャンが止まり、開眼を確かめ直すと残り時間から再開する", () => {
+  const d = driver()
+  d.run(0, 300, OPEN)
+  assert.equal(d.phase, "open")
+  // 300ms を最後にフレームが届かない。見張りの tick だけが 50ms ごとに来る
+  for (let t = 350; t <= 750; t += FRAME_MS) d.tick(t)
+  d.tick(799)
+  assert.equal(d.phase, "open", "最後に届いてから 499ms は、まだ開眼のまま")
+  d.tick(800)
+  assert.equal(d.phase, "arming", "500ms ちょうどで準備中へ戻る")
+  // 「a」は 300ms から 3000ms 光る予定だった。止まっていなければ 3300ms で「b」へ移る
+  for (let t = 850; t <= 4000; t += FRAME_MS) d.tick(t)
+  assert.equal(d.phase, "arming")
+  assert.equal(d.highlighted, "a", "準備中はスキャンの時計が止まる")
+  assert.equal(d.count("highlight"), 0)
+  // フレームが戻る。開眼を 300ms 続けて見て（4350ms）から、時計がまた進む
+  d.run(4050, 4350, OPEN)
+  assert.equal(d.phase, "open")
+  // 止まるまでに 499ms 使ったので、残りは 2501ms。4350 + 2501 = 6851ms で「b」へ移る
+  d.run(4400, 6850, OPEN)
+  assert.equal(d.highlighted, "a")
+  d.frame(6900, OPEN)
+  assert.equal(d.highlighted, "b")
 })
