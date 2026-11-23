@@ -85,6 +85,17 @@ test("準備中に目を閉じると、開眼の確認は数え直しになる",
   assert.equal(d.phase, "open")
 })
 
+test("準備中にフレームが 250ms を超えて途切れたら、開眼の確認は数え直しになる", () => {
+  const d = driver()
+  d.run(0, 50, OPEN)
+  d.feed(350, OPEN)
+  assert.equal(d.phase, "arming", "途切れた間も開いていたとはみなさない")
+  d.run(400, 600, OPEN)
+  assert.equal(d.phase, "arming")
+  d.feed(650, OPEN)
+  assert.equal(d.phase, "open")
+})
+
 test("300ms のまばたきでは決定しない（候補を捨てて開眼に戻る）", () => {
   const d = opened()
   d.run(350, 650, CLOSED)
@@ -225,6 +236,17 @@ test("顔ロストが 300ms 以内に戻れば開眼のまま", () => {
   d.feed(600, OPEN)
   d.run(650, 1200, OPEN)
   assert.equal(d.phase, "open")
+})
+
+test("安定待ち中の顔ロストも 300ms までは待ち、300ms を超えたら顔なしになる", () => {
+  const d = opened()
+  d.run(350, 1150, CLOSED)
+  d.feed(1200, OPEN)
+  assert.equal(d.phase, "refractory")
+  d.run(1250, 1550, null, { faceDetected: false, face: null })
+  assert.equal(d.phase, "refractory")
+  d.feed(1600, null, { faceDetected: false, face: null })
+  assert.equal(d.phase, "noface")
 })
 
 for (const [label, missing] of [["null", null], ["NaN", NaN], ["undefined", undefined]]) {
@@ -434,6 +456,19 @@ test("保持の途中で画面の世代が変わったら、古い画面の候�
   assert.equal(d.count("select"), 0)
   assert.deepEqual(d.last("cancel"), { type: "cancel", reason: "generationChanged", key: "A" })
   assert.equal(d.phase, "arming")
+})
+
+test("世代が変わった直後に届いたのが古い世代の結果でも、古い画面の候補は取り消す", () => {
+  const d = opened()
+  d.run(350, 1150, CLOSED)
+  const events = d.feed(1200, OPEN, { generation: 0, currentGeneration: 1 })
+  assert.deepEqual(events, [
+    { type: "cancel", reason: "generationChanged", key: "A" },
+    { type: "discard", reason: "generation" }
+  ])
+  assert.equal(d.phase, "arming")
+  d.feed(1250, OPEN, { generation: 1, currentGeneration: 1 })
+  assert.equal(d.count("select"), 0)
 })
 
 test("何も光っていない時（項目 null）の長いまばたきも、key が null の決定として出す", () => {

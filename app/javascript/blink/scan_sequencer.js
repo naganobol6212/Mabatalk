@@ -132,7 +132,7 @@ function advanceScan(state, elapsed, settings, events) {
   const rounds = index === 0 ? state.rounds + 1 : state.rounds
   if (index === 0 && rounds >= settings.autoPauseRounds) {
     events.push({ type: "paused", reason: "idle" })
-    return { ...toPaused(state), wasOpen: state.wasOpen }
+    return toPaused(state)
   }
   const duration = index === 0 ? firstStepMs(settings) : settings.stepMs
   return { ...state, index, rounds, remainingMs: remainingMs + duration }
@@ -148,7 +148,7 @@ function advanceConfirm(state, elapsed, isOpen, settings, events) {
   const rounds = index === 0 ? state.rounds + 1 : state.rounds
   if (index === 0 && rounds >= settings.confirmRounds) {
     events.push({ type: "confirmCancelled", reason: "timeout" })
-    return { ...toScanning(state, settings), wasOpen: state.wasOpen }
+    return toScanning(state, settings)
   }
   return { ...state, index, rounds, remainingMs: remainingMs + settings.stepMs }
 }

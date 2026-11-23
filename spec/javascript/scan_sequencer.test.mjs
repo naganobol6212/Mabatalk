@@ -269,6 +269,29 @@ test("tick の間隔が 250ms を超えた分は、見ていなかった時間�
   assert.equal(d.highlighted, "b")
 })
 
+test("tick が切り替わりの時刻をまたいでも、次の項目の持ち時間はずれない", () => {
+  const d = driver()
+  // 240ms ごとの tick。3000 をまたぐのは 3120、5000 をまたぐのは 5040
+  for (let t = 0; t <= 2880; t += 240) d.tick(t)
+  assert.equal(d.highlighted, "a")
+  d.tick(3120)
+  assert.equal(d.highlighted, "b")
+  for (let t = 3360; t <= 4800; t += 240) d.tick(t)
+  assert.equal(d.highlighted, "b")
+  d.tick(5040)
+  assert.equal(d.highlighted, "c")
+})
+
+test("時刻が逆戻りした tick は無視する", () => {
+  const d = driver()
+  d.run(0, 1000)
+  d.tick(500)
+  d.run(1050, 2950)
+  assert.equal(d.highlighted, "a")
+  d.tick(3000)
+  assert.equal(d.highlighted, "b")
+})
+
 test("入力の状態オブジェクトを書き換えない", () => {
   const started = startScan(ITEMS, DEFAULTS)
   const frozen = Object.freeze({ ...started.state })
