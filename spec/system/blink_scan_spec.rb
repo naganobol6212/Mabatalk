@@ -25,16 +25,65 @@ RSpec.describe "まばたきスキャン画面で選んで伝える", type: :sys
     expect(page).to have_current_path(message_categories_path)
   end
 
-  def open_scan
+  def open_scan(settings = FAST_SETTINGS)
     visit message_category_blink_scan_path(category)
-    page.execute_script(<<~JS, FAST_SETTINGS.to_json)
+    page.execute_script(<<~JS, settings.to_json)
       document.querySelector("[data-controller~='scan']").setAttribute("data-scan-settings-value", arguments[0])
+    JS
+    watch_highlights
+  end
+
+  def start_scan(settings = FAST_SETTINGS)
+    open_scan(settings)
+    click_button t("start")
+  end
+
+  # 光り始めるたびに、その項目（確認の時は質問の文も）が画面の中に見えていたかを控える。
+  # 見えている = 表示領域からはみ出さず、上のヘッダー・下のメニュー（固定表示）にも隠れていない
+  def watch_highlights
+    page.execute_script(<<~JS)
+      const visible = (element) => {
+        const box = element.getBoundingClientRect()
+        if (box.top < 0 || box.left < 0 || box.bottom > window.innerHeight || box.right > window.innerWidth) return false
+        const middle = [(box.left + box.right) / 2, (box.top + box.bottom) / 2]
+        const corners = [[box.left + 4, box.top + 4], [box.right - 4, box.top + 4], [box.left + 4, box.bottom - 4], [box.right - 4, box.bottom - 4]]
+        return [middle, ...corners].every(([x, y]) => element.contains(document.elementFromPoint(x, y)))
+      }
+      const scan = document.querySelector("[data-controller~='scan']")
+      window.scanWatch = { seen: {}, questionSeen: [] }
+      new MutationObserver((changes) => {
+        for (const { target } of changes) {
+          if (!target.hasAttribute("data-highlighted")) continue
+          const key = target.dataset.key
+          window.scanWatch.seen[key] = (window.scanWatch.seen[key] || []).concat(visible(target))
+          if (key.startsWith("confirm:")) {
+            const question = scan.querySelector("[data-screens='confirming'] [data-scan-target='pendingName']").parentElement
+            window.scanWatch.questionSeen.push(visible(question))
+          }
+        }
+      }).observe(scan, { attributes: true, attributeFilter: ["data-highlighted"], subtree: true })
     JS
   end
 
-  def start_scan
-    open_scan
-    click_button t("start")
+  # 光った項目ごとの「見えていたか」。{ key => [true, ...] }
+  def seen_highlights
+    page.evaluate_script("window.scanWatch.seen")
+  end
+
+  # keys がすべて 1 回は光るまで待つ（Capybara の待ち方: 条件が成り立つまで確かめ直す）
+  def wait_until_highlighted_once(keys)
+    page.document.synchronize(20, errors: [ Capybara::ExpectationNotMet ]) do
+      missing = keys - seen_highlights.keys
+      raise Capybara::ExpectationNotMet, "まだ光っていない: #{missing.join(', ')}" if missing.any?
+    end
+  end
+
+  # スマホを縦に持った大きさ（375×667）で見る
+  def on_phone_screen
+    page.driver.browser.execute_cdp("Emulation.setDeviceMetricsOverride", width: 375, height: 667, deviceScaleFactor: 2, mobile: false)
+    yield
+  ensure
+    page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
   end
 
   def highlighted(key)
@@ -48,7 +97,7 @@ RSpec.describe "まばたきスキャン画面で選んで伝える", type: :sys
 
   # その項目が光るのを待って押す
   def select_when_highlighted(key, with: :space)
-    expect(page).to have_css(highlighted(key), wait: 10)
+    expect(page).to have_css(highlighted(key), wait: 20)
     press(with)
   end
 
@@ -239,6 +288,39 @@ RSpec.describe "まばたきスキャン画面で選んで伝える", type: :sys
     expect(page).to have_css(highlighted(tea.key), wait: 10)
     expect(page).to have_no_content(t("done_html", name: "おちゃ"))
     expect(user.message_logs.count).to eq(0)
+  end
+
+  describe "スマホの縦の画面（375×667）で、定型文が 10 個ある時" do
+    let!(:more_items) do
+      (3..10).map { |n| create(:flow_item, message_category: category, user: nil, name: "ことば#{n}", kana: "ことば#{n}", position: n) }
+    end
+    let(:all_keys) { [ tea.key, water.key, *more_items.map(&:key), "scan:pause" ] }
+
+    it "下の段の定型文・「休止」が光る時も、光っている項目は画面の中に見えている" do
+      on_phone_screen do
+        # 押さずに 1 周見るだけなので、1 項目の時間は短くする
+        start_scan(FAST_SETTINGS.merge(stepMs: 250))
+        expect(page.evaluate_script("[window.innerWidth, window.innerHeight]")).to eq([ 375, 667 ])
+
+        wait_until_highlighted_once(all_keys)
+
+        hidden = seen_highlights.reject { |_key, seen| seen.all? }.keys
+        expect(hidden).to eq([])
+      end
+    end
+
+    it "いちばん下の定型文を選んだあとの確認でも、質問の文（何を伝えるか）と光っている「いいえ」「はい」が見えている" do
+      on_phone_screen do
+        start_scan
+
+        select_when_highlighted(more_items.last.key)
+        expect(page).to have_content(t("confirm_question_html", name: "ことば10"))
+        wait_until_highlighted_once([ "confirm:no", "confirm:yes" ])
+
+        expect(seen_highlights.slice("confirm:no", "confirm:yes").values.flatten).to all(be(true))
+        expect(page.evaluate_script("window.scanWatch.questionSeen")).to all(be(true)).and(be_present)
+      end
+    end
   end
 
   describe "送信がうまくいかなかった時" do
