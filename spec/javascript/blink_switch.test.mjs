@@ -124,6 +124,29 @@ test("800ms 閉じ続けた時点で holdReached、目を開いた瞬間に sele
   assert.equal(d.count("holdReached"), 1)
 })
 
+test("閉じてからちょうど 800ms のフレームで開いていたら、holdReached と select を1回ずつ出す", () => {
+  const d = opened()
+  d.run(350, 1100, CLOSED)
+  assert.equal(d.count("holdReached"), 0, "最後の閉眼フレームは 750ms の時点")
+  const events = d.feed(1150, OPEN)
+  assert.deepEqual(events, [{ type: "holdReached", key: "A" }, { type: "select", key: "A" }])
+  assert.equal(d.phase, "refractory")
+  d.run(1200, 2500, OPEN)
+  assert.equal(d.count("holdReached"), 1)
+  assert.equal(d.count("select"), 1)
+  assert.equal(d.count("cancel"), 0)
+})
+
+test("閉じてから 799ms で開いたら、保持時間の前なので決定しない", () => {
+  const d = opened()
+  d.run(350, 1100, CLOSED)
+  d.feed(1149, OPEN)
+  assert.equal(d.phase, "open")
+  assert.equal(d.count("holdReached"), 0)
+  assert.equal(d.count("select"), 0)
+  assert.deepEqual(d.last("cancel"), { type: "cancel", reason: "shortBlink", key: "A" })
+})
+
 test("しきい値のあいだのスコアでは閉眼を始めない", () => {
   const d = opened()
   d.run(350, 1500, BETWEEN)
