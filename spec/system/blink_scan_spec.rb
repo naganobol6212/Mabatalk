@@ -3,11 +3,14 @@ require 'rails_helper'
 # まばたきスキャン画面を、本物のブラウザ（ヘッドレス Chrome）で通す。
 # PR2 の入力はキー操作: 光っている時に Space / Enter を押すと「長いまばたき 1 回」と同じ扱いになる。
 # 時間は画面の data 属性（data-scan-settings-value）で短くするが、表示の切り替わりは待つ（sleep に頼らない）。
+# 押すのは「光り始めてすぐ」の時だけにして、光っているのを見てから押すまでのあいだに次へ移る競合をなくす。
 RSpec.describe "まばたきスキャン画面で選んで伝える", type: :system do
   before { driven_by :selenium_chrome_headless }
 
   # 1 項目 1200ms（先頭は 1.5 倍の 1800ms）、安定待ち 150ms、完了表示 1000ms
   FAST_SETTINGS = { stepMs: 1200, refractoryMs: 150, doneMs: 1000 }.freeze
+  # 光り始めてからこの時間までなら押す（残りは 800ms 以上ある）。過ぎていたら、次に光り始めるまで待つ
+  FRESH_MS = 400
 
   let(:category) { create(:message_category, user: nil, name: "のみもの", kana: "のみもの") }
   let!(:tea) { create(:flow_item, message_category: category, user: nil, name: "おちゃ", kana: "おちゃ", position: 1) }
@@ -31,6 +34,7 @@ RSpec.describe "まばたきスキャン画面で選んで伝える", type: :sys
       document.querySelector("[data-controller~='scan']").setAttribute("data-scan-settings-value", arguments[0])
     JS
     watch_highlights
+    watch_timers
   end
 
   def start_scan(settings = FAST_SETTINGS)
@@ -51,11 +55,21 @@ RSpec.describe "まばたきスキャン画面で選んで伝える", type: :sys
         return points.every(([px, py]) => element.contains(document.elementFromPoint(px, py)))
       }
       const scan = document.querySelector("[data-controller~='scan']")
-      window.scanWatch = { seen: {}, questionSeen: [] }
+      window.scanWatch = {
+        seen: {},
+        questionSeen: [],
+        since: {},
+        // その項目がいま光っていて、光り始めてから limit ミリ秒たっていない
+        fresh(key, limit) {
+          const lit = [...scan.querySelectorAll("[data-highlighted]")].some((element) => element.dataset.key === key)
+          return lit && performance.now() - this.since[key] < limit
+        }
+      }
       new MutationObserver((changes) => {
         for (const { target } of changes) {
           if (!target.hasAttribute("data-highlighted")) continue
           const key = target.dataset.key
+          window.scanWatch.since[key] = performance.now()
           window.scanWatch.seen[key] = (window.scanWatch.seen[key] || []).concat(visible(target))
           if (key.startsWith("confirm:")) {
             const question = scan.querySelector("[data-screens='confirming'] [data-scan-target='pendingName']").parentElement
@@ -79,6 +93,60 @@ RSpec.describe "まばたきスキャン画面で選んで伝える", type: :sys
     end
   end
 
+  # 動いている時計（setInterval）と、長い待ち（1 秒以上の setTimeout。送信の時間切れの見張り）を数えられるようにする
+  def watch_timers
+    page.execute_script(<<~JS)
+      const intervals = new Set()
+      const longWaits = new Set()
+      const { setInterval: realSetInterval, clearInterval: realClearInterval, setTimeout: realSetTimeout, clearTimeout: realClearTimeout } = window
+      window.setInterval = (...args) => {
+        const id = realSetInterval(...args)
+        intervals.add(id)
+        return id
+      }
+      window.clearInterval = (id) => {
+        intervals.delete(id)
+        realClearInterval(id)
+      }
+      window.setTimeout = (callback, delay, ...args) => {
+        const id = realSetTimeout((...given) => {
+          longWaits.delete(id)
+          callback(...given)
+        }, delay, ...args)
+        if (delay >= 1000) longWaits.add(id)
+        return id
+      }
+      window.clearTimeout = (id) => {
+        longWaits.delete(id)
+        realClearTimeout(id)
+      }
+      window.runningTimers = () => ({ clocks: intervals.size, longWaits: longWaits.size })
+    JS
+  end
+
+  def running_timers
+    page.evaluate_script("window.runningTimers()").symbolize_keys
+  end
+
+  # タブを切り替えた・アプリを切り替えた時と同じ: document.hidden が変わり、visibilitychange が届く
+  def hide_page
+    page.execute_script(<<~JS)
+      Object.defineProperty(document, "hidden", { configurable: true, get: () => true })
+      document.dispatchEvent(new Event("visibilitychange"))
+    JS
+  end
+
+  def show_page
+    page.execute_script(<<~JS)
+      delete document.hidden
+      document.dispatchEvent(new Event("visibilitychange"))
+    JS
+  end
+
+  def highlighted_key_now
+    page.evaluate_script("document.querySelector('[data-highlighted]')?.dataset.key ?? null")
+  end
+
   # スマホを縦に持った大きさ（375×667）で見る
   def on_phone_screen
     page.driver.browser.execute_cdp("Emulation.setDeviceMetricsOverride", width: 375, height: 667, deviceScaleFactor: 2, mobile: false)
@@ -96,16 +164,30 @@ RSpec.describe "まばたきスキャン画面で選んで伝える", type: :sys
     page.driver.browser.action.send_keys(key).perform
   end
 
-  # その項目が光るのを待って押す
+  # その項目が光り始めてすぐ（FRESH_MS 以内）になるまで待つ。戻った時、その項目はあと 800ms 以上光っている
+  def wait_for_fresh_highlight(key)
+    page.document.synchronize(20, errors: [ Capybara::ExpectationNotMet ]) do
+      fresh = page.evaluate_script("window.scanWatch.fresh(arguments[0], arguments[1])", key, FRESH_MS)
+      raise Capybara::ExpectationNotMet, "#{key} が光り始めるのを待っている" unless fresh
+    end
+  end
+
+  # その項目が光り始めたら押す
   def select_when_highlighted(key, with: :space)
-    expect(page).to have_css(highlighted(key), wait: 20)
+    wait_for_fresh_highlight(key)
     press(with)
   end
 
-  def choose_tea_and_wait_for_yes
+  # 「おちゃ」を選んで、確認に入る
+  def choose_tea
     select_when_highlighted(tea.key)
     expect(page).to have_content(t("confirm_question_html", name: "おちゃ"))
-    expect(page).to have_css(highlighted("confirm:yes"), wait: 10)
+  end
+
+  # 「おちゃ」を選び、確認の「はい」で押して、送信する
+  def send_tea
+    choose_tea
+    select_when_highlighted("confirm:yes")
   end
 
   # 1 回目の送信だけ「サーバーには届いて保存されたが、返事はまだ届いていない」ことにする。
@@ -117,6 +199,7 @@ RSpec.describe "まばたきスキャン画面で選んで伝える", type: :sys
       window.fetch = (url, options) => {
         window.sentSubmissionIds.push(JSON.parse(options.body).submission_id)
         const { signal, ...withoutSignal } = options
+        if (window.sentSubmissionIds.length === 1) window.firstSendSignal = signal
         if (window.sentSubmissionIds.length > 1) return realFetch(url, options)
         const answered = realFetch(url, withoutSignal).then(async (res) => {
           const body = await res.json()
@@ -193,10 +276,10 @@ RSpec.describe "まばたきスキャン画面で選んで伝える", type: :sys
   it "タップでも選べる（キーと同じ選択処理に入る）" do
     start_scan
 
-    expect(page).to have_css(highlighted(tea.key), wait: 10)
+    wait_for_fresh_highlight(tea.key)
     find(highlighted(tea.key)).click
     expect(page).to have_content(t("confirm_question_html", name: "おちゃ"))
-    expect(page).to have_css(highlighted("confirm:yes"), wait: 10)
+    wait_for_fresh_highlight("confirm:yes")
     find(highlighted("confirm:yes")).click
 
     expect(page).to have_content(t("done_html", name: "おちゃ"), wait: 10)
@@ -206,7 +289,7 @@ RSpec.describe "まばたきスキャン画面で選んで伝える", type: :sys
     start_scan
 
     select_when_highlighted(tea.key)
-    expect(page).to have_css(highlighted("confirm:no"), wait: 10)
+    wait_for_fresh_highlight("confirm:no")
     # 押したままの時にブラウザが出し続ける keydown（repeat: true）を、フォーカスのある所へ流す
     page.execute_script(<<~JS)
       for (let i = 0; i < 5; i++) {
@@ -234,7 +317,7 @@ RSpec.describe "まばたきスキャン画面で選んで伝える", type: :sys
   it "Shift を押しながらの Space は、スキャン入力にならない（何も選ばれない）" do
     start_scan
 
-    expect(page).to have_css(highlighted(tea.key), wait: 10)
+    wait_for_fresh_highlight(tea.key)
     page.driver.browser.action.key_down(:shift).send_keys(:space).key_up(:shift).perform
 
     # 選ばれていれば、押した時点で確認に入っている。選ばれていないので確認は出ず、そのまま次の定型文が光る
@@ -279,7 +362,8 @@ RSpec.describe "まばたきスキャン画面で選んで伝える", type: :sys
     user = create(:user, email: "taro@example.com", password: "password123")
     log_in(user)
     start_scan
-    choose_tea_and_wait_for_yes
+    choose_tea
+    wait_for_fresh_highlight("confirm:yes")
 
     page.execute_script('window.dispatchEvent(new PageTransitionEvent("pagehide"))')
     expect(page).to have_no_css("[data-highlighted]")
@@ -324,12 +408,94 @@ RSpec.describe "まばたきスキャン画面で選んで伝える", type: :sys
     end
   end
 
+  # 画面の実体（scan_controller）が、止まるべき時に時計・送信・時間切れの見張りを本当に片付けることを確かめる
+  describe "画面が隠れた時・画面から外された時の片付け" do
+    it "スキャン中に画面が隠れる（visibilitychange）と止まって時計も止まり、そのあいだのキーは使わず、戻ると先頭からやり直す" do
+      start_scan
+      expect(running_timers).to eq(clocks: 1, longWaits: 0)
+      # 先頭ではない所（2 番目）まで進めておく
+      wait_for_fresh_highlight(water.key)
+
+      hide_page
+      expect(highlighted_key_now).to be_nil
+      expect(running_timers).to eq(clocks: 0, longWaits: 0)
+      press
+
+      show_page
+      expect(highlighted_key_now).to eq(tea.key)
+      expect(running_timers).to eq(clocks: 1, longWaits: 0)
+      expect(page).to have_no_content(t("confirm_question_html", name: "みず"), wait: 0)
+    end
+
+    it "送信中に画面が隠れたら、送信を打ち切って時間切れの見張りも外す。あとから返事が届いても完了にせず、戻ると「届いたか確認できません」。送り直しは同じ送信IDで、記録は 1 件だけ" do
+      user = create(:user, email: "taro@example.com", password: "password123")
+      log_in(user)
+      start_scan
+      hold_first_response
+      send_tea
+      expect(page).to have_content(t("sending_html", name: "おちゃ"))
+      wait_until_first_request_is_answered
+      expect(running_timers).to eq(clocks: 0, longWaits: 1)
+
+      hide_page
+      expect(page.evaluate_script("window.firstSendSignal.aborted")).to be(true)
+      expect(running_timers).to eq(clocks: 0, longWaits: 0)
+      deliver_held_response
+      show_page
+
+      expect(page).to have_content(t("unknown.title"), wait: 0)
+      expect(page).to have_no_content(t("done_html", name: "おちゃ"), wait: 0)
+      # 「届いたか分からない」は 1 回だけ数える（遅れて届いた返事で、もう 1 回と数えない）
+      expect(page).to have_no_content(t("unknown.repeated"), wait: 0)
+
+      click_button t("unknown.retry")
+      expect(page).to have_content(t("done_html", name: "おちゃ"), wait: 10)
+      sent = page.evaluate_script("window.sentSubmissionIds")
+      expect(sent.size).to eq(2)
+      expect(sent.uniq.size).to eq(1)
+      expect(user.message_logs.sole.submission_id).to eq(sent.first)
+    end
+
+    it "スキャン中に画面から外される（disconnect）と、時計が止まる" do
+      start_scan
+      wait_for_fresh_highlight(tea.key)
+      expect(running_timers).to eq(clocks: 1, longWaits: 0)
+
+      page.execute_script("document.querySelector(\"[data-controller~='scan']\").remove()")
+
+      expect(running_timers).to eq(clocks: 0, longWaits: 0)
+    end
+
+    it "送信中に画面から外される（disconnect）と、送信を打ち切って時間切れの見張りも外す。あとから返事が届いても、エラーにならない" do
+      start_scan
+      hold_first_response
+      send_tea
+      expect(page).to have_content(t("sending_html", name: "おちゃ"))
+      wait_until_first_request_is_answered
+      expect(running_timers).to eq(clocks: 0, longWaits: 1)
+      page.execute_script(<<~JS)
+        window.scanErrors = []
+        window.addEventListener("error", (event) => window.scanErrors.push(String(event.message)))
+        window.addEventListener("unhandledrejection", (event) => window.scanErrors.push(String(event.reason)))
+      JS
+
+      page.execute_script("document.querySelector(\"[data-controller~='scan']\").remove()")
+      expect(page.evaluate_script("window.firstSendSignal.aborted")).to be(true)
+      expect(running_timers).to eq(clocks: 0, longWaits: 0)
+
+      deliver_held_response
+      expect(page.evaluate_script("window.scanErrors")).to eq([])
+      expect(running_timers).to eq(clocks: 0, longWaits: 0)
+    end
+  end
+
   describe "送信がうまくいかなかった時" do
     it "定型文が消されていた（404）: 介助者を呼ぶ表示で止まり、そのあと押しても動かない" do
       start_scan
-      choose_tea_and_wait_for_yes
+      choose_tea
+      # 「はい」が光る前に消しておく（光ってから押すまでのあいだに、ほかの処理をはさまない）
       tea.destroy!
-      press
+      select_when_highlighted("confirm:yes")
 
       expect(page).to have_content(t("halted.title"), wait: 10)
       expect(page).to have_content(t("halted.not_found"))
@@ -354,8 +520,7 @@ RSpec.describe "まばたきスキャン画面で選んで伝える", type: :sys
           return response
         }
       JS
-      choose_tea_and_wait_for_yes
-      press
+      send_tea
 
       expect(page).to have_content(t("unknown.title"), wait: 10)
       expect(page).to have_no_content(t("done_html", name: "おちゃ"))
@@ -375,8 +540,7 @@ RSpec.describe "まばたきスキャン画面で選んで伝える", type: :sys
       log_in(user)
       start_scan
       hold_first_response
-      choose_tea_and_wait_for_yes
-      press
+      send_tea
       expect(page).to have_content(t("sending_html", name: "おちゃ"))
       wait_until_first_request_is_answered
       expect(user.message_logs.count).to eq(1)
