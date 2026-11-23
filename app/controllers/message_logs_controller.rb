@@ -6,7 +6,7 @@ class MessageLogsController < ApplicationController
   end
 
   def create
-    flow_item = FlowItem.find_by!(key: params[:flow_item_key])
+    flow_item = FlowItem.for_user(current_user).find_by!(key: params[:flow_item_key])
 
     if user_signed_in?
       detail_text, detail_data = build_detail_flow(flow_item)

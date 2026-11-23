@@ -4,7 +4,7 @@ class MessageCompletionsController < ApplicationController
       last_log = MessageLog.for_viewer(current_user).first
       assign_from_log(last_log) if last_log
     else
-      flow_item = FlowItem.find_by(key: session[:last_flow_item_key])
+      flow_item = FlowItem.for_user(current_user).find_by(key: session[:last_flow_item_key])
       assign_from_flow_item(flow_item) if flow_item
     end
   end
