@@ -191,6 +191,50 @@ RSpec.describe "まばたきスキャン画面", type: :request do
       end
     end
 
+    # CSP はこの画面だけ。今は report-only（止めずに違反を知らせるだけ）。強制に切り替えるのは PR3c の公開判定
+    describe "CSP（report-only）" do
+      def csp_directives(header)
+        header.split(";").to_h do |directive|
+          name, *values = directive.split
+          [ name, values ]
+        end
+      end
+
+      it "report-only の CSP が付き、強制の CSP は付かない" do
+        get message_category_blink_scan_path(shared_category)
+
+        expect(response.headers["Content-Security-Policy"]).to be_nil
+        expect(csp_directives(response.headers["Content-Security-Policy-Report-Only"])).to eq(
+          "default-src" => [ "'self'" ],
+          "script-src" => [ "'self'", "'wasm-unsafe-eval'" ],
+          "worker-src" => [ "'self'" ],
+          "connect-src" => [ "'self'" ],
+          "img-src" => [ "'self'", "data:" ],
+          "style-src" => [ "'self'", "https://fonts.googleapis.com" ],
+          "font-src" => [ "'self'", "https://fonts.gstatic.com" ],
+          "object-src" => [ "'none'" ],
+          "base-uri" => [ "'self'" ],
+          "frame-ancestors" => [ "'none'" ]
+        )
+      end
+
+      it "ふつうの画面（定型文一覧）には CSP が付かない" do
+        get message_category_flow_items_path(shared_category)
+
+        expect(response.headers["Content-Security-Policy-Report-Only"]).to be_nil
+        expect(response.headers["Content-Security-Policy"]).to be_nil
+      end
+    end
+
+    describe "Permissions-Policy" do
+      it "カメラはこのサイトだけ、マイクと位置情報は使わない" do
+        get message_category_blink_scan_path(shared_category)
+
+        expect(response.headers["Permissions-Policy"]).to eq("camera=(self), microphone=(), geolocation=()")
+        expect(response.headers["Feature-Policy"]).to be_nil
+      end
+    end
+
     describe "Turbo を使わない（出る時は必ずページを読み込み直す）" do
       it "画面全体に data-turbo=false が付き、turbo-visit-control が reload になっている" do
         get message_category_blink_scan_path(shared_category)

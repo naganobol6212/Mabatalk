@@ -4,6 +4,25 @@ class BlinkScansController < ApplicationController
   # 定型文がこの数を超えたら、介助者に「絞る・分ける」ことをすすめる
   ITEM_NOTICE_THRESHOLD = 10
 
+  # この画面だけの CSP。今は report-only（違反をブラウザのコンソールに出すだけで、止めない）。
+  # 強制に切り替えるかは、実機で違反を見てから PR3c の公開判定で決める。
+  # report-only は止める設定ではないので、「外へ送らない」ことの保証にはしない。
+  # Worker の中は、この画面の CSP ではなく Worker のスクリプトの応答で決まる（PR3b で考える）。
+  # GA はこの画面に出さないので、googletagmanager は許可しない。Material Symbols は Google Fonts から読む。
+  content_security_policy do |policy|
+    policy.default_src :self
+    policy.script_src :self, :wasm_unsafe_eval
+    policy.worker_src :self
+    policy.connect_src :self
+    policy.img_src :self, :data
+    policy.style_src :self, "https://fonts.googleapis.com"
+    policy.font_src :self, "https://fonts.gstatic.com"
+    policy.object_src :none
+    policy.base_uri :self
+    policy.frame_ancestors :none
+  end
+  content_security_policy_report_only
+
   def show
     @message_category = MessageCategory.for_user(current_user).find(params[:message_category_id])
     # スキャンの順番がぶれないよう、同じ position の時は id の順に固定する
