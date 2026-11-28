@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'support/chrome_reset_fallback'
 
 # まばたきスキャン画面を、本物のブラウザ（ヘッドレス Chrome）で通す。
 # PR2 の入力はキー操作: 光っている時に Space / Enter を押すと「長いまばたき 1 回」と同じ扱いになる。
