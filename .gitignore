@@ -46,3 +46,6 @@ backup.dump
 
 /coverage
 .claude/settings.local.json
+
+# MediaPipe の WASM は yarn build が node_modules から写す（script/copy_mediapipe_wasm.mjs）
+/public/mediapipe/tasks-vision/
