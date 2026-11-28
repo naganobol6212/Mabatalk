@@ -61,6 +61,9 @@
           収集される情報は匿名であり、
           個人を特定するものではありません。
         </p>
+        <p class="mt-2">
+          <%= t(".analytics_blink_scan") %>
+        </p>
       </div>
 
       <div>
@@ -81,6 +84,9 @@
           ユーザーが退会された場合、アカウントおよび関連データは削除されます。
           削除後の復元はできません。
         </p>
+        <p class="mt-2">
+          <%= t(".deletion_blink_scan") %>
+        </p>
       </div>
 
       <div>
@@ -91,6 +97,20 @@
           本サービスは、不正アクセスや情報漏えいを防ぐため、
           可能な限り適切な管理に努めます。
         </p>
+      </div>
+
+      <div id="blink-input">
+        <h2 class="font-semibold text-stone-900 mb-2">
+          <%= t(".blink_input.heading") %>
+        </h2>
+        <p>
+          <%= t(".blink_input.lead") %>
+        </p>
+        <ul class="list-disc pl-5 mt-2 space-y-1">
+          <% t(".blink_input.items").each do |item| %>
+            <li><%= item %></li>
+          <% end %>
+        </ul>
       </div>
 
     </section>

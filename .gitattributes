@@ -7,3 +7,6 @@ db/schema.rb linguist-generated
 vendor/* linguist-vendored
 config/credentials/*.yml.enc diff=rails_credentials
 config/credentials.yml.enc diff=rails_credentials
+
+# まばたき入力のモデル（MediaPipe）。改行コードの変換などで中身が変わらないようにする
+public/mediapipe/models/*.task binary
