@@ -24,3 +24,6 @@ application.register("reorder", ReorderController)
 
 import PasswordWhitespaceController from "./password_whitespace_controller"
 application.register("password-whitespace", PasswordWhitespaceController)
+
+import ScanController from "./scan_controller"
+application.register("scan", ScanController)

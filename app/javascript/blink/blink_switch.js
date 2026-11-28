@@ -25,6 +25,10 @@
 //               invalidTime（now や capturedAt が有限の数値でない・capturedAt が now より先）/
 //               invalidSeq（seq が整数でない）
 //
+// 世代の決まり: currentGeneration が前の入力から変わったら（画面が切り替わったら）、
+// 保持の途中の候補は取り消し、新しい世代のフレームで開眼を 1 度見るまで閉じ始めを受け付けない。
+// 前の画面に向けて閉じた目が、新しい画面の項目の決定になるのを防ぐ。
+//
 // 時計の決まり: now と capturedAt は同じ単調な時計（performance.now()）の値で、capturedAt ≦ now。
 // 別の基準の時計（Worker 側の performance.now() など）で capturedAt を作り直さないこと。
 // 守られていない入力は、判定に使わず入口で捨てる（上の invalidTime / invalidSeq）。
@@ -44,6 +48,7 @@ export function createBlinkSwitch() {
     phase: "noface",
     candidateKey: null,
     generation: null,
+    awaitingOpen: false,
     since: null,
     unusableSince: null,
     lastSeq: null,
@@ -102,9 +107,16 @@ function toNoFace(state, events) {
 }
 
 // 画面の世代が変わったら、前の画面で固定した候補は持ち越さない。
+// 前の画面から閉じたままの目も持ち越さない: 新しい世代で開眼を 1 度見るまで（awaitingOpen）、
+// 閉じた目を閉じ始めとして受け付けない。phase は変えないので、開眼ならスキャンの時計は進む。
+//
+// 限界（PR3b でカメラをつなぐ前に直す）: awaitingOpen のあいだも phase は "open" のままなので、
+// 前の画面から目を閉じ続けている（まだ開眼を確かめられていない）時も、スキャンの時計は進んでしまう。
+// 「開眼を確かめられていない時は時計を止める」には、準備中（arming）へ戻すか、受け付けられないことを
+// 別の形で呼び出し側へ伝える必要がある。PR2 の入力はキー（key_switch）で、この判定は画面につないでいない。
 function syncGeneration(state, currentGeneration, events) {
   if (state.generation === currentGeneration) return state
-  const synced = { ...state, generation: currentGeneration }
+  const synced = { ...state, generation: currentGeneration, awaitingOpen: state.generation !== null }
   const holding = state.phase === "closing" || state.phase === "ready"
   return holding && state.generation !== null ? toArming(synced, "generationChanged", events) : synced
 }
@@ -142,7 +154,7 @@ function acceptFrame(state, { now, frame }, settings, events) {
   // 顔が戻ったフレームでも猶予の期限を確かめる。使えないフレームが来た時だけ確かめると、
   // 猶予を過ぎてから戻った顔が、開眼の確認（準備中）を通らずにそのまま続いてしまう。
   if (graceExpired(next, t, settings)) next = toNoFace(next, events)
-  next = { ...next, lastFace: frame.face, unusableSince: null }
+  next = { ...next, lastFace: frame.face, unusableSince: null, awaitingOpen: next.awaitingOpen && eye !== "open" }
   return onEye[next.phase](next, eye, t, frame, settings, events)
 }
 
@@ -192,7 +204,7 @@ const onEye = {
   },
 
   open(state, eye, t, frame) {
-    if (eye !== "closed") return state
+    if (eye !== "closed" || state.awaitingOpen) return state
     return { ...state, phase: "closing", candidateKey: frame.highlightedKey ?? null, since: t }
   },
 

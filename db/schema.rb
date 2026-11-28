@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_05_09_231905) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_24_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -105,7 +105,9 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_09_231905) do
     t.string "message_category_icon_color"
     t.string "detail_flow_text"
     t.jsonb "detail_flow_data"
+    t.string "submission_id"
     t.index ["flow_item_id"], name: "index_message_logs_on_flow_item_id"
+    t.index ["user_id", "submission_id"], name: "index_message_logs_on_user_id_and_submission_id", unique: true
     t.index ["user_id"], name: "index_message_logs_on_user_id"
   end
 

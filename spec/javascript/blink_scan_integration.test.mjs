@@ -237,12 +237,10 @@ test("つないだ時: 結果が届く前の tick で確認が時間切れにな
   assert.equal(d.count("select"), 1, "決定は、最初に「a」を選んだ 1 回だけ")
 })
 
-// PR1 の限界（まだ直していない。画面につなぐ PR2 で直す）:
-// 上の列の続き。前の画面の「はい」に向けて閉じた目が、時間切れのあとも閉じたままだと、
-// 新しい画面で最初に届いた閉眼フレームから数え直され、同じ 1 回のまばたきが先頭の「a」の決定になる。
-// 直す時の決まり: 画面が自動で切り替わったあとは、新しい画面で開眼を見るまで閉眼の始まりを受け付けない。
-// 今はこのテストは落ちる（select が 2 回になる）ので todo にしてある。
-test("つないだ時: 時間切れで画面が切り替わる前から閉じていた目は、新しい画面の項目の決定にならない", { todo: "PR2 で直す" }, () => {
+// 上の列の続き。前の画面の「はい」に向けて閉じた目が、時間切れのあとも閉じたままの時。
+// 決まり（blink_switch）: 画面の世代が変わったあとは、新しい画面で開眼を見るまで閉眼の始まりを受け付けない。
+// これが無いと、新しい画面で最初に届いた閉眼フレームから数え直され、同じ 1 回のまばたきが先頭の「a」の決定になる。
+test("つないだ時: 時間切れで画面が切り替わる前から閉じていた目は、新しい画面の項目の決定にならない", () => {
   const d = driver()
   const t = confirmingA(d)
   d.run(t + FRAME_MS, t + 7950, OPEN)
@@ -251,8 +249,26 @@ test("つないだ時: 時間切れで画面が切り替わる前から閉じて
   d.deliver(late, t + 8010)
   d.run(t + 8040, t + 8790, CLOSED)
   d.frame(t + 8840, OPEN)
+  assert.equal(d.count("holdReached"), 1, "合図の音も、最初に「a」を選んだ 1 回だけ")
   assert.equal(d.count("select"), 1)
   assert.equal(d.count("confirmStarted"), 1)
+  assert.equal(d.mode, "scanning")
+})
+
+test("つないだ時: 画面が切り替わる前から閉じていた目を一度開ければ、そのあとの長いまばたきは新しい画面の項目の決定になる", () => {
+  const d = driver()
+  const t = confirmingA(d)
+  d.run(t + FRAME_MS, t + 7950, OPEN)
+  const late = d.capture(t + 7990, CLOSED)
+  d.tick(t + 8000)
+  d.deliver(late, t + 8010)
+  d.run(t + 8040, t + 8790, CLOSED)
+  // 開けて（t+8840〜）、もう一度 800ms 閉じて開ける
+  d.run(t + 8840, t + 8990, OPEN)
+  d.run(t + 9040, t + 9840, CLOSED)
+  d.frame(t + 9890, OPEN)
+  assert.equal(d.count("select"), 2)
+  assert.deepEqual(d.last("confirmStarted"), { type: "confirmStarted", key: "a" })
 })
 
 test("つないだ時: フレームが届かなくなって 500ms たつと準備中へ戻ってスキャンが止まり、開眼を確かめ直すと残り時間から再開する", () => {

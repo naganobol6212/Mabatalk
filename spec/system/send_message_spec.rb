@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'support/chrome_reset_fallback'
 
 # 利用者のいちばん大事な一連の操作を、本物のブラウザ（ヘッドレス Chrome）で通す。
 # ログイン → カテゴリを選ぶ → 項目を選ぶ → 「はい」で伝える → 完了画面 → ログに残る

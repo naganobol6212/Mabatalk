@@ -55,3 +55,9 @@ test("初期値と固定の値は書き換えられない", () => {
   assert.throws(() => { DEFAULTS.holdMs = 1 }, TypeError)
   assert.throws(() => { FIXED.watchdogMs = 1 }, TypeError)
 })
+
+test("完了表示は 4000ms（調整範囲 2000〜10000ms）。記録の送信は 10 秒で時間切れ", () => {
+  assert.equal(DEFAULTS.doneMs, 4000)
+  assert.deepEqual({ ...RANGES.doneMs }, { min: 2000, max: 10000 })
+  assert.equal(FIXED.sendTimeoutMs, 10000)
+})

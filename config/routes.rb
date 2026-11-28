@@ -7,6 +7,8 @@ Rails.application.routes.draw do
   resources :message_categories, only: %i[index new create edit update destroy] do
     get :copy, on: :member
     collection { post :reorder }
+    # まばたきスキャン画面: GET /message_categories/:message_category_id/blink_scan
+    resource :blink_scan, only: %i[show]
     resources :flow_items, only: %i[index new create edit update destroy] do
       get :confirm, on: :member
       collection { post :reorder }

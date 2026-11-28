@@ -1,0 +1,119 @@
+<% content_for :back_path, message_category_flow_items_path(@message_category) %>
+<% content_for :page_title, t(".title") %>
+<%# この画面は GA を出さず、Turbo も使わない（layouts/application.html.erb で見ている） %>
+<% content_for :skip_analytics, true %>
+<% content_for :turbo_disabled, true %>
+<% content_for :head do %>
+  <meta name="turbo-visit-control" content="reload">
+<% end %>
+
+<main class="relative min-h-screen w-full bg-stone-200 overflow-x-hidden pb-28">
+  <div class="flex flex-col items-center gap-6 px-4 pt-6 w-full max-w-md md:max-w-4xl mx-auto">
+    <h1 class="text-2xl font-bold text-stone-800"><%= @message_category.name %></h1>
+
+    <% if @flow_items.empty? %>
+      <p class="w-full rounded-2xl bg-white p-6 text-xl text-stone-800"><%= t(".empty") %></p>
+    <% else %>
+      <% if @too_many_items %>
+        <p role="note" class="w-full rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 text-base text-stone-800">
+          <%= t(".too_many", count: @flow_items.size) %>
+        </p>
+      <% end %>
+
+      <%# 時間の設定は data-scan-settings-value（JSON）で上書きできる。ふだんは付けない（system spec が短くするのに使う） %>
+      <div class="w-full flex flex-col items-center gap-6"
+           data-controller="scan"
+           data-scan-url-value="<%= message_logs_path %>"
+           data-scan-highlight-class="ring-8 ring-amber-600 scale-105 shadow-xl"
+           data-action="keydown@document->scan#keydown visibilitychange@document->scan#visibilityChanged pagehide@window->scan#suspend pageshow@window->scan#pageShown">
+
+        <div class="flex gap-4">
+          <button type="button" class="btn btn-lg btn-primary text-xl" data-scan-target="startButton" data-action="scan#start">
+            <%= t(".start") %>
+          </button>
+          <button type="button" class="btn btn-lg text-xl" data-scan-target="stopButton" data-action="scan#stop" hidden>
+            <%= t(".stop") %>
+          </button>
+        </div>
+
+        <p class="w-full text-base text-stone-700" data-scan-target="panel" data-screens="idle"><%= t(".intro") %></p>
+
+        <%# ここから下が本人の見る所。タップもキーと同じ「選ぶ」入力になる %>
+        <%# scroll-mt-20 / scroll-mb-28: 光った項目や表示を画面内へ動かす時（scan_controller の keepInView）に、
+            固定表示のヘッダー・下のメニューの下に隠れないようにする余白 %>
+        <div class="w-full flex flex-col items-center gap-6 focus:outline-none" aria-live="polite" tabindex="-1"
+             data-scan-target="stage" data-action="click->scan#tap">
+
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-6 w-full p-2" data-scan-target="panel" data-screens="idle scanning">
+            <% @flow_items.each do |item| %>
+              <div class="bg-white rounded-2xl p-4 min-h-40 flex flex-col justify-center items-center gap-2 text-center transition-transform scroll-mt-20 scroll-mb-28"
+                   data-scan-target="item highlightable" data-key="<%= item.key %>" data-name="<%= item.name %>">
+                <span class="material-symbols-outlined !text-[52px] <%= icon_color_class(item.icon_color) %>"><%= item.icon %></span>
+                <span class="text-3xl font-bold text-stone-900 leading-tight line-clamp-2"><%= item.name %></span>
+              </div>
+            <% end %>
+            <div class="bg-stone-100 rounded-2xl p-4 min-h-40 flex flex-col justify-center items-center gap-2 text-center transition-transform scroll-mt-20 scroll-mb-28"
+                 data-scan-target="item highlightable" data-key="scan:pause" data-kind="pause">
+              <span class="material-symbols-outlined !text-[52px] text-stone-500">pause_circle</span>
+              <span class="text-3xl font-bold text-stone-900 leading-tight"><%= t(".pause_item") %></span>
+            </div>
+          </div>
+
+          <div class="w-full flex flex-col items-center gap-8 scroll-mt-20 scroll-mb-28" data-scan-target="panel" data-screens="confirming" hidden>
+            <p class="text-4xl font-bold text-stone-900 text-center leading-snug">
+              <%= t(".confirm_question_html", name: tag.span(data: { scan_target: "pendingName" })) %>
+            </p>
+            <div class="grid grid-cols-2 gap-8 w-full p-2">
+              <div class="bg-white rounded-2xl min-h-40 flex justify-center items-center text-5xl font-bold text-stone-900 transition-transform scroll-mt-20 scroll-mb-28"
+                   data-scan-target="highlightable" data-key="confirm:no"><%= t(".no") %></div>
+              <div class="bg-white rounded-2xl min-h-40 flex justify-center items-center text-5xl font-bold text-stone-900 transition-transform scroll-mt-20 scroll-mb-28"
+                   data-scan-target="highlightable" data-key="confirm:yes"><%= t(".yes") %></div>
+            </div>
+          </div>
+
+          <p class="w-full rounded-2xl bg-white p-8 text-3xl font-bold text-stone-900 text-center scroll-mt-20 scroll-mb-28" data-scan-target="panel" data-screens="paused" hidden>
+            <%= t(".paused") %>
+          </p>
+        </div>
+
+        <p class="w-full rounded-2xl bg-white p-8 text-3xl font-bold text-stone-900 text-center scroll-mt-20 scroll-mb-28" data-scan-target="panel" data-screens="sending" hidden>
+          <%= t(".sending_html", name: tag.span(data: { scan_target: "pendingName" })) %>
+        </p>
+
+        <div class="w-full rounded-2xl bg-white p-8 flex flex-col items-center gap-4 text-center scroll-mt-20 scroll-mb-28" role="status" data-scan-target="panel" data-screens="done" hidden>
+          <span class="material-symbols-outlined !text-[72px] text-emerald-600">check_circle</span>
+          <p class="text-4xl font-bold text-stone-900 leading-snug">
+            <%= t(".done_html", name: tag.span(data: { scan_target: "doneName" })) %>
+          </p>
+          <p class="text-xl text-stone-700" data-scan-target="guestNote" hidden><%= t(".guest_note") %></p>
+        </div>
+
+        <%# ここから下は介助者向け %>
+        <div class="w-full rounded-2xl border-2 border-amber-300 bg-amber-50 p-6 flex flex-col items-center gap-4 text-center scroll-mt-20 scroll-mb-28" role="alert" data-scan-target="panel" data-screens="unknown" hidden>
+          <p class="text-3xl font-bold text-stone-900"><%= t(".unknown.title") %></p>
+          <p class="text-xl text-stone-800">
+            <%= t(".unknown.target_html", name: tag.span(data: { scan_target: "pendingName" })) %>
+          </p>
+          <p class="text-base text-stone-700"><%= t(".unknown.help") %></p>
+          <button type="button" class="btn btn-lg btn-primary text-xl" data-action="scan#retry"><%= t(".unknown.retry") %></button>
+          <div class="flex flex-col items-center gap-2" data-scan-target="repeatedNote" hidden>
+            <p class="text-base text-stone-700"><%= t(".unknown.repeated") %></p>
+            <% if user_signed_in? %>
+              <%= link_to t(".unknown.logs_link"), message_logs_path, class: "link text-lg" %>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="w-full rounded-2xl border-2 border-red-300 bg-red-50 p-6 flex flex-col items-center gap-4 text-center scroll-mt-20 scroll-mb-28" role="alert" data-scan-target="panel" data-screens="halted" hidden>
+          <p class="text-3xl font-bold text-stone-900"><%= t(".halted.title") %></p>
+          <% %w[conflict not_found reload unauthorized forbidden rate_limited].each do |reason| %>
+            <p class="text-xl text-stone-800" data-scan-target="haltReason" data-reason="<%= reason.camelize(:lower) %>" hidden><%= t(".halted.#{reason}") %></p>
+          <% end %>
+          <button type="button" class="btn btn-lg btn-primary text-xl" data-action="scan#reload"><%= t(".halted.reload_button") %></button>
+        </div>
+      </div>
+    <% end %>
+
+    <%= link_to t(".back_to_list"), message_category_flow_items_path(@message_category), class: "btn btn-lg text-lg" %>
+  </div>
+</main>
