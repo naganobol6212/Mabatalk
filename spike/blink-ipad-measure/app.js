@@ -960,5 +960,5 @@ for (const k of MANUAL_FIELDS) {
   renderCriteria();
   renderResults();
   setRunningUI(false);
-  window.__blinkMeasure = { exportData, store, get run() { return run; } }; // Mac の自動確認用
+  window.__blinkMeasure = { exportData, store, get run() { return run; }, get audioState() { return audioCtx?.state ?? null; } }; // Mac の自動確認用
 })();

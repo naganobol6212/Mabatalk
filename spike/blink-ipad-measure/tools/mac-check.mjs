@@ -1,6 +1,6 @@
 // Mac の Chrome（ヘッドレス）で計測ページを動かし、2 つの版で数字が出るかを確かめる。
 //   node tools/mac-check.mjs [source=image|camera] [秒]
-// 先に `node server.mjs` を動かしておく。カメラは Chrome の偽カメラ、image は公開のテスト画像（顔あり）。
+// 先に `node server.mjs` を動かしておく。Chrome は --mute-audio で起動し、合図の音は鳴らさない。カメラは Chrome の偽カメラ、image は公開のテスト画像（顔あり）。
 import { spawn } from "node:child_process";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -14,7 +14,7 @@ const port = 9333;
 const profile = mkdtempSync(join(tmpdir(), "blink-chrome-"));
 const chrome = spawn(CHROME, [
   "--headless=new", `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`,
-  "--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream", "--autoplay-policy=no-user-gesture-required",
+  "--mute-audio", "--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream", "--autoplay-policy=no-user-gesture-required",
   "--no-first-run", "--window-size=1200,1800", "about:blank",
 ], { stdio: "ignore" });
 
@@ -94,6 +94,7 @@ if (process.argv[4] === "extra") {
 
 const shot = await send("Page.captureScreenshot", { format: "png", captureBeyondViewport: true });
 writeFileSync(join(out, `mac-check-${source}.png`), Buffer.from(shot.result.data, "base64"));
+console.log("AudioContext:", await evaluate(`window.__blinkMeasure.audioState`)); // 音はスピーカーに出さず（--mute-audio）、状態だけ確かめる
 const data = await evaluate(`JSON.stringify(window.__blinkMeasure.exportData())`);
 writeFileSync(join(out, `mac-check-${source}.json`), data);
 const d = JSON.parse(data);
