@@ -1,0 +1,52 @@
+MabaTalk - Third-party notices for files served under /mediapipe/
+
+This directory distributes the following third-party works. Both are
+licensed under the Apache License, Version 2.0. The full license text is in
+the file LICENSE next to this file. LICENSE is copied unmodified from the
+MediaPipe repository at tag v1.2.3:
+https://github.com/google-ai-edge/mediapipe/blob/v1.2.3/LICENSE
+
+The upstream MediaPipe distribution (the npm package and the model download)
+does not include a NOTICE file. This NOTICE was written by MabaTalk to record
+where each file came from, which version it is, and its checksum.
+
+
+1. MediaPipe Tasks Vision - WebAssembly runtime
+
+   Package : @mediapipe/tasks-vision 1.2.3 (npm, license field "Apache-2.0")
+   Source  : https://github.com/google-ai-edge/mediapipe (tag v1.2.3)
+   Author  : The MediaPipe Authors (mediapipe@google.com)
+   License : Apache License, Version 2.0 (see LICENSE)
+   Changes : none. Copied from the package's wasm/ directory at build time.
+
+   Files:
+     /mediapipe/tasks-vision/1.2.3/wasm/vision_wasm_module_internal.js
+       336,662 bytes
+       SHA-256 d29996249490361715c769c6a49b43ad47e6ac9a28a8e8bce8d02b238e897851
+     /mediapipe/tasks-vision/1.2.3/wasm/vision_wasm_module_internal.wasm
+       14,665,738 bytes
+       SHA-256 a269e84b12aefc93c9d6a4d62b01f41e5434a9fa941533bb8e75b1e3d1669e46
+
+
+2. MediaPipe Face Landmarker model (float16, version 1)
+
+   Source  : https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task
+   Model card: https://huggingface.co/litert-community/MediaPipe-FaceLandmarker
+             (license: apache-2.0)
+   Guide   : https://developers.google.com/edge/mediapipe/solutions/vision/face_landmarker
+   Author  : Google (MediaPipe)
+   License : Apache License, Version 2.0 (see LICENSE)
+   Changes : none to the contents. The file was renamed from
+             face_landmarker.task to face_landmarker-float16-1.task so that
+             the URL carries the model variant and version.
+
+   File:
+     /mediapipe/models/face_landmarker-float16-1.task
+       3,758,596 bytes
+       SHA-256 64184e229b263107bc2b804c6625db1341ff2bb731874b0bcc2fe6544e0bc9ff
+
+
+The MediaPipe LICENSE file also reproduces a notice by Rob Pike, Ken Thompson
+and Lucent Technologies for files under
+tasks/cc/text/language_detector/custom_ops/utils/utf/ in the MediaPipe
+repository. It is kept as part of the unmodified LICENSE.
