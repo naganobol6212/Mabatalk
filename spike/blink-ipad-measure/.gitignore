@@ -1,0 +1,2 @@
+# setup.sh が取ってくる MediaPipe 本体・モデル・テスト画像（git に入れない）
+vendor/

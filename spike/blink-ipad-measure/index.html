@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>まばたき計測 PR0.5</title>
+<style>
+  :root { --bg:#f7f7f5; --fg:#1d1d1f; --muted:#666; --card:#fff; --line:#ddd; --pass:#137333; --fail:#b3261e; --acc:#1f6feb; --tmp:#8a5a00; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#16171a; --fg:#ececec; --muted:#9a9a9a; --card:#202226; --line:#363a40; --pass:#6dd58c; --fail:#ff8a80; --acc:#6ea8fe; --tmp:#f0c060; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font: 15px/1.5 -apple-system, "Hiragino Sans", sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 20px; margin: 4px 0 8px; } h2 { font-size: 17px; margin: 0 0 8px; } h4 { margin: 14px 0 6px; }
+  section { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; margin:12px 0; }
+  .muted { color:var(--muted); font-size:13px; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:6px 0; }
+  label { display:inline-flex; gap:6px; align-items:center; }
+  input[type=text], select { font-size:15px; padding:6px 8px; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--fg); }
+  button { font-size:16px; padding:10px 16px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--fg); min-height:44px; }
+  button.primary { background:var(--acc); color:#fff; border-color:var(--acc); }
+  button.danger { background:var(--fail); color:#fff; border-color:var(--fail); }
+  button:disabled { opacity:.4; }
+  #tap.alt { background:var(--acc); color:#fff; }
+  .status { font-weight:600; padding:8px 10px; border-radius:6px; background:var(--bg); }
+  .status.running { background:#1f6feb22; } .status.stopped { background:#b3261e22; }
+  .grid { display:grid; grid-template-columns: 200px 1fr; gap:12px; }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+  video { width:200px; aspect-ratio:4/3; background:#000; border-radius:8px; transform:scaleX(-1); object-fit:cover; }
+  .kv { display:flex; justify-content:space-between; gap:8px; border-bottom:1px dashed var(--line); padding:2px 0; font-size:14px; }
+  .bars { margin:8px 0; } .bar { height:12px; background:var(--line); border-radius:6px; overflow:hidden; margin:3px 0; }
+  .bar > div { height:100%; background:var(--acc); width:0; }
+  .scan { display:grid; grid-template-columns: repeat(4, 1fr); gap:6px; margin-top:8px; }
+  .scan-cell { padding:10px; text-align:center; border:2px solid var(--line); border-radius:8px; font-size:14px; }
+  .scan-cell.on { border-color:var(--acc); background:#1f6feb33; }
+  #cue { position:fixed; left:0; right:0; top:0; padding:24px 16px; text-align:center; font-size:32px; font-weight:700; background:#000c; color:#fff; z-index:10; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { border-bottom:1px solid var(--line); padding:5px 6px; text-align:left; vertical-align:top; }
+  .tablewrap { overflow-x:auto; }
+  tr[data-id] { cursor:pointer; } tr.sel { background:#1f6feb1a; }
+  td.pass, td.fail, td.none { white-space:nowrap; }
+  .pass { color:var(--pass); font-weight:600; } .fail { color:var(--fail); font-weight:600; } .none { color:var(--muted); }
+  .src { display:inline-block; font-size:11px; border:1px solid var(--pass); color:var(--pass); border-radius:4px; padding:0 4px; margin-right:6px; }
+  .src.tmp { border-color:var(--tmp); color:var(--tmp); }
+  textarea { width:100%; height:120px; font-size:11px; }
+  .warn { background:#b3261e22; padding:8px; border-radius:6px; }
+</style>
+</head>
+<body>
+<div id="cue" hidden></div>
+<main>
+  <h1>まばたき計測（PR0.5・iPad 実機）</h1>
+  <p class="muted">Worker 版と画面側版を同じ条件で比べます。映像はこの端末の中だけで処理し、どこにも送りません。残るのは時間の数字と集計だけです（この端末の中）。MediaPipe tasks-vision 1.2.3・face_landmarker float16/1・前面カメラ 640×480。</p>
+  <p id="insecure" class="warn" hidden>このページは HTTPS で開かれていないため、カメラが使えません。</p>
+  <p class="muted" id="env"></p>
+
+  <section>
+    <h2>1. 端末のこと（手で入れる）</h2>
+    <p class="muted">Safari からは型番や OS の版が取れないので入れてください。名前など個人のことは書かないでください。</p>
+    <div class="row">
+      <label>型番 <input type="text" id="m-model" placeholder="例：iPad（第10世代）"></label>
+      <label>iPadOS <input type="text" id="m-os" placeholder="例：26.1" size="8"></label>
+      <label>開き方 <select id="m-launch"><option>Safari のタブ</option><option>ホーム画面から</option></select></label>
+      <label>充電 <select id="m-charging"><option value="">—</option><option>しながら</option><option>しない</option></select></label>
+    </div>
+    <div class="row">
+      <label>電池（始め）<input type="text" id="m-batteryStart" size="5" placeholder="%"></label>
+      <label>電池（終わり）<input type="text" id="m-batteryEnd" size="5" placeholder="%"></label>
+      <label>熱さ（長時間のあと）<select id="m-heat"><option value="">—</option><option>変わらない</option><option>温かい</option><option>熱い（持ちにくい）</option></select></label>
+      <label>メモ <input type="text" id="m-note" size="30" placeholder="気づいたこと"></label>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. 測る</h2>
+    <div class="row">
+      <button id="compare" class="primary" data-start>4 通りを順に比べる</button>
+      <label>各 <select id="cmp-sec"><option value="60" selected>60 秒</option><option value="120">120 秒</option><option value="20">20 秒（お試し）</option></select></label>
+      <label><input type="checkbox" id="cmp-guided" checked> 各組み合わせで「長いまばたき 10 回」も測る（音と画面で合図。まだ調整していなければ最初に「調整」も行う）</label>
+    </div>
+    <p class="muted">順番：Worker＋GPU → 画面側＋GPU → Worker＋CPU → 画面側＋CPU。カメラの許可を求められたら「許可」。正面に座り、合図「目を閉じて」で閉じ、「目を開けて」で開けてください。</p>
+    <div class="row">
+      <label>版 <select id="mode"><option value="worker">Worker</option><option value="main">画面側（メインスレッド）</option></select></label>
+      <label>処理 <select id="delegate"><option>GPU</option><option>CPU</option></select></label>
+      <label>長さ <select id="dur"><option value="60">1 分</option><option value="300">5 分</option><option value="1800">30 分</option><option value="3600">60 分</option><option value="86400">止めるまで</option></select></label>
+      <button id="start" data-start>この組み合わせだけ開始</button>
+      <label><input type="checkbox" id="cold"> キャッシュなしで測る（初回の読み込み時間）</label>
+    </div>
+    <div class="row">
+      <button id="stop" class="danger" disabled>停止</button>
+      <button id="tap" data-test disabled>タップ反応（何度か押す）</button>
+      <button id="calib" data-test disabled>調整（開 3 秒→閉 3 秒）</button>
+      <button id="guided" data-test disabled>長いまばたき 10 回</button>
+      <button id="normal" data-test disabled>ふつうのまばたき 30 秒</button>
+    </div>
+    <p class="muted">しきい値：<span id="thr"></span>　<span id="seq"></span></p>
+  </section>
+
+  <section>
+    <h2>3. 動作中</h2>
+    <div id="status" class="status">止まっています</div>
+    <div class="grid" style="margin-top:10px">
+      <div>
+        <video id="video" playsinline muted autoplay></video>
+        <div class="bars">
+          <div class="muted">eyeBlink 左 / 右</div>
+          <div class="bar"><div id="bar-left"></div></div>
+          <div class="bar"><div id="bar-right"></div></div>
+          <div class="muted" id="score-text">—</div>
+          <div class="muted">保持：<span id="hold-state">—</span></div>
+        </div>
+      </div>
+      <div>
+        <div id="live"></div>
+        <div class="scan"><div class="scan-cell">はい</div><div class="scan-cell">いいえ</div><div class="scan-cell">トイレ</div><div class="scan-cell">休止</div></div>
+        <p class="muted">下の 4 つは本番のスキャンの代わりに 2 秒ごとに光らせ、予定からの遅れを測っています。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>4. 結果（<span id="runs-count">0</span> 回分）</h2>
+    <div class="tablewrap" id="runs"></div>
+    <h4 id="eval-title"></h4>
+    <div class="tablewrap" id="eval"></div>
+  </section>
+
+  <section>
+    <h2>5. 結果を渡す</h2>
+    <div class="row">
+      <button id="share" class="primary">共有（AirDrop など）</button>
+      <button id="download">JSON を保存</button>
+      <button id="copy">JSON をコピー</button>
+      <button id="clear">この端末の結果を消す</button>
+      <span id="flash" class="muted"></span>
+    </div>
+    <textarea id="json-out" hidden readonly></textarea>
+  </section>
+
+  <section>
+    <h2>合格条件（測る前に決めたもの）</h2>
+    <p class="muted"><span class="src">設計</span>は設計書「PR0.5 の合格条件」と時間の値の表から。<span class="src tmp">仮</span>は設計に数値が無いので、このページで先に決めた仮の条件です。臨床的な根拠はありません。</p>
+    <div class="tablewrap" id="criteria"></div>
+    <p class="muted">このページで測らないもの：音・日本語の読み上げ（PR3c）、記録と二重送信（PR2・PR3b）、介助者の顔・顔の入れ替わり・項目の境目（PR1 の判定モジュールと画面がそろってから）。保持の試算は PR1 の判定モジュールではなく、速さが保持を壊すかを見るための簡易版です。</p>
+  </section>
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>
